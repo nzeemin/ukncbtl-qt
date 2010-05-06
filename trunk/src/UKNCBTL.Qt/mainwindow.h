@@ -15,15 +15,17 @@ public:
     ~MainWindow();
 
 public slots:
+    void helpAboutQt();
     void emulatorFrame();
     void emulatorRun();
+    void emulatorReset();
 
 protected:
     void changeEvent(QEvent *e);
 
 private:
     Ui::MainWindow *ui;
-    QScreen *screen;
+    QScreen *m_screen;
 };
 
 #endif // MAINWINDOW_H
