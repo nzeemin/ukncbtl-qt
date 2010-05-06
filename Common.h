@@ -4,7 +4,28 @@
 
 
 //////////////////////////////////////////////////////////////////////
-// Defines for compilation under MinGW
+// Defines for compilation under MinGW and GCC
+
+#ifndef _TCHAR_DEFINED
+#ifdef	_UNICODE
+typedef wchar_t TCHAR;
+#define _tfsopen    _wfsopen
+#define _tcscpy     wcscpy
+#define _tstat      _wstat
+#define _tcsrchr    wcsrchr
+#define _tcsicmp    _wcsicmp
+#define _sntprintf  _snwprintf
+#else
+typedef char TCHAR;
+#define _tfsopen    _fsopen
+#define _tcscpy     strcpy
+#define _tstat      _stat
+#define _tcsrchr    strrchr
+#define _tcsicmp    _stricmp
+#define _sntprintf  _snprintf
+#endif
+#define _T(x)      x
+#endif
 
 #ifdef	_UNICODE
 typedef const wchar_t * LPCTSTR;
@@ -32,7 +53,11 @@ typedef int BOOL;
 #define LOBYTE(w)           ((BYTE)(((DWORD)(w)) & 0xff))
 #define HIBYTE(w)           ((BYTE)((((DWORD)(w)) >> 8) & 0xff))
 
+#ifdef __GNUC__
+#define CALLBACK __attribute__((stdcall))
+#else
 #define CALLBACK __stdcall
+#endif
 
 typedef void *HANDLE;
 #define INVALID_HANDLE_VALUE ((HANDLE)(LONG)-1)
