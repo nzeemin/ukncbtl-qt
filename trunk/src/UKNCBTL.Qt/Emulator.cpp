@@ -9,8 +9,10 @@
 #include "emubase\Emubase.h"
 //#include "SoundGen.h"
 
+#ifdef _MSC_VER
 //NOTE: I know, we use unsafe string functions
 #pragma warning( disable: 4996 )
+#endif
 
 
 //////////////////////////////////////////////////////////////////////
@@ -340,7 +342,7 @@ void Emulator_PrepareScreenRGB32(void* pImageBits)
                     BYTE value012 = (src0 & 1) | (src1 & 1) * 2 | (src2 & 1) * 4;
                     // Map value to palette; result is 4-bit value YRGB
                     BYTE valueYRGB;
-                    if (cursorOn && pos == cursorPos && (!okCursorType || okCursorType && bit == cursorAddress))
+                    if (cursorOn && (pos == cursorPos) && (!okCursorType || (okCursorType && bit == cursorAddress)))
                         valueYRGB = cursorYRGB;
                     else
                         valueYRGB = (BYTE) (palette >> (value012 * 4)) & 15;

@@ -11,7 +11,9 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <memory.h>
-#include <tchar.h>
 
+#ifndef __GNUC__
+#include <tchar.h>
+#endif
 
 #include "Common.h"

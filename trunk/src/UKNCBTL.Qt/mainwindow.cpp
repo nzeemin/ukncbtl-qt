@@ -44,6 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete m_screen;
 }
 
 void MainWindow::changeEvent(QEvent *e)
