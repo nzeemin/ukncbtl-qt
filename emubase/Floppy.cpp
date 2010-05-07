@@ -6,6 +6,10 @@
 #include <sys/stat.h>
 #include "Emubase.h"
 
+#ifdef _MSC_VER
+#pragma warning( disable: 4996 )  //NOTE: I know, we use unsafe functions
+#endif
+
 //////////////////////////////////////////////////////////////////////
 
 // Маска флагов, сохраняемых в m_flags
