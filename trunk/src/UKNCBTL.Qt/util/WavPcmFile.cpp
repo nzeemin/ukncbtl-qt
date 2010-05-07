@@ -2,8 +2,6 @@
 
 #include "stdafx.h"
 #include "WavPcmFile.h"
-#include <stdio.h>
-#include <Share.h>
 
 
 //////////////////////////////////////////////////////////////////////
@@ -79,7 +77,7 @@ HWAVPCMFILE WavPcmFile_Create(LPCTSTR filename, int sampleRate)
 	const int channels = 1;
     const int blockAlign = channels * bitsPerSample / 8;
 
-    FILE* fpFileNew = ::_tfsopen(filename, _T("w+b"), _SH_DENYWR);
+    FILE* fpFileNew = ::_tfopen(filename, _T("w+b"));
 	if (fpFileNew == NULL)
 		return (HWAVPCMFILE) INVALID_HANDLE_VALUE;  // Failed to create file
 
@@ -127,7 +125,7 @@ HWAVPCMFILE WavPcmFile_Create(LPCTSTR filename, int sampleRate)
 
 HWAVPCMFILE WavPcmFile_Open(LPCTSTR filename)
 {
-    FILE* fpFileOpen = ::_tfsopen(filename, _T("rb"), _SH_DENYWR);
+    FILE* fpFileOpen = ::_tfopen(filename, _T("rb"));
 	if (fpFileOpen == NULL)
 		return (HWAVPCMFILE) INVALID_HANDLE_VALUE;  // Failed to open file
 

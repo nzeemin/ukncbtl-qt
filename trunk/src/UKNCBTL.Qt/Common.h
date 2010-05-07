@@ -9,6 +9,7 @@
 #ifndef _TCHAR_DEFINED
 #ifdef	_UNICODE
 typedef wchar_t TCHAR;
+#define _tfopen     _wfopen
 #define _tfsopen    _wfsopen
 #define _tcscpy     wcscpy
 #define _tstat      _wstat
@@ -17,6 +18,7 @@ typedef wchar_t TCHAR;
 #define _sntprintf  _snwprintf
 #else
 typedef char TCHAR;
+#define _tfopen     fopen
 #define _tfsopen    _fsopen
 #define _tcscpy     strcpy
 #define _tstat      _stat
@@ -24,7 +26,13 @@ typedef char TCHAR;
 #define _tcsicmp    _stricmp
 #define _sntprintf  _snprintf
 #endif
-#define _T(x)      x
+#define _T(x)       x
+#endif
+
+#ifndef __MINGW32__
+#define _stat       stat
+#define _stricmp    strcasecmp
+#define _snprintf   snprintf
 #endif
 
 #ifdef	_UNICODE
