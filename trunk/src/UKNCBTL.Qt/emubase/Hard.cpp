@@ -2,10 +2,12 @@
 //
 
 #include "stdafx.h"
-#include <stdio.h>
-//#include <sys/types.h>
 #include <sys/stat.h>
 #include "Emubase.h"
+
+#ifdef _MSC_VER
+#pragma warning( disable: 4996 )  //NOTE: I know, we use unsafe functions
+#endif
 
 
 //////////////////////////////////////////////////////////////////////
