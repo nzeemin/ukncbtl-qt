@@ -35,6 +35,10 @@ int Emulator_SystemFrame();
 
 void Emulator_PrepareScreenRGB32(void* pBits);
 
+void Emulator_KeyEvent(BYTE keyPressed, BOOL pressed);
+WORD Emulator_GetKeyEventFromQueue();
+void Emulator_ProcessKeyEvent();
+
 //void Emulator_LoadROMCartridge(int slot, LPCTSTR sFilePath);
 
 // Update cached values after Run or Step

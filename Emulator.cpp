@@ -39,6 +39,12 @@ WORD g_wEmulatorPrevCpuPC = 0177777;  // Previous PC value
 WORD g_wEmulatorPpuPC = 0177777;      // Current PC value
 WORD g_wEmulatorPrevPpuPC = 0177777;  // Previous PC value
 
+const int KEYEVENT_QUEUE_SIZE = 32;
+WORD m_EmulatorKeyQueue[KEYEVENT_QUEUE_SIZE];
+int m_EmulatorKeyQueueTop = 0;
+int m_EmulatorKeyQueueBottom = 0;
+int m_EmulatorKeyQueueCount = 0;
+
 
 //////////////////////////////////////////////////////////////////////
 // Colors
@@ -125,10 +131,6 @@ void Emulator_Start()
 {
     g_okEmulatorRunning = TRUE;
 
-    // Set title bar text
-    //SetWindowText(g_hwnd, _T("UKNC Back to Life [run]"));
-    //MainWindow_UpdateMenu();
-
     m_nFrameCount = 0;
     //m_dwTickCount = GetTickCount();
 }
@@ -138,9 +140,6 @@ void Emulator_Stop()
     m_wEmulatorCPUBreakpoint = 0177777;
     m_wEmulatorPPUBreakpoint = 0177777;
 
-    // Reset title bar message
-    //SetWindowText(g_hwnd, _T("UKNC Back to Life [stop]"));
-    //MainWindow_UpdateMenu();
     // Reset FPS indicator
     //MainWindow_SetStatusbarText(StatusbarPartFPS, _T(""));
 
@@ -165,6 +164,7 @@ int Emulator_SystemFrame()
     g_pBoard->SetPPUBreakpoint(m_wEmulatorPPUBreakpoint);
 
     //ScreenView_ScanKeyboard();
+    Emulator_ProcessKeyEvent();
     
 	if (!g_pBoard->SystemFrame())
         return 0;
@@ -364,6 +364,44 @@ void Emulator_PrepareScreenRGB32(void* pImageBits)
             }
         }
 
+    }
+}
+
+void Emulator_KeyEvent(BYTE keyscan, BOOL pressed)
+{
+    if (m_EmulatorKeyQueueCount == KEYEVENT_QUEUE_SIZE) return;  // Full queue
+
+    WORD keyevent = MAKEWORD(keyscan, pressed ? 128 : 0);
+
+    m_EmulatorKeyQueue[m_EmulatorKeyQueueTop] = keyevent;
+    m_EmulatorKeyQueueTop++;
+    if (m_EmulatorKeyQueueTop >= KEYEVENT_QUEUE_SIZE)
+        m_EmulatorKeyQueueTop = 0;
+    m_EmulatorKeyQueueCount++;
+}
+
+WORD Emulator_GetKeyEventFromQueue()
+{
+    if (m_EmulatorKeyQueueCount == 0) return 0;  // Empty queue
+
+    WORD keyevent = m_EmulatorKeyQueue[m_EmulatorKeyQueueBottom];
+    m_EmulatorKeyQueueBottom++;
+    if (m_EmulatorKeyQueueBottom >= KEYEVENT_QUEUE_SIZE)
+        m_EmulatorKeyQueueBottom = 0;
+    m_EmulatorKeyQueueCount--;
+
+    return keyevent;
+}
+
+void Emulator_ProcessKeyEvent()
+{
+    // Process next event in the keyboard queue
+    WORD keyevent = Emulator_GetKeyEventFromQueue();
+    if (keyevent != 0)
+    {
+        BOOL pressed = ((keyevent & 0x8000) != 0);
+        BYTE ukncscan = LOBYTE(keyevent);
+        g_pBoard->KeyboardEvent(ukncscan, pressed);
     }
 }
 

@@ -2,7 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "qscreen.h"
+
+class QScreen;
+class QKeyboardView;
 
 namespace Ui {
     class MainWindow;
@@ -26,6 +28,7 @@ protected:
 private:
     Ui::MainWindow *ui;
     QScreen *m_screen;
+    QKeyboardView *m_keyboard;
 };
 
 #endif // MAINWINDOW_H
