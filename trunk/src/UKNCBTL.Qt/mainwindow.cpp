@@ -3,6 +3,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "qscreen.h"
+#include "qkeyboardview.h"
 #include "Emulator.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -39,6 +40,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Screen
     m_screen = new QScreen(ui->centralWidget);
+    m_keyboard = new QKeyboardView(ui->centralWidget);
+    m_keyboard->move(0, UKNC_SCREEN_HEIGHT);
 }
 
 MainWindow::~MainWindow()

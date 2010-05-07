@@ -14,7 +14,8 @@ SOURCES += main.cpp \
     emubase/Disasm.cpp \
     emubase/Board.cpp \
     Emulator.cpp \
-    qscreen.cpp
+    qscreen.cpp \
+    qkeyboardview.cpp
 HEADERS += mainwindow.h \
     stdafx.h \
     util/WavPcmFile.h \
@@ -26,5 +27,7 @@ HEADERS += mainwindow.h \
     emubase/Defines.h \
     emubase/Board.h \
     Emulator.h \
-    qscreen.h
+    qscreen.h \
+    qkeyboardview.h
 FORMS += mainwindow.ui
+RESOURCES += QtUkncBtl.qrc
