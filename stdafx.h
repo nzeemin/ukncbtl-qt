@@ -9,7 +9,13 @@
 // C RunTime Header Files
 #include <string.h>
 #include <stdio.h>
+
+#ifdef __APPLE__
+#include <stdlib.h>
+#else
 #include <malloc.h>
+#endif
+
 #include <memory.h>
 
 #ifndef __GNUC__
