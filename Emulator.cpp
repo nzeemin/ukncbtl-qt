@@ -1,12 +1,10 @@
 // Emulator.cpp
 
 #include "stdafx.h"
-#include <stdio.h>
-#include <Share.h>
 //#include "UKNCBTL.h"
 #include "Emulator.h"
 //#include "Views.h"
-#include "emubase\Emubase.h"
+#include "emubase/Emubase.h"
 //#include "SoundGen.h"
 
 #ifdef _MSC_VER
@@ -74,7 +72,7 @@ BOOL InitEmulator()
 
     // Load ROM file
     memset(buffer, 0, 32768);
-    FILE* fpRomFile = ::_tfsopen(FILE_NAME_UKNC_ROM, _T("rb"), _SH_DENYWR);
+    FILE* fpRomFile = ::_tfopen(FILE_NAME_UKNC_ROM, _T("rb"));
     if (fpRomFile == NULL)
     {
         AlertWarning(_T("Failed to load ROM file."));
