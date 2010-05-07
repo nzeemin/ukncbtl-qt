@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include <QMessageBox>
+#include <QFileDialog>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "qscreen.h"
@@ -37,6 +38,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QAction* actionReset = ui->mainToolBar->addAction(_T("Reset"));
     QObject::connect(actionReset, SIGNAL(triggered()), this, SLOT(emulatorReset()));
     ui->mainToolBar->addSeparator();
+    ui->mainToolBar->addAction(_T("Cart 1"), this, SLOT(emulatorCartridge1()));
+    ui->mainToolBar->addAction(_T("Cart 2"), this, SLOT(emulatorCartridge2()));
 
     // Screen
     m_screen = new QScreen(ui->centralWidget);
@@ -97,4 +100,32 @@ void MainWindow::emulatorReset()
     Emulator_Reset();
 
     m_screen->repaint();
+}
+
+void MainWindow::emulatorCartridge1()
+{
+    emulatorCartridge(1);
+}
+void MainWindow::emulatorCartridge2()
+{
+    emulatorCartridge(1);
+}
+void MainWindow::emulatorCartridge(int slot)
+{
+    if (g_pBoard->IsROMCartridgeLoaded(slot))
+    {
+        g_pBoard->UnloadROMCartridge(slot);
+        //Settings_SetCartridgeFilePath(slot, NULL);
+    }
+    else
+    {
+        QFileDialog dlg;
+        dlg.setNameFilter(_T("UKNC ROM cartridge images (*.bin)"));
+        if (dlg.exec() == QDialog::Rejected)
+            return;
+
+        QString strFileName = dlg.selectedFiles().at(0);
+
+        Emulator_LoadROMCartridge(slot, qPrintable(strFileName));
+    }
 }

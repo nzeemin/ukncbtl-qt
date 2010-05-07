@@ -1,16 +1,9 @@
 // Emulator.cpp
 
 #include "stdafx.h"
-//#include "UKNCBTL.h"
 #include "Emulator.h"
-//#include "Views.h"
 #include "emubase/Emubase.h"
 //#include "SoundGen.h"
-
-#ifdef _MSC_VER
-//NOTE: I know, we use unsafe string functions
-#pragma warning( disable: 4996 )
-#endif
 
 
 //////////////////////////////////////////////////////////////////////
@@ -249,6 +242,29 @@ WORD Emulator_GetChangeRamStatus(int addrtype, WORD address)
     default:
         return 0;
     }
+}
+
+void Emulator_LoadROMCartridge(int slot, LPCTSTR sFilePath)
+{
+    // Open file
+    FILE* fpFile = ::_tfopen(sFilePath, _T("rb"));
+    if (fpFile == INVALID_HANDLE_VALUE)
+    {
+        AlertWarning(_T("Failed to load ROM cartridge image."));
+        return;
+    }
+
+    // Allocate memory
+    BYTE* pImage = (BYTE*) ::malloc(24 * 1024);
+
+    DWORD dwBytesRead = ::fread(pImage, 1, 24 * 1024, fpFile);
+    ASSERT(dwBytesRead == 24 * 1024);
+
+    g_pBoard->LoadROMCartridge(slot, pImage);
+
+    // Free memory, close file
+    ::free(pImage);
+    ::fclose(fpFile);
 }
 
 void Emulator_PrepareScreenRGB32(void* pImageBits)
