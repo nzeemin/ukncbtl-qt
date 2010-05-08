@@ -21,8 +21,14 @@ public slots:
     void emulatorFrame();
     void emulatorRun();
     void emulatorReset();
+    void emulatorFloppy0();
+    void emulatorFloppy1();
+    void emulatorFloppy2();
+    void emulatorFloppy3();
     void emulatorCartridge1();
     void emulatorCartridge2();
+    void emulatorHardDrive1();
+    void emulatorHardDrive2();
 
 protected:
     void changeEvent(QEvent *e);
@@ -33,6 +39,8 @@ private:
     QKeyboardView *m_keyboard;
 
     void emulatorCartridge(int slot);
+    void emulatorHardDrive(int slot);
+    void emulatorFloppy(int slot);
 };
 
 #endif // MAINWINDOW_H
