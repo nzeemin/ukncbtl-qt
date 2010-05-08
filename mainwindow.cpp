@@ -23,8 +23,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QMenu* menuEmulator = ui->menuBar->addMenu(_T("Emulator"));
     QAction* actionEmulatorRun = menuEmulator->addAction(_T("Run"));
     actionEmulatorRun->setCheckable(true);
-    menuEmulator->addAction(_T("Reset"), this, SLOT(emulatorReset()));
     QObject::connect(actionEmulatorRun, SIGNAL(changed()), this, SLOT(emulatorRun()));
+    menuEmulator->addAction(_T("Reset"), this, SLOT(emulatorReset()));
     QMenu* menuDrives = ui->menuBar->addMenu(_T("Drives"));
     menuDrives->addSeparator();
     menuDrives->addAction(_T("Floppy MZ0:"), this, SLOT(emulatorFloppy0()));
@@ -45,18 +45,29 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mainToolBar->setIconSize(QSize(16, 16));
     QAction* actionRun = ui->mainToolBar->addAction(_T("Run"));
     actionRun->setCheckable(true);
+    actionRun->setIcon(QIcon(_T(":/images/iconRun.png")));
     QObject::connect(actionRun, SIGNAL(changed()), this, SLOT(emulatorRun()));
-    ui->mainToolBar->addAction(_T("Reset"), this, SLOT(emulatorReset()));
+    QAction* actionReset = ui->mainToolBar->addAction(_T("Reset"), this, SLOT(emulatorReset()));
+    actionReset->setIcon(QIcon(_T(":/images/iconReset.png")));
     ui->mainToolBar->addSeparator();
-    ui->mainToolBar->addAction(_T("MZ0"), this, SLOT(emulatorFloppy0()));
-    ui->mainToolBar->addAction(_T("MZ1"), this, SLOT(emulatorFloppy1()));
-    ui->mainToolBar->addAction(_T("MZ2"), this, SLOT(emulatorFloppy2()));
-    ui->mainToolBar->addAction(_T("MZ3"), this, SLOT(emulatorFloppy3()));
+    QAction* actionFloppy0 = ui->mainToolBar->addAction(_T("0"), this, SLOT(emulatorFloppy0()));
+    actionFloppy0->setIcon(QIcon(_T(":/images/iconFloppySlot.png")));
+    QAction* actionFloppy1 = ui->mainToolBar->addAction(_T("1"), this, SLOT(emulatorFloppy1()));
+    actionFloppy1->setIcon(QIcon(_T(":/images/iconFloppySlot.png")));
+    QAction* actionFloppy2 = ui->mainToolBar->addAction(_T("2"), this, SLOT(emulatorFloppy2()));
+    actionFloppy2->setIcon(QIcon(_T(":/images/iconFloppySlot.png")));
+    QAction* actionFloppy3 = ui->mainToolBar->addAction(_T("3"), this, SLOT(emulatorFloppy3()));
+    actionFloppy3->setIcon(QIcon(_T(":/images/iconFloppySlot.png")));
     ui->mainToolBar->addSeparator();
-    ui->mainToolBar->addAction(_T("Cart1"), this, SLOT(emulatorCartridge1()));
-    ui->mainToolBar->addAction(_T("Hard1"), this, SLOT(emulatorHardDrive1()));
-    ui->mainToolBar->addAction(_T("Cart2"), this, SLOT(emulatorCartridge2()));
-    ui->mainToolBar->addAction(_T("Hard2"), this, SLOT(emulatorHardDrive2()));
+    QAction* actionCart1 = ui->mainToolBar->addAction(_T(""), this, SLOT(emulatorCartridge1()));
+    actionCart1->setIcon(QIcon(_T(":/images/iconCartridgeSlot.png")));
+    QAction* actionHard1 = ui->mainToolBar->addAction(_T("1"), this, SLOT(emulatorHardDrive1()));
+    actionHard1->setIcon(QIcon(_T(":/images/iconHddSlot.png")));
+    QAction* actionCart2 = ui->mainToolBar->addAction(_T(""), this, SLOT(emulatorCartridge2()));
+    actionCart2->setIcon(QIcon(_T(":/images/iconCartridgeSlot.png")));
+    QAction* actionHard2 = ui->mainToolBar->addAction(_T("2"), this, SLOT(emulatorHardDrive2()));
+    actionHard2->setIcon(QIcon(_T(":/images/iconHddSlot.png")));
+    ui->mainToolBar->addSeparator();
 
     // Screen
     m_screen = new QScreen(ui->centralWidget);
