@@ -1,5 +1,13 @@
 <RCC>
     <qresource prefix="/">
         <file>images/keyboard.png</file>
+        <file>images/iconRun.png</file>
+        <file>images/iconReset.png</file>
+        <file>images/iconFloppy.png</file>
+        <file>images/iconFloppySlot.png</file>
+        <file>images/iconCartridge.png</file>
+        <file>images/iconCartridgeSlot.png</file>
+        <file>images/iconHdd.png</file>
+        <file>images/iconHddSlot.png</file>
     </qresource>
 </RCC>
