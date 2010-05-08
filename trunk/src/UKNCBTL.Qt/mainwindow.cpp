@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QAction>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "qscreen.h"
@@ -15,59 +16,19 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->setWindowTitle(_T("UKNC Back to Life"));
 
-    // Setup menu
-    QMenu* menuFile = ui->menuBar->addMenu(_T("File"));
-    QAction* actionFileExit = menuFile->addAction(_T("Exit"));
-    QObject::connect(actionFileExit, SIGNAL(triggered()), this, SLOT(close()));
-    //QMenu* menuView = ui->menuBar->addMenu(_T("View"));
-    QMenu* menuEmulator = ui->menuBar->addMenu(_T("Emulator"));
-    QAction* actionEmulatorRun = menuEmulator->addAction(_T("Run"));
-    actionEmulatorRun->setCheckable(true);
-    QObject::connect(actionEmulatorRun, SIGNAL(changed()), this, SLOT(emulatorRun()));
-    menuEmulator->addAction(_T("Reset"), this, SLOT(emulatorReset()));
-    QMenu* menuDrives = ui->menuBar->addMenu(_T("Drives"));
-    menuDrives->addSeparator();
-    menuDrives->addAction(_T("Floppy MZ0:"), this, SLOT(emulatorFloppy0()));
-    menuDrives->addAction(_T("Floppy MZ1:"), this, SLOT(emulatorFloppy1()));
-    menuDrives->addAction(_T("Floppy MZ2:"), this, SLOT(emulatorFloppy2()));
-    menuDrives->addAction(_T("Floppy MZ3:"), this, SLOT(emulatorFloppy3()));
-    menuDrives->addSeparator();
-    menuDrives->addAction(_T("Cartridge 1"), this, SLOT(emulatorCartridge1()));
-    menuDrives->addAction(_T("Hard Drive 1"), this, SLOT(emulatorHardDrive1()));
-    menuDrives->addAction(_T("Cartridge 2"), this, SLOT(emulatorCartridge2()));
-    menuDrives->addAction(_T("Hard Drive 2"), this, SLOT(emulatorHardDrive2()));
-    //QMenu* menuDebug = ui->menuBar->addMenu(_T("Debug"));
-    QMenu* menuHelp = ui->menuBar->addMenu(_T("Help"));
-    QAction* actionHelpAboutQt = menuHelp->addAction(_T("About Qt"));
-    QObject::connect(actionHelpAboutQt, SIGNAL(triggered()), this, SLOT(helpAboutQt()));
-
-    // Setup toolbar
-    ui->mainToolBar->setIconSize(QSize(16, 16));
-    QAction* actionRun = ui->mainToolBar->addAction(_T("Run"));
-    actionRun->setCheckable(true);
-    actionRun->setIcon(QIcon(_T(":/images/iconRun.png")));
-    QObject::connect(actionRun, SIGNAL(changed()), this, SLOT(emulatorRun()));
-    QAction* actionReset = ui->mainToolBar->addAction(_T("Reset"), this, SLOT(emulatorReset()));
-    actionReset->setIcon(QIcon(_T(":/images/iconReset.png")));
-    ui->mainToolBar->addSeparator();
-    QAction* actionFloppy0 = ui->mainToolBar->addAction(_T("0"), this, SLOT(emulatorFloppy0()));
-    actionFloppy0->setIcon(QIcon(_T(":/images/iconFloppySlot.png")));
-    QAction* actionFloppy1 = ui->mainToolBar->addAction(_T("1"), this, SLOT(emulatorFloppy1()));
-    actionFloppy1->setIcon(QIcon(_T(":/images/iconFloppySlot.png")));
-    QAction* actionFloppy2 = ui->mainToolBar->addAction(_T("2"), this, SLOT(emulatorFloppy2()));
-    actionFloppy2->setIcon(QIcon(_T(":/images/iconFloppySlot.png")));
-    QAction* actionFloppy3 = ui->mainToolBar->addAction(_T("3"), this, SLOT(emulatorFloppy3()));
-    actionFloppy3->setIcon(QIcon(_T(":/images/iconFloppySlot.png")));
-    ui->mainToolBar->addSeparator();
-    QAction* actionCart1 = ui->mainToolBar->addAction(_T(""), this, SLOT(emulatorCartridge1()));
-    actionCart1->setIcon(QIcon(_T(":/images/iconCartridgeSlot.png")));
-    QAction* actionHard1 = ui->mainToolBar->addAction(_T("1"), this, SLOT(emulatorHardDrive1()));
-    actionHard1->setIcon(QIcon(_T(":/images/iconHddSlot.png")));
-    QAction* actionCart2 = ui->mainToolBar->addAction(_T(""), this, SLOT(emulatorCartridge2()));
-    actionCart2->setIcon(QIcon(_T(":/images/iconCartridgeSlot.png")));
-    QAction* actionHard2 = ui->mainToolBar->addAction(_T("2"), this, SLOT(emulatorHardDrive2()));
-    actionHard2->setIcon(QIcon(_T(":/images/iconHddSlot.png")));
-    ui->mainToolBar->addSeparator();
+    // Assign signals
+    QObject::connect(ui->actionFileExit, SIGNAL(triggered()), this, SLOT(close()));
+    QObject::connect(ui->actionEmulatorRun, SIGNAL(triggered()), this, SLOT(emulatorRun()));
+    QObject::connect(ui->actionEmulatorReset, SIGNAL(triggered()), this, SLOT(emulatorReset()));
+    QObject::connect(ui->actionDrivesFloppy0, SIGNAL(triggered()), this, SLOT(emulatorFloppy0()));
+    QObject::connect(ui->actionDrivesFloppy1, SIGNAL(triggered()), this, SLOT(emulatorFloppy1()));
+    QObject::connect(ui->actionDrivesFloppy2, SIGNAL(triggered()), this, SLOT(emulatorFloppy2()));
+    QObject::connect(ui->actionDrivesFloppy3, SIGNAL(triggered()), this, SLOT(emulatorFloppy3()));
+    QObject::connect(ui->actionDrivesCartridge1, SIGNAL(triggered()), this, SLOT(emulatorCartridge1()));
+    QObject::connect(ui->actionDrivesHard1, SIGNAL(triggered()), this, SLOT(emulatorHardDrive1()));
+    QObject::connect(ui->actionDrivesCartridge2, SIGNAL(triggered()), this, SLOT(emulatorCartridge2()));
+    QObject::connect(ui->actionDrivesHard2, SIGNAL(triggered()), this, SLOT(emulatorHardDrive2()));
+    QObject::connect(ui->actionHelpAboutQt, SIGNAL(triggered()), this, SLOT(helpAboutQt()));
 
     // Screen
     m_screen = new QScreen(ui->centralWidget);
@@ -92,6 +53,28 @@ void MainWindow::changeEvent(QEvent *e)
     default:
         break;
     }
+}
+
+void MainWindow::UpdateMenu()
+{
+    ui->actionDrivesFloppy0->setIcon(QIcon(
+            g_pBoard->IsFloppyImageAttached(0) ? _T(":/images/iconFloppy.png") : _T(":/images/iconFloppySlot.png") ));
+    ui->actionDrivesFloppy1->setIcon(QIcon(
+            g_pBoard->IsFloppyImageAttached(1) ? _T(":/images/iconFloppy.png") : _T(":/images/iconFloppySlot.png") ));
+    ui->actionDrivesFloppy2->setIcon(QIcon(
+            g_pBoard->IsFloppyImageAttached(2) ? _T(":/images/iconFloppy.png") : _T(":/images/iconFloppySlot.png") ));
+    ui->actionDrivesFloppy3->setIcon(QIcon(
+            g_pBoard->IsFloppyImageAttached(3) ? _T(":/images/iconFloppy.png") : _T(":/images/iconFloppySlot.png") ));
+
+    ui->actionDrivesCartridge1->setIcon(QIcon(
+            g_pBoard->IsROMCartridgeLoaded(1) ? _T(":/images/iconCartridge.png") : _T(":/images/iconCartridgeSlot.png") ));
+    ui->actionDrivesCartridge2->setIcon(QIcon(
+            g_pBoard->IsROMCartridgeLoaded(2) ? _T(":/images/iconCartridge.png") : _T(":/images/iconCartridgeSlot.png") ));
+
+    ui->actionDrivesHard1->setIcon(QIcon(
+            g_pBoard->IsHardImageAttached(1) ? _T(":/images/iconHdd.png") : _T(":/images/iconHddSlot.png") ));
+    ui->actionDrivesHard2->setIcon(QIcon(
+            g_pBoard->IsHardImageAttached(2) ? _T(":/images/iconHdd.png") : _T(":/images/iconHddSlot.png") ));
 }
 
 void MainWindow::helpAboutQt()
@@ -154,6 +137,8 @@ void MainWindow::emulatorCartridge(int slot)
 
         //Settings_SetCartridgeFilePath(slot, sFileName);
     }
+
+    UpdateMenu();
 }
 
 void MainWindow::emulatorFloppy0() { emulatorFloppy(0); }
@@ -185,6 +170,8 @@ void MainWindow::emulatorFloppy(int slot)
 
         //Settings_SetFloppyFilePath(slot, sFileName);
     }
+
+    UpdateMenu();
 }
 
 void MainWindow::emulatorHardDrive1() { emulatorHardDrive(1); }
@@ -220,4 +207,6 @@ void MainWindow::emulatorHardDrive(int slot)
 
         //Settings_SetHardFilePath(slot, bufFileName);
     }
+
+    UpdateMenu();
 }
