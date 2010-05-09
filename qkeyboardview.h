@@ -7,7 +7,7 @@ class QKeyboardView : public QWidget
 {
     Q_OBJECT
 public:
-    QKeyboardView(QWidget *parent);
+    QKeyboardView(QWidget *parent = 0);
 
 protected:
     void paintEvent(QPaintEvent *event);

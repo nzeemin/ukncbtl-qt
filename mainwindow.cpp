@@ -2,6 +2,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QAction>
+#include <QVBoxLayout>
 #include "main.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -31,11 +32,17 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionDrivesHard2, SIGNAL(triggered()), this, SLOT(emulatorHardDrive2()));
     QObject::connect(ui->actionHelpAboutQt, SIGNAL(triggered()), this, SLOT(helpAboutQt()));
 
-    // Screen
-    m_screen = new QScreen(ui->centralWidget);
-    m_screen->move(4, 4);
-    m_keyboard = new QKeyboardView(ui->centralWidget);
-    m_keyboard->move(4, UKNC_SCREEN_HEIGHT + 8);
+    // Screen and keyboard
+    m_screen = new QScreen();
+    m_keyboard = new QKeyboardView();
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->setMargin(4);
+    layout->setSpacing(4);
+    layout->addWidget(m_screen);
+    layout->addWidget(m_keyboard);
+    ui->centralWidget->setLayout(layout);
+    this->adjustSize();
+    this->setFocusProxy(m_screen);
 }
 
 MainWindow::~MainWindow()
