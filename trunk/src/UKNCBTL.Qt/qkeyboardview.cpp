@@ -110,7 +110,7 @@ const int m_nKeyboardKeysCount = sizeof(m_arrKeyboardKeys) / sizeof(unsigned sho
 QKeyboardView::QKeyboardView(QWidget *parent) :
         QWidget(parent)
 {
-    setMinimumSize(UKNC_SCREEN_WIDTH, 220);
+    setMinimumSize(UKNC_SCREEN_WIDTH, 210);
 }
 
 void QKeyboardView::paintEvent(QPaintEvent *)
