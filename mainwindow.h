@@ -16,6 +16,9 @@ public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+public:
+    void UpdateMenu();
+
 public slots:
     void helpAboutQt();
     void emulatorFrame();
@@ -41,8 +44,6 @@ private:
     void emulatorCartridge(int slot);
     void emulatorHardDrive(int slot);
     void emulatorFloppy(int slot);
-
-    void UpdateMenu();
 };
 
 #endif // MAINWINDOW_H

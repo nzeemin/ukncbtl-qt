@@ -2,6 +2,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QAction>
+#include "main.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "qscreen.h"
@@ -121,7 +122,7 @@ void MainWindow::emulatorCartridge(int slot)
     if (g_pBoard->IsROMCartridgeLoaded(slot))
     {
         g_pBoard->UnloadROMCartridge(slot);
-        //Settings_SetCartridgeFilePath(slot, NULL);
+        Settings_SetCartridgeFilePath(slot, NULL);
     }
     else
     {
@@ -135,7 +136,7 @@ void MainWindow::emulatorCartridge(int slot)
 
         Emulator_LoadROMCartridge(slot, sFileName);
 
-        //Settings_SetCartridgeFilePath(slot, sFileName);
+        Settings_SetCartridgeFilePath(slot, sFileName);
     }
 
     UpdateMenu();
@@ -150,7 +151,7 @@ void MainWindow::emulatorFloppy(int slot)
     if (g_pBoard->IsFloppyImageAttached(slot))
     {
         g_pBoard->DetachFloppyImage(slot);
-        //Settings_SetFloppyFilePath(slot, NULL);
+        Settings_SetFloppyFilePath(slot, NULL);
     }
     else
     {
@@ -168,7 +169,7 @@ void MainWindow::emulatorFloppy(int slot)
             return;
         }
 
-        //Settings_SetFloppyFilePath(slot, sFileName);
+        Settings_SetFloppyFilePath(slot, sFileName);
     }
 
     UpdateMenu();
@@ -181,7 +182,7 @@ void MainWindow::emulatorHardDrive(int slot)
     if (g_pBoard->IsHardImageAttached(slot))
     {
         g_pBoard->DetachHardImage(slot);
-        //Settings_SetHardFilePath(slot, NULL);
+        Settings_SetHardFilePath(slot, NULL);
     }
     else
     {
@@ -205,7 +206,7 @@ void MainWindow::emulatorHardDrive(int slot)
         // Attach HDD disk image
         g_pBoard->AttachHardImage(slot, sFileName);
 
-        //Settings_SetHardFilePath(slot, bufFileName);
+        Settings_SetHardFilePath(slot, sFileName);
     }
 
     UpdateMenu();
