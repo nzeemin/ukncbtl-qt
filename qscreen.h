@@ -10,6 +10,9 @@ public:
     QScreen(QWidget *parent = 0);
     ~QScreen();
 
+public:
+    void saveScreenshot(QString strFileName);
+
 protected:
     void paintEvent(QPaintEvent *event);
     void keyPressEvent(QKeyEvent *event);
