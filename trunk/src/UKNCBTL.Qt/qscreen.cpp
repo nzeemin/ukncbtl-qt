@@ -17,6 +17,11 @@ QScreen::~QScreen()
     delete m_image;
 }
 
+void QScreen::saveScreenshot(QString strFileName)
+{
+    m_image->save(strFileName, _T("PNG"), -1);
+}
+
 void QScreen::paintEvent(QPaintEvent *event)
 {
     Emulator_PrepareScreenRGB32(m_image->bits());

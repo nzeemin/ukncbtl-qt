@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setWindowTitle(_T("UKNC Back to Life"));
 
     // Assign signals
+    QObject::connect(ui->actionFileScreenshot, SIGNAL(triggered()), this, SLOT(fileScreenshot()));
     QObject::connect(ui->actionFileExit, SIGNAL(triggered()), this, SLOT(close()));
     QObject::connect(ui->actionEmulatorRun, SIGNAL(triggered()), this, SLOT(emulatorRun()));
     QObject::connect(ui->actionEmulatorReset, SIGNAL(triggered()), this, SLOT(emulatorReset()));
@@ -83,6 +84,19 @@ void MainWindow::UpdateMenu()
             g_pBoard->IsHardImageAttached(1) ? _T(":/images/iconHdd.png") : _T(":/images/iconHddSlot.png") ));
     ui->actionDrivesHard2->setIcon(QIcon(
             g_pBoard->IsHardImageAttached(2) ? _T(":/images/iconHdd.png") : _T(":/images/iconHddSlot.png") ));
+}
+
+void MainWindow::fileScreenshot()
+{
+    QFileDialog dlg;
+    dlg.setAcceptMode(QFileDialog::AcceptSave);
+    dlg.setNameFilter(_T("PNG images (*.png)"));
+    if (dlg.exec() == QDialog::Rejected)
+        return;
+
+    QString strFileName = dlg.selectedFiles().at(0);
+
+    m_screen->saveScreenshot(strFileName);
 }
 
 void MainWindow::helpAboutQt()

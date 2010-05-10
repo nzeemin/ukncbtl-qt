@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Sun May 9 18:06:40 2010
+** Created: Mon May 10 19:34:45 2010
 **      by: Qt User Interface Compiler version 4.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -39,6 +39,7 @@ public:
     QAction *actionDrivesHard1;
     QAction *actionDrivesCartridge2;
     QAction *actionDrivesHard2;
+    QAction *actionFileScreenshot;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -108,6 +109,8 @@ public:
         actionDrivesHard2->setObjectName(QString::fromUtf8("actionDrivesHard2"));
         actionDrivesHard2->setCheckable(false);
         actionDrivesHard2->setIcon(icon4);
+        actionFileScreenshot = new QAction(MainWindow);
+        actionFileScreenshot->setObjectName(QString::fromUtf8("actionFileScreenshot"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         MainWindow->setCentralWidget(centralWidget);
@@ -139,6 +142,8 @@ public:
         menuBar->addAction(menuEmulator->menuAction());
         menuBar->addAction(menuDrives->menuAction());
         menuBar->addAction(menuHelp->menuAction());
+        menuFile->addAction(actionFileScreenshot);
+        menuFile->addSeparator();
         menuFile->addAction(actionFileExit);
         menuEmulator->addAction(actionEmulatorRun);
         menuEmulator->addAction(actionEmulatorReset);
@@ -193,6 +198,7 @@ public:
         actionDrivesCartridge2->setIconText(QApplication::translate("MainWindow", "2", 0, QApplication::UnicodeUTF8));
         actionDrivesHard2->setText(QApplication::translate("MainWindow", "Hard Drive 2", 0, QApplication::UnicodeUTF8));
         actionDrivesHard2->setIconText(QApplication::translate("MainWindow", "2", 0, QApplication::UnicodeUTF8));
+        actionFileScreenshot->setText(QApplication::translate("MainWindow", "Screenshot", 0, QApplication::UnicodeUTF8));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0, QApplication::UnicodeUTF8));
         menuEmulator->setTitle(QApplication::translate("MainWindow", "Emulator", 0, QApplication::UnicodeUTF8));
         menuDrives->setTitle(QApplication::translate("MainWindow", "Drives", 0, QApplication::UnicodeUTF8));

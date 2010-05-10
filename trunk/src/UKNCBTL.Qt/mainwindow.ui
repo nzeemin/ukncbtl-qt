@@ -27,6 +27,8 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionFileScreenshot"/>
+    <addaction name="separator"/>
     <addaction name="actionFileExit"/>
    </widget>
    <widget class="QMenu" name="menuEmulator">
@@ -255,6 +257,11 @@
    </property>
    <property name="iconText">
     <string>2</string>
+   </property>
+  </action>
+  <action name="actionFileScreenshot">
+   <property name="text">
+    <string>Screenshot</string>
    </property>
   </action>
  </widget>
