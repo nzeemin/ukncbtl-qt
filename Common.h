@@ -2,6 +2,10 @@
 
 #pragma once
 
+class QFont;
+class QPainter;
+class QString;
+
 
 //////////////////////////////////////////////////////////////////////
 // Defines for compilation under MinGW and GCC
@@ -93,6 +97,7 @@ BOOL AssertFailedLine(LPCSTR lpszFileName, int nLine);
 
 
 void AlertWarning(LPCTSTR sMessage);
+BOOL AlertOkCancel(LPCTSTR sMessage);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -117,8 +122,14 @@ const LPCTSTR REGISTER_NAME[] = { _T("R0"), _T("R1"), _T("R2"), _T("R3"), _T("R4
 const int UKNC_SCREEN_WIDTH = 640;
 const int UKNC_SCREEN_HEIGHT = 288;
 
-
+QFont Common_GetMonospacedFont();
+void Common_Cleanup();
 void PrintOctalValue(TCHAR* buffer, WORD value);
+void PrintBinaryValue(TCHAR* buffer, WORD value);
+void DrawOctalValue(QPainter &painter, int x, int y, WORD value);
+void DrawBinaryValue(QPainter &painter, int x, int y, WORD value);
+BOOL ParseOctalValue(LPCTSTR text, WORD* pValue);
+BOOL ParseOctalValue(const QString &text, WORD* pValue);
 
 
 

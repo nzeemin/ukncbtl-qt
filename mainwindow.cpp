@@ -3,11 +3,13 @@
 #include <QFileDialog>
 #include <QAction>
 #include <QVBoxLayout>
+#include <QDockWidget>
 #include "main.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "qscreen.h"
 #include "qkeyboardview.h"
+#include "qdebugview.h"
 #include "Emulator.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -36,13 +38,26 @@ MainWindow::MainWindow(QWidget *parent) :
     // Screen and keyboard
     m_screen = new QScreen();
     m_keyboard = new QKeyboardView();
+    m_debug = new QDebugView();
+
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(4);
     layout->setSpacing(4);
     layout->addWidget(m_screen);
     layout->addWidget(m_keyboard);
     ui->centralWidget->setLayout(layout);
-    this->adjustSize();
+    ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
+    int maxwid = m_screen->maximumWidth() > m_keyboard->maximumWidth() ? m_screen->maximumWidth() : m_keyboard->maximumWidth();
+    ui->centralWidget->setMaximumWidth(maxwid);
+
+    m_dockDebug = new QDockWidget(_T("Processor"));
+    m_dockDebug->setObjectName(_T("dockDebug"));
+    m_dockDebug->setWidget(m_debug);
+
+    this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
+    this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
+    this->addDockWidget(Qt::RightDockWidgetArea, m_dockDebug, Qt::Vertical);
+
     this->setFocusProxy(m_screen);
 }
 
@@ -86,6 +101,27 @@ void MainWindow::UpdateMenu()
             g_pBoard->IsHardImageAttached(2) ? _T(":/images/iconHdd.png") : _T(":/images/iconHddSlot.png") ));
 }
 
+void MainWindow::UpdateAllViews()
+{
+    Emulator_OnUpdate();
+
+    if (m_debug != NULL)
+        m_debug->updateData();
+//    if (m_disasm != NULL)
+//        m_disasm->updateData();
+//    if (m_memory != NULL)
+//        m_memory->updateData();
+
+    m_screen->repaint();
+    if (m_debug != NULL)
+        m_debug->repaint();
+//    if (m_disasm != NULL)
+//        m_disasm->repaint();
+//    if (m_memory != NULL)
+//        m_memory->repaint();
+
+    UpdateMenu();
+}
 void MainWindow::fileScreenshot()
 {
     QFileDialog dlg;

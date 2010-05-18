@@ -4,13 +4,15 @@
 //////////////////////////////////////////////////////////////////////
 
 class QApplication;
-class QMainWindow;
+class MainWindow;
 class QSettings;
 
 
 QApplication* Global_getApplication();
-QMainWindow* Global_getMainWindow();
+MainWindow* Global_getMainWindow();
 QSettings* Global_getSettings();
+void Global_UpdateAllViews();
+void Global_UpdateMenu();
 
 
 //////////////////////////////////////////////////////////////////////
