@@ -12,7 +12,7 @@ void RestoreSettings();
 
 
 QApplication *g_Application;
-QMainWindow *g_MainWindow;
+MainWindow *g_MainWindow;
 QSettings *g_Settings;
 
 
@@ -50,13 +50,22 @@ QApplication* Global_getApplication()
 {
     return g_Application;
 }
-QMainWindow* Global_getMainWindow()
+MainWindow* Global_getMainWindow()
 {
     return g_MainWindow;
 }
 QSettings* Global_getSettings()
 {
     return g_Settings;
+}
+
+void Global_UpdateAllViews()
+{
+    Global_getMainWindow()->UpdateAllViews();
+}
+void Global_UpdateMenu()
+{
+    Global_getMainWindow()->UpdateMenu();
 }
 
 void RestoreSettings()

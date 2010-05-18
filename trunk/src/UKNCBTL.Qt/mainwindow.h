@@ -5,6 +5,10 @@
 
 class QScreen;
 class QKeyboardView;
+class QConsoleView;
+class QDebugView;
+class QDisasmView;
+class QMemoryView;
 
 namespace Ui {
     class MainWindow;
@@ -18,6 +22,7 @@ public:
 
 public:
     void UpdateMenu();
+    void UpdateAllViews();
 
 public slots:
     void fileScreenshot();
@@ -39,8 +44,11 @@ protected:
 
 private:
     Ui::MainWindow *ui;
+
     QScreen *m_screen;
     QKeyboardView *m_keyboard;
+    QDebugView *m_debug;
+    QDockWidget* m_dockDebug;
 
     void emulatorCartridge(int slot);
     void emulatorHardDrive(int slot);
