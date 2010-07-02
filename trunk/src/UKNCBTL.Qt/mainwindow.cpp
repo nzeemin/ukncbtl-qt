@@ -9,7 +9,9 @@
 #include "ui_mainwindow.h"
 #include "qscreen.h"
 #include "qkeyboardview.h"
+#include "qconsoleview.h"
 #include "qdebugview.h"
+#include "qdisasmview.h"
 #include "Emulator.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -38,7 +40,9 @@ MainWindow::MainWindow(QWidget *parent) :
     // Screen and keyboard
     m_screen = new QScreen();
     m_keyboard = new QKeyboardView();
+    m_console = new QConsoleView();
     m_debug = new QDebugView();
+    m_disasm = new QDisasmView();
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(4);
@@ -53,10 +57,22 @@ MainWindow::MainWindow(QWidget *parent) :
     m_dockDebug = new QDockWidget(_T("Processor"));
     m_dockDebug->setObjectName(_T("dockDebug"));
     m_dockDebug->setWidget(m_debug);
+    m_dockDisasm = new QDockWidget(_T("Disassemble"));
+    m_dockDisasm->setObjectName(_T("dockDisasm"));
+    m_dockDisasm->setWidget(m_disasm);
+//    m_dockMemory = new QDockWidget(_T("Memory"));
+//    m_dockMemory->setObjectName(_T("dockMemory"));
+//    m_dockMemory->setWidget(m_memory);
+    m_dockConsole = new QDockWidget(_T("Debug Console"));
+    m_dockConsole->setObjectName(_T("dockConsole"));
+    m_dockConsole->setWidget(m_console);
 
     this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
     this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
     this->addDockWidget(Qt::RightDockWidgetArea, m_dockDebug, Qt::Vertical);
+    this->addDockWidget(Qt::RightDockWidgetArea, m_dockDisasm, Qt::Vertical);
+//    this->addDockWidget(Qt::RightDockWidgetArea, m_dockMemory, Qt::Vertical);
+    this->addDockWidget(Qt::BottomDockWidgetArea, m_dockConsole);
 
     this->setFocusProxy(m_screen);
 }
@@ -65,6 +81,9 @@ MainWindow::~MainWindow()
 {
     delete ui;
     delete m_screen;
+    delete m_keyboard;
+    delete m_debug;
+    delete m_disasm;
 }
 
 void MainWindow::changeEvent(QEvent *e)

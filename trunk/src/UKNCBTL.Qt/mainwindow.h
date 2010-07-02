@@ -47,8 +47,12 @@ private:
 
     QScreen *m_screen;
     QKeyboardView *m_keyboard;
+    QConsoleView *m_console;
+    QDockWidget* m_dockConsole;
     QDebugView *m_debug;
     QDockWidget* m_dockDebug;
+    QDisasmView *m_disasm;
+    QDockWidget* m_dockDisasm;
 
     void emulatorCartridge(int slot);
     void emulatorHardDrive(int slot);
