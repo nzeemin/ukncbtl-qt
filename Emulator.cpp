@@ -155,6 +155,25 @@ void Emulator_Reset()
     Global_UpdateAllViews();
 }
 
+void Emulator_SetCPUBreakpoint(WORD address)
+{
+    m_wEmulatorCPUBreakpoint = address;
+}
+void Emulator_SetPPUBreakpoint(WORD address)
+{
+    m_wEmulatorPPUBreakpoint = address;
+}
+BOOL Emulator_IsBreakpoint()
+{
+    WORD wCPUAddr = g_pBoard->GetCPU()->GetPC();
+    if (wCPUAddr == m_wEmulatorCPUBreakpoint)
+        return TRUE;
+    WORD wPPUAddr = g_pBoard->GetPPU()->GetPC();
+    if (wPPUAddr == m_wEmulatorPPUBreakpoint)
+        return TRUE;
+    return FALSE;
+}
+
 int Emulator_SystemFrame()
 {
     g_pBoard->SetCPUBreakpoint(m_wEmulatorCPUBreakpoint);

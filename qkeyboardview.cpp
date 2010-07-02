@@ -111,6 +111,7 @@ QKeyboardView::QKeyboardView(QWidget *parent) :
         QWidget(parent)
 {
     setMinimumSize(UKNC_SCREEN_WIDTH, 210);
+    setMaximumSize(UKNC_SCREEN_WIDTH + 60, 210 + 20);
 }
 
 void QKeyboardView::paintEvent(QPaintEvent *)
