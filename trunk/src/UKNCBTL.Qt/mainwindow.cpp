@@ -2,6 +2,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QAction>
+#include <QSettings>
 #include <QVBoxLayout>
 #include <QDockWidget>
 #include "main.h"
@@ -36,6 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionDrivesHard1, SIGNAL(triggered()), this, SLOT(emulatorHardDrive1()));
     QObject::connect(ui->actionDrivesCartridge2, SIGNAL(triggered()), this, SLOT(emulatorCartridge2()));
     QObject::connect(ui->actionDrivesHard2, SIGNAL(triggered()), this, SLOT(emulatorHardDrive2()));
+    QObject::connect(ui->actionDebugConsoleView, SIGNAL(triggered()), this, SLOT(debugConsoleView()));
     QObject::connect(ui->actionHelpAboutQt, SIGNAL(triggered()), this, SLOT(helpAboutQt()));
 
     // Screen and keyboard
@@ -84,8 +86,14 @@ MainWindow::~MainWindow()
     delete ui;
     delete m_screen;
     delete m_keyboard;
+    delete m_console;
     delete m_debug;
     delete m_disasm;
+    delete m_memory;
+    delete m_dockConsole;
+    delete m_dockDebug;
+    delete m_dockDisasm;
+    delete m_dockMemory;
 }
 
 void MainWindow::changeEvent(QEvent *e)
@@ -100,8 +108,31 @@ void MainWindow::changeEvent(QEvent *e)
     }
 }
 
+void MainWindow::closeEvent(QCloseEvent *)
+{
+    Global_getSettings()->setValue("MainWindow/Geometry", saveGeometry());
+    Global_getSettings()->setValue("MainWindow/WindowState", saveState());
+
+    Global_getSettings()->setValue("MainWindow/ConsoleView", m_dockConsole->isVisible());
+    Global_getSettings()->setValue("MainWindow/DebugView", m_dockDebug->isVisible());
+    Global_getSettings()->setValue("MainWindow/DisasmView", m_dockDisasm->isVisible());
+    Global_getSettings()->setValue("MainWindow/MemoryView", m_dockMemory->isVisible());
+}
+
+void MainWindow::restoreSettings()
+{
+    restoreGeometry(Global_getSettings()->value("MainWindow/Geometry").toByteArray());
+    restoreState(Global_getSettings()->value("MainWindow/WindowState").toByteArray());
+
+    m_dockConsole->setVisible(Global_getSettings()->value("MainWindow/ConsoleView", false).toBool());
+    m_dockDebug->setVisible(Global_getSettings()->value("MainWindow/DebugView", false).toBool());
+    m_dockDisasm->setVisible(Global_getSettings()->value("MainWindow/DisasmView", false).toBool());
+    m_dockMemory->setVisible(Global_getSettings()->value("MainWindow/MemoryView", false).toBool());
+}
+
 void MainWindow::UpdateMenu()
 {
+    ui->actionEmulatorRun->setChecked(g_okEmulatorRunning);
     ui->actionDrivesFloppy0->setIcon(QIcon(
             g_pBoard->IsFloppyImageAttached(0) ? _T(":/images/iconFloppy.png") : _T(":/images/iconFloppySlot.png") ));
     ui->actionDrivesFloppy1->setIcon(QIcon(
@@ -120,6 +151,8 @@ void MainWindow::UpdateMenu()
             g_pBoard->IsHardImageAttached(1) ? _T(":/images/iconHdd.png") : _T(":/images/iconHddSlot.png") ));
     ui->actionDrivesHard2->setIcon(QIcon(
             g_pBoard->IsHardImageAttached(2) ? _T(":/images/iconHdd.png") : _T(":/images/iconHddSlot.png") ));
+
+    ui->actionDebugConsoleView->setChecked(m_console->isVisible());
 }
 
 void MainWindow::UpdateAllViews()
@@ -163,12 +196,14 @@ void MainWindow::helpAboutQt()
 
 void MainWindow::emulatorFrame()
 {
-    if (g_okEmulatorRunning)
+    if (!g_okEmulatorRunning)
+        return;
+
+    if (Emulator_IsBreakpoint())
+        Emulator_Stop();
+    else if (Emulator_SystemFrame())
     {
-        if (Emulator_SystemFrame())
-        {
-            m_screen->repaint();
-        }
+        m_screen->repaint();
     }
 }
 
@@ -288,4 +323,18 @@ void MainWindow::emulatorHardDrive(int slot)
     }
 
     UpdateMenu();
+}
+
+void MainWindow::debugConsoleView()
+{
+    BOOL okShow = !m_dockConsole->isVisible();
+    m_dockConsole->setVisible(okShow);
+    m_dockDebug->setVisible(okShow);
+    m_dockDisasm->setVisible(okShow);
+    m_dockMemory->setVisible(okShow);
+
+    if (!okShow)
+    {
+        this->adjustSize();
+    }
 }

@@ -58,9 +58,23 @@
     </property>
     <addaction name="actionHelpAboutQt"/>
    </widget>
+   <widget class="QMenu" name="menuDebug">
+    <property name="title">
+     <string>Debug</string>
+    </property>
+    <addaction name="actionDebugConsoleView"/>
+    <addaction name="separator"/>
+    <addaction name="actionDebugDebugView"/>
+    <addaction name="actionDebugDisasmView"/>
+    <addaction name="actionDebugMemoryView"/>
+    <addaction name="separator"/>
+    <addaction name="actionDebugStepInto"/>
+    <addaction name="actionDebugStepOver"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEmulator"/>
    <addaction name="menuDrives"/>
+   <addaction name="menuDebug"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
@@ -262,6 +276,36 @@
   <action name="actionFileScreenshot">
    <property name="text">
     <string>Screenshot</string>
+   </property>
+  </action>
+  <action name="actionDebugConsoleView">
+   <property name="text">
+    <string>Debug Views</string>
+   </property>
+  </action>
+  <action name="actionDebugStepInto">
+   <property name="text">
+    <string>Step Into</string>
+   </property>
+  </action>
+  <action name="actionDebugStepOver">
+   <property name="text">
+    <string>Step Over</string>
+   </property>
+  </action>
+  <action name="actionDebugDebugView">
+   <property name="text">
+    <string>Processor View</string>
+   </property>
+  </action>
+  <action name="actionDebugDisasmView">
+   <property name="text">
+    <string>Disasm View</string>
+   </property>
+  </action>
+  <action name="actionDebugMemoryView">
+   <property name="text">
+    <string>Memory View</string>
    </property>
   </action>
  </widget>

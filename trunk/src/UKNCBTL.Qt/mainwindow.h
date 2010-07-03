@@ -23,6 +23,7 @@ public:
 public:
     void UpdateMenu();
     void UpdateAllViews();
+    void restoreSettings();
 
 public slots:
     void fileScreenshot();
@@ -38,9 +39,13 @@ public slots:
     void emulatorCartridge2();
     void emulatorHardDrive1();
     void emulatorHardDrive2();
+    void debugConsoleView();
+    //void debugStepInto();
+    //void debugStepOver();
 
 protected:
     void changeEvent(QEvent *e);
+    void closeEvent(QCloseEvent *);
 
 private:
     Ui::MainWindow *ui;

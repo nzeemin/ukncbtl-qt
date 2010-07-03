@@ -26,9 +26,11 @@ int main(int argc, char *argv[])
 
     MainWindow w;
     g_MainWindow = &w;
-    w.show();
 
     if (!InitEmulator()) return 255;
+
+    w.restoreSettings();
+    w.show();
 
     RestoreSettings();
     w.UpdateMenu();
