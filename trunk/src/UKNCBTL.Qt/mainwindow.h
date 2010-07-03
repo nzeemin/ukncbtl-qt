@@ -53,6 +53,8 @@ private:
     QDockWidget* m_dockDebug;
     QDisasmView *m_disasm;
     QDockWidget* m_dockDisasm;
+    QMemoryView * m_memory;
+    QDockWidget* m_dockMemory;
 
     void emulatorCartridge(int slot);
     void emulatorHardDrive(int slot);
