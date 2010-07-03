@@ -12,6 +12,7 @@
 #include "qconsoleview.h"
 #include "qdebugview.h"
 #include "qdisasmview.h"
+#include "qmemoryview.h"
 #include "Emulator.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -43,6 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_console = new QConsoleView();
     m_debug = new QDebugView();
     m_disasm = new QDisasmView();
+    m_memory = new QMemoryView();
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(4);
@@ -60,9 +62,9 @@ MainWindow::MainWindow(QWidget *parent) :
     m_dockDisasm = new QDockWidget(_T("Disassemble"));
     m_dockDisasm->setObjectName(_T("dockDisasm"));
     m_dockDisasm->setWidget(m_disasm);
-//    m_dockMemory = new QDockWidget(_T("Memory"));
-//    m_dockMemory->setObjectName(_T("dockMemory"));
-//    m_dockMemory->setWidget(m_memory);
+    m_dockMemory = new QDockWidget(_T("Memory"));
+    m_dockMemory->setObjectName(_T("dockMemory"));
+    m_dockMemory->setWidget(m_memory);
     m_dockConsole = new QDockWidget(_T("Debug Console"));
     m_dockConsole->setObjectName(_T("dockConsole"));
     m_dockConsole->setWidget(m_console);
@@ -71,7 +73,7 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
     this->addDockWidget(Qt::RightDockWidgetArea, m_dockDebug, Qt::Vertical);
     this->addDockWidget(Qt::RightDockWidgetArea, m_dockDisasm, Qt::Vertical);
-//    this->addDockWidget(Qt::RightDockWidgetArea, m_dockMemory, Qt::Vertical);
+    this->addDockWidget(Qt::RightDockWidgetArea, m_dockMemory, Qt::Vertical);
     this->addDockWidget(Qt::BottomDockWidgetArea, m_dockConsole);
 
     this->setFocusProxy(m_screen);
