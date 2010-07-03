@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Mon May 31 21:18:59 2010
+** Created: Sat Jul 3 11:54:53 2010
 **      by: Qt User Interface Compiler version 4.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -40,12 +40,19 @@ public:
     QAction *actionDrivesCartridge2;
     QAction *actionDrivesHard2;
     QAction *actionFileScreenshot;
+    QAction *actionDebugConsoleView;
+    QAction *actionDebugStepInto;
+    QAction *actionDebugStepOver;
+    QAction *actionDebugDebugView;
+    QAction *actionDebugDisasmView;
+    QAction *actionDebugMemoryView;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuEmulator;
     QMenu *menuDrives;
     QMenu *menuHelp;
+    QMenu *menuDebug;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
 
@@ -111,6 +118,18 @@ public:
         actionDrivesHard2->setIcon(icon4);
         actionFileScreenshot = new QAction(MainWindow);
         actionFileScreenshot->setObjectName(QString::fromUtf8("actionFileScreenshot"));
+        actionDebugConsoleView = new QAction(MainWindow);
+        actionDebugConsoleView->setObjectName(QString::fromUtf8("actionDebugConsoleView"));
+        actionDebugStepInto = new QAction(MainWindow);
+        actionDebugStepInto->setObjectName(QString::fromUtf8("actionDebugStepInto"));
+        actionDebugStepOver = new QAction(MainWindow);
+        actionDebugStepOver->setObjectName(QString::fromUtf8("actionDebugStepOver"));
+        actionDebugDebugView = new QAction(MainWindow);
+        actionDebugDebugView->setObjectName(QString::fromUtf8("actionDebugDebugView"));
+        actionDebugDisasmView = new QAction(MainWindow);
+        actionDebugDisasmView->setObjectName(QString::fromUtf8("actionDebugDisasmView"));
+        actionDebugMemoryView = new QAction(MainWindow);
+        actionDebugMemoryView->setObjectName(QString::fromUtf8("actionDebugMemoryView"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         MainWindow->setCentralWidget(centralWidget);
@@ -125,6 +144,8 @@ public:
         menuDrives->setObjectName(QString::fromUtf8("menuDrives"));
         menuHelp = new QMenu(menuBar);
         menuHelp->setObjectName(QString::fromUtf8("menuHelp"));
+        menuDebug = new QMenu(menuBar);
+        menuDebug->setObjectName(QString::fromUtf8("menuDebug"));
         MainWindow->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindow);
         mainToolBar->setObjectName(QString::fromUtf8("mainToolBar"));
@@ -141,6 +162,7 @@ public:
         menuBar->addAction(menuFile->menuAction());
         menuBar->addAction(menuEmulator->menuAction());
         menuBar->addAction(menuDrives->menuAction());
+        menuBar->addAction(menuDebug->menuAction());
         menuBar->addAction(menuHelp->menuAction());
         menuFile->addAction(actionFileScreenshot);
         menuFile->addSeparator();
@@ -157,6 +179,14 @@ public:
         menuDrives->addAction(actionDrivesCartridge2);
         menuDrives->addAction(actionDrivesHard2);
         menuHelp->addAction(actionHelpAboutQt);
+        menuDebug->addAction(actionDebugConsoleView);
+        menuDebug->addSeparator();
+        menuDebug->addAction(actionDebugDebugView);
+        menuDebug->addAction(actionDebugDisasmView);
+        menuDebug->addAction(actionDebugMemoryView);
+        menuDebug->addSeparator();
+        menuDebug->addAction(actionDebugStepInto);
+        menuDebug->addAction(actionDebugStepOver);
         mainToolBar->addAction(actionEmulatorRun);
         mainToolBar->addAction(actionEmulatorReset);
         mainToolBar->addSeparator();
@@ -199,10 +229,17 @@ public:
         actionDrivesHard2->setText(QApplication::translate("MainWindow", "Hard Drive 2", 0, QApplication::UnicodeUTF8));
         actionDrivesHard2->setIconText(QApplication::translate("MainWindow", "2", 0, QApplication::UnicodeUTF8));
         actionFileScreenshot->setText(QApplication::translate("MainWindow", "Screenshot", 0, QApplication::UnicodeUTF8));
+        actionDebugConsoleView->setText(QApplication::translate("MainWindow", "Debug Views", 0, QApplication::UnicodeUTF8));
+        actionDebugStepInto->setText(QApplication::translate("MainWindow", "Step Into", 0, QApplication::UnicodeUTF8));
+        actionDebugStepOver->setText(QApplication::translate("MainWindow", "Step Over", 0, QApplication::UnicodeUTF8));
+        actionDebugDebugView->setText(QApplication::translate("MainWindow", "Processor View", 0, QApplication::UnicodeUTF8));
+        actionDebugDisasmView->setText(QApplication::translate("MainWindow", "Disasm View", 0, QApplication::UnicodeUTF8));
+        actionDebugMemoryView->setText(QApplication::translate("MainWindow", "Memory View", 0, QApplication::UnicodeUTF8));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0, QApplication::UnicodeUTF8));
         menuEmulator->setTitle(QApplication::translate("MainWindow", "Emulator", 0, QApplication::UnicodeUTF8));
         menuDrives->setTitle(QApplication::translate("MainWindow", "Drives", 0, QApplication::UnicodeUTF8));
         menuHelp->setTitle(QApplication::translate("MainWindow", "Help", 0, QApplication::UnicodeUTF8));
+        menuDebug->setTitle(QApplication::translate("MainWindow", "Debug", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };
