@@ -79,9 +79,6 @@ void QMemoryView::paintEvent(QPaintEvent *event)
     int cxChar = fontmetrics.averageCharWidth();
     int cyLine = fontmetrics.height();
 
-    CProcessor* pDebugPU = g_pBoard->GetCPU();
-    ASSERT(pDebugPU != NULL);
-
     QColor colorText = painter.pen().color();
 
     m_cyLineMemory = cyLine;

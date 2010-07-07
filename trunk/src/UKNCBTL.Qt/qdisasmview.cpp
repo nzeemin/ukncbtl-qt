@@ -19,7 +19,7 @@ QDisasmView::QDisasmView()
 
 void QDisasmView::updateData()
 {
-    CProcessor* pDisasmPU = g_pBoard->GetCPU();
+    CProcessor* pDisasmPU = (m_okDisasmProcessor) ? g_pBoard->GetCPU() : g_pBoard->GetPPU();
     ASSERT(pDisasmPU != NULL);
     m_wDisasmBaseAddr = pDisasmPU->GetPC();
 }
@@ -34,11 +34,11 @@ void QDisasmView::paintEvent(QPaintEvent *event)
     QFont font = Common_GetMonospacedFont();
     painter.setFont(font);
 
-    CProcessor* pDisasmPU = g_pBoard->GetCPU();
+    CProcessor* pDisasmPU = (m_okDisasmProcessor) ? g_pBoard->GetCPU() : g_pBoard->GetPPU();
     ASSERT(pDisasmPU != NULL);
 
     // Draw disasseble for the current processor
-    WORD prevPC = g_wEmulatorPrevCpuPC;
+    WORD prevPC = (m_okDisasmProcessor) ? g_wEmulatorPrevCpuPC : g_wEmulatorPrevPpuPC;
     DrawDisassemble(painter, pDisasmPU, m_wDisasmBaseAddr, prevPC);
 }
 

@@ -38,6 +38,11 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionDrivesCartridge2, SIGNAL(triggered()), this, SLOT(emulatorCartridge2()));
     QObject::connect(ui->actionDrivesHard2, SIGNAL(triggered()), this, SLOT(emulatorHardDrive2()));
     QObject::connect(ui->actionDebugConsoleView, SIGNAL(triggered()), this, SLOT(debugConsoleView()));
+    QObject::connect(ui->actionDebugDebugView, SIGNAL(triggered()), this, SLOT(debugDebugView()));
+    QObject::connect(ui->actionDebugDisasmView, SIGNAL(triggered()), this, SLOT(debugDisasmView()));
+    QObject::connect(ui->actionDebugMemoryView, SIGNAL(triggered()), this, SLOT(debugMemoryView()));
+    QObject::connect(ui->actionDebugStepInto, SIGNAL(triggered()), this, SLOT(debugStepInto()));
+    QObject::connect(ui->actionDebugStepOver, SIGNAL(triggered()), this, SLOT(debugStepOver()));
     QObject::connect(ui->actionHelpAboutQt, SIGNAL(triggered()), this, SLOT(helpAboutQt()));
 
     // Screen and keyboard
@@ -153,6 +158,9 @@ void MainWindow::UpdateMenu()
             g_pBoard->IsHardImageAttached(2) ? _T(":/images/iconHdd.png") : _T(":/images/iconHddSlot.png") ));
 
     ui->actionDebugConsoleView->setChecked(m_console->isVisible());
+    ui->actionDebugDebugView->setChecked(m_dockDebug->isVisible());
+    ui->actionDebugDisasmView->setChecked(m_dockDisasm->isVisible());
+    ui->actionDebugMemoryView->setChecked(m_dockMemory->isVisible());
 }
 
 void MainWindow::UpdateAllViews()
@@ -161,18 +169,18 @@ void MainWindow::UpdateAllViews()
 
     if (m_debug != NULL)
         m_debug->updateData();
-//    if (m_disasm != NULL)
-//        m_disasm->updateData();
-//    if (m_memory != NULL)
-//        m_memory->updateData();
+    if (m_disasm != NULL)
+        m_disasm->updateData();
+    if (m_memory != NULL)
+        m_memory->updateData();
 
     m_screen->repaint();
     if (m_debug != NULL)
         m_debug->repaint();
-//    if (m_disasm != NULL)
-//        m_disasm->repaint();
-//    if (m_memory != NULL)
-//        m_memory->repaint();
+    if (m_disasm != NULL)
+        m_disasm->repaint();
+    if (m_memory != NULL)
+        m_memory->repaint();
 
     UpdateMenu();
 }
@@ -337,4 +345,32 @@ void MainWindow::debugConsoleView()
     {
         this->adjustSize();
     }
+
+    UpdateMenu();
+}
+void MainWindow::debugDebugView()
+{
+    m_dockDebug->setVisible(!m_dockDebug->isVisible());
+    UpdateMenu();
+}
+void MainWindow::debugDisasmView()
+{
+    m_dockDisasm->setVisible(!m_dockDisasm->isVisible());
+    UpdateMenu();
+}
+void MainWindow::debugMemoryView()
+{
+    m_dockMemory->setVisible(!m_dockMemory->isVisible());
+    UpdateMenu();
+}
+
+void MainWindow::debugStepInto()
+{
+    if (!g_okEmulatorRunning)
+        m_console->execConsoleCommand(_T("s"));
+}
+void MainWindow::debugStepOver()
+{
+    if (!g_okEmulatorRunning)
+        m_console->execConsoleCommand(_T("so"));
 }

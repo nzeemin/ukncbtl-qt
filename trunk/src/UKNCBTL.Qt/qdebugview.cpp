@@ -63,12 +63,13 @@ void QDebugView::paintEvent(QPaintEvent *event)
     int cxChar = fontmetrics.averageCharWidth();
     int cyLine = fontmetrics.height();
 
-    CProcessor* pDebugPU = g_pBoard->GetCPU();
+    CProcessor* pDebugPU = (m_okDebugProcessor) ? g_pBoard->GetCPU() : g_pBoard->GetPPU();
     ASSERT(pDebugPU != NULL);
-    WORD* arrR = m_wDebugCpuR;
-    BOOL* arrRChanged = m_okDebugCpuRChanged;
+    WORD* arrR = (m_okDebugProcessor) ? m_wDebugCpuR : m_wDebugPpuR;
+    BOOL* arrRChanged = (m_okDebugProcessor) ? m_okDebugCpuRChanged : m_okDebugPpuRChanged;
 
-    painter.drawText(cxChar * 1, 2 * cyLine, _T("CPU"));
+    LPCTSTR sProcName = pDebugPU->GetName();
+    painter.drawText(cxChar * 1, 2 * cyLine, sProcName);
 
     DrawProcessor(painter, pDebugPU, cxChar * 6, 1 * cyLine, arrR, arrRChanged);
 

@@ -22,10 +22,10 @@ extern WORD g_wEmulatorPrevPpuPC;  // Previous PC value
 //////////////////////////////////////////////////////////////////////
 
 
-BOOL InitEmulator();
-void DoneEmulator();
+BOOL Emulator_Init();
+void Emulator_Done();
 void Emulator_SetCPUBreakpoint(WORD address);
-//void Emulator_SetPPUBreakpoint(WORD address);
+void Emulator_SetPPUBreakpoint(WORD address);
 BOOL Emulator_IsBreakpoint();
 //void Emulator_SetSound(BOOL soundOnOff);
 void Emulator_Start();

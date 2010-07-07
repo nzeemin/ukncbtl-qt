@@ -40,8 +40,11 @@ public slots:
     void emulatorHardDrive1();
     void emulatorHardDrive2();
     void debugConsoleView();
-    //void debugStepInto();
-    //void debugStepOver();
+    void debugDebugView();
+    void debugDisasmView();
+    void debugMemoryView();
+    void debugStepInto();
+    void debugStepOver();
 
 protected:
     void changeEvent(QEvent *e);
