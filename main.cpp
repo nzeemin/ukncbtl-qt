@@ -27,13 +27,14 @@ int main(int argc, char *argv[])
     MainWindow w;
     g_MainWindow = &w;
 
-    if (!InitEmulator()) return 255;
+    if (!Emulator_Init()) return 255;
 
     w.restoreSettings();
     w.show();
 
     RestoreSettings();
     w.UpdateMenu();
+    w.UpdateAllViews();
 
     QTimer timerFrame;
     QObject::connect(&timerFrame, SIGNAL(timeout()), &w, SLOT(emulatorFrame()), Qt::AutoConnection);
@@ -41,9 +42,11 @@ int main(int argc, char *argv[])
 
     int result = application.exec();
 
-    DoneEmulator();
+    Emulator_Done();
 
     settings.sync();
+
+    Common_Cleanup();
 
     return result;
 }

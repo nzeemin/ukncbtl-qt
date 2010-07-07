@@ -55,7 +55,7 @@ const DWORD ScreenView_StandardRGBColors[16] = {
 
 const LPCTSTR FILE_NAME_UKNC_ROM = _T("uknc_rom.bin");
 
-BOOL InitEmulator()
+BOOL Emulator_Init()
 {
     ASSERT(g_pBoard == NULL);
 
@@ -102,7 +102,7 @@ BOOL InitEmulator()
     return TRUE;
 }
 
-void DoneEmulator()
+void Emulator_Done()
 {
     ASSERT(g_pBoard != NULL);
 
