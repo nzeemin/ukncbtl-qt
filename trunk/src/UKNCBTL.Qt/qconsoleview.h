@@ -16,6 +16,7 @@ public:
     ~QConsoleView();
 
     void print(const QString &message);
+    void printLine(const QString &message);
     void clear();
 
 public slots:
@@ -31,6 +32,8 @@ private:
     void printConsolePrompt();
     void printHelp();
     int printDisassemble(CProcessor* pProc, WORD address, BOOL okOneInstr, BOOL okShort);
+    void printRegister(LPCTSTR strName, WORD value);
+    void printMemoryDump(CProcessor* pProc, WORD address, int lines);
 };
 
 #endif // QCONSOLEVIEW_H

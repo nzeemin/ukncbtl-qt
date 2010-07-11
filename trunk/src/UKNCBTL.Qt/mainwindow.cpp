@@ -53,12 +53,12 @@ MainWindow::MainWindow(QWidget *parent) :
     m_disasm = new QDisasmView();
     m_memory = new QMemoryView();
 
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->setMargin(4);
-    layout->setSpacing(4);
-    layout->addWidget(m_screen);
-    layout->addWidget(m_keyboard);
-    ui->centralWidget->setLayout(layout);
+    QVBoxLayout *vboxlayout = new QVBoxLayout;
+    vboxlayout->setMargin(4);
+    vboxlayout->setSpacing(4);
+    vboxlayout->addWidget(m_screen);
+    vboxlayout->addWidget(m_keyboard);
+    ui->centralWidget->setLayout(vboxlayout);
     ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
     int maxwid = m_screen->maximumWidth() > m_keyboard->maximumWidth() ? m_screen->maximumWidth() : m_keyboard->maximumWidth();
     ui->centralWidget->setMaximumWidth(maxwid);

@@ -132,5 +132,4 @@ BOOL ParseOctalValue(LPCTSTR text, WORD* pValue);
 BOOL ParseOctalValue(const QString &text, WORD* pValue);
 
 
-
 //////////////////////////////////////////////////////////////////////
