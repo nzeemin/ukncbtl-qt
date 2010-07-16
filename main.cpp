@@ -74,6 +74,10 @@ void Global_UpdateMenu()
 {
     Global_getMainWindow()->UpdateMenu();
 }
+void Global_SetCurrentProc(bool okProc)
+{
+    Global_getMainWindow()->setCurrentProc(okProc);
+}
 
 void RestoreSettings()
 {

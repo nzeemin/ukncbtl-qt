@@ -18,6 +18,7 @@ public:
     void print(const QString &message);
     void printLine(const QString &message);
     void clear();
+    void setCurrentProc(bool okProc);
 
 public slots:
     void execConsoleCommand();

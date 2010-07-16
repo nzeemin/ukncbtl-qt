@@ -12,6 +12,7 @@ class QDisasmView : public QWidget
 public:
     QDisasmView();
 
+    void setCurrentProc(bool okProc);
     void updateData();
 
 protected:

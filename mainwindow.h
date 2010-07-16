@@ -23,6 +23,7 @@ public:
 public:
     void UpdateMenu();
     void UpdateAllViews();
+    void setCurrentProc(bool okProc);
     void restoreSettings();
 
 public slots:

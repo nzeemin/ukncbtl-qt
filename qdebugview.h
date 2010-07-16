@@ -12,6 +12,7 @@ class QDebugView : public QWidget
 public:
     QDebugView(QWidget *parent = 0);
 
+    void setCurrentProc(bool okProc);
     void updateData();
 
 protected:

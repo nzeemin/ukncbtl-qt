@@ -13,6 +13,7 @@ MainWindow* Global_getMainWindow();
 QSettings* Global_getSettings();
 void Global_UpdateAllViews();
 void Global_UpdateMenu();
+void Global_SetCurrentProc(bool);
 
 
 //////////////////////////////////////////////////////////////////////

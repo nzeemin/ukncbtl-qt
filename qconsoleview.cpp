@@ -57,6 +57,11 @@ void QConsoleView::clear()
     m_log->clear();
 }
 
+void QConsoleView::setCurrentProc(bool okProc)
+{
+    m_okCurrentProc = okProc;
+}
+
 void QConsoleView::print(const QString &message)
 {
     // Put selection to the end of text
@@ -70,7 +75,7 @@ void QConsoleView::printConsolePrompt()
 {
     CProcessor* pProc = this->getCurrentProcessor();
     TCHAR buffer[14];
-    _sntprintf(buffer, 14, _T("%06o> "), pProc->GetPC());
+    _sntprintf(buffer, 14, _T("%s:%06o> "), pProc->GetName(), pProc->GetPC());
     this->print(buffer);
 }
 
@@ -84,6 +89,7 @@ void QConsoleView::printHelp()
             _T("  m          Memory dump at current address\r\n")
             _T("  mXXXXXX    Memory dump at address XXXXXX\r\n")
             _T("  mrN        Memory dump at address from register N; N=0..7\r\n")
+            _T("  p          Switch to other processor\r\n")
             _T("  r          Show register values\r\n")
             _T("  rN         Show value of register N; N=0..7,ps\r\n")
             _T("  rN XXXXXX  Set register N to value XXXXXX; N=0..7,ps\r\n")
@@ -237,6 +243,11 @@ void QConsoleView::execConsoleCommand(const QString &command)
     else if (command == _T("c"))  // Clear log
     {
         this->clear();
+    }
+    else if (command == _T("p"))  // Switch CPU/PPU
+    {
+        Global_SetCurrentProc(! m_okCurrentProc);
+        okUpdateAllViews = true;
     }
     else if (command.startsWith(_T("r")))  // Register operations
     {
