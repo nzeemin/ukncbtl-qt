@@ -4,7 +4,9 @@
 #include <QWidget>
 #include "Common.h"
 
+class CMotherboard;
 class CProcessor;
+class CMemoryController;
 
 class QDebugView : public QWidget
 {
@@ -26,8 +28,9 @@ private:
     BOOL m_okDebugPpuRChanged[9];   // Register change flags
 
 private:
-    void DrawProcessor(QPainter &painter, const CProcessor *pProc, int x, int y, WORD *arrR, BOOL *arrRChanged);
-    void DrawMemoryForRegister(QPainter &painter, int reg, CProcessor *pProc, int x, int y);
+    void drawProcessor(QPainter &painter, const CProcessor *pProc, int x, int y, WORD *arrR, BOOL *arrRChanged);
+    void drawMemoryForRegister(QPainter &painter, int reg, CProcessor *pProc, int x, int y);
+    void drawPorts(QPainter &painter, BOOL okProcessor, CMemoryController* pMemCtl, CMotherboard* pBoard, int x, int y);
 };
 
 #endif // QDEBUGVIEW_H
