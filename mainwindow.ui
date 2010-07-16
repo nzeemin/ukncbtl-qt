@@ -37,6 +37,9 @@
     </property>
     <addaction name="actionEmulatorRun"/>
     <addaction name="actionEmulatorReset"/>
+    <addaction name="separator"/>
+    <addaction name="actionViewRgbScreen"/>
+    <addaction name="actionViewGrayscaleScreen"/>
    </widget>
    <widget class="QMenu" name="menuDrives">
     <property name="title">
@@ -321,6 +324,22 @@
    </property>
    <property name="text">
     <string>Debug Views</string>
+   </property>
+  </action>
+  <action name="actionViewRgbScreen">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>RGB Screen</string>
+   </property>
+  </action>
+  <action name="actionViewGrayscaleScreen">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Grayscale Screen</string>
    </property>
   </action>
  </widget>

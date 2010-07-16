@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Wed Jul 7 22:48:43 2010
+** Created: Fri Jul 16 20:41:29 2010
 **      by: Qt User Interface Compiler version 4.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -46,6 +46,8 @@ public:
     QAction *actionDebugDisasmView;
     QAction *actionDebugMemoryView;
     QAction *actionDebugConsoleView;
+    QAction *actionViewRgbScreen;
+    QAction *actionViewGrayscaleScreen;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -134,6 +136,12 @@ public:
         actionDebugConsoleView = new QAction(MainWindow);
         actionDebugConsoleView->setObjectName(QString::fromUtf8("actionDebugConsoleView"));
         actionDebugConsoleView->setCheckable(true);
+        actionViewRgbScreen = new QAction(MainWindow);
+        actionViewRgbScreen->setObjectName(QString::fromUtf8("actionViewRgbScreen"));
+        actionViewRgbScreen->setCheckable(true);
+        actionViewGrayscaleScreen = new QAction(MainWindow);
+        actionViewGrayscaleScreen->setObjectName(QString::fromUtf8("actionViewGrayscaleScreen"));
+        actionViewGrayscaleScreen->setCheckable(true);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         MainWindow->setCentralWidget(centralWidget);
@@ -173,6 +181,9 @@ public:
         menuFile->addAction(actionFileExit);
         menuEmulator->addAction(actionEmulatorRun);
         menuEmulator->addAction(actionEmulatorReset);
+        menuEmulator->addSeparator();
+        menuEmulator->addAction(actionViewRgbScreen);
+        menuEmulator->addAction(actionViewGrayscaleScreen);
         menuDrives->addAction(actionDrivesFloppy0);
         menuDrives->addAction(actionDrivesFloppy1);
         menuDrives->addAction(actionDrivesFloppy2);
@@ -240,6 +251,8 @@ public:
         actionDebugDisasmView->setText(QApplication::translate("MainWindow", "Disasm View", 0, QApplication::UnicodeUTF8));
         actionDebugMemoryView->setText(QApplication::translate("MainWindow", "Memory View", 0, QApplication::UnicodeUTF8));
         actionDebugConsoleView->setText(QApplication::translate("MainWindow", "Debug Views", 0, QApplication::UnicodeUTF8));
+        actionViewRgbScreen->setText(QApplication::translate("MainWindow", "RGB Screen", 0, QApplication::UnicodeUTF8));
+        actionViewGrayscaleScreen->setText(QApplication::translate("MainWindow", "Grayscale Screen", 0, QApplication::UnicodeUTF8));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0, QApplication::UnicodeUTF8));
         menuEmulator->setTitle(QApplication::translate("MainWindow", "Emulator", 0, QApplication::UnicodeUTF8));
         menuDrives->setTitle(QApplication::translate("MainWindow", "Drives", 0, QApplication::UnicodeUTF8));

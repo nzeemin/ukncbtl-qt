@@ -44,6 +44,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionDebugStepInto, SIGNAL(triggered()), this, SLOT(debugStepInto()));
     QObject::connect(ui->actionDebugStepOver, SIGNAL(triggered()), this, SLOT(debugStepOver()));
     QObject::connect(ui->actionHelpAboutQt, SIGNAL(triggered()), this, SLOT(helpAboutQt()));
+    QObject::connect(ui->actionViewRgbScreen, SIGNAL(triggered()), this, SLOT(viewRgbScreen()));
+    QObject::connect(ui->actionViewGrayscaleScreen, SIGNAL(triggered()), this, SLOT(viewGrayscaleScreen()));
 
     // Screen and keyboard
     m_screen = new QScreen();
@@ -138,6 +140,9 @@ void MainWindow::restoreSettings()
 void MainWindow::UpdateMenu()
 {
     ui->actionEmulatorRun->setChecked(g_okEmulatorRunning);
+    ui->actionViewRgbScreen->setChecked(m_screen->mode() == RGBScreen);
+    ui->actionViewGrayscaleScreen->setChecked(m_screen->mode() == GrayScreen);
+
     ui->actionDrivesFloppy0->setIcon(QIcon(
             g_pBoard->IsFloppyImageAttached(0) ? _T(":/images/iconFloppy.png") : _T(":/images/iconFloppySlot.png") ));
     ui->actionDrivesFloppy1->setIcon(QIcon(
@@ -211,6 +216,17 @@ void MainWindow::fileScreenshot()
 void MainWindow::helpAboutQt()
 {
     QMessageBox::aboutQt(this, _T("About Qt"));
+}
+
+void MainWindow::viewRgbScreen()
+{
+    m_screen->setMode(RGBScreen);
+    UpdateMenu();
+}
+void MainWindow::viewGrayscaleScreen()
+{
+    m_screen->setMode(GrayScreen);
+    UpdateMenu();
 }
 
 void MainWindow::emulatorFrame()

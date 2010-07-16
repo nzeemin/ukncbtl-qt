@@ -12,6 +12,15 @@ const DWORD ScreenView_StandardRGBColors[16] = {
     0x000000, 0x000080, 0x008000, 0x008080, 0x800000, 0x800080, 0x808000, 0x808080,
     0x000000, 0x0000FF, 0x00FF00, 0x00FFFF, 0xFF0000, 0xFF00FF, 0xFFFF00, 0xFFFFFF,
 };
+const DWORD ScreenView_StandardGRBColors[16] = {
+    0x000000, 0x000080, 0x800000, 0x800080, 0x008000, 0x008080, 0x808000, 0x808080,
+    0x000000, 0x0000FF, 0xFF0000, 0xFF00FF, 0x00FF00, 0x00FFFF, 0xFFFF00, 0xFFFFFF,
+};
+// Table for color conversion, gray (black and white) display
+const DWORD ScreenView_GrayColors[16] = {
+    0x000000, 0x242424, 0x484848, 0x6C6C6C, 0x909090, 0xB4B4B4, 0xD8D8D8, 0xFFFFFF,
+    0x000000, 0x242424, 0x484848, 0x6C6C6C, 0x909090, 0xB4B4B4, 0xD8D8D8, 0xFFFFFF,
+};
 
 
 //////////////////////////////////////////////////////////////////////
@@ -25,11 +34,18 @@ QScreen::QScreen(QWidget *parent) :
     setFocusPolicy(Qt::StrongFocus);
 
     m_image = new QImage(UKNC_SCREEN_WIDTH, UKNC_SCREEN_HEIGHT, QImage::Format_RGB32);
+
+    m_mode = RGBScreen;
 }
 
 QScreen::~QScreen()
 {
     delete m_image;
+}
+
+void QScreen::setMode(ScreenViewMode mode)
+{
+    m_mode = mode;
 }
 
 void QScreen::saveScreenshot(QString strFileName)
@@ -39,7 +55,16 @@ void QScreen::saveScreenshot(QString strFileName)
 
 void QScreen::paintEvent(QPaintEvent *event)
 {
-    Emulator_PrepareScreenRGB32(m_image->bits(), ScreenView_StandardRGBColors);
+    const DWORD* colors;
+    switch (m_mode)
+    {
+        case RGBScreen:   colors = ScreenView_StandardRGBColors; break;
+        case GrayScreen:  colors = ScreenView_GrayColors; break;
+        case GRBScreen:   colors = ScreenView_StandardGRBColors; break;
+        default:          colors = ScreenView_StandardRGBColors; break;
+    }
+
+    Emulator_PrepareScreenRGB32(m_image->bits(), colors);
 
     QPainter painter(this);
     painter.drawImage(0, 0, *m_image);
