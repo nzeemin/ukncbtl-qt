@@ -3,6 +3,20 @@
 #include "qscreen.h"
 #include "Emulator.h"
 
+
+//////////////////////////////////////////////////////////////////////
+// Colors
+
+// Table for color conversion yrgb (4 bits) -> DWORD (32 bits)
+const DWORD ScreenView_StandardRGBColors[16] = {
+    0x000000, 0x000080, 0x008000, 0x008080, 0x800000, 0x800080, 0x808000, 0x808080,
+    0x000000, 0x0000FF, 0x00FF00, 0x00FFFF, 0xFF0000, 0xFF00FF, 0xFFFF00, 0xFFFFFF,
+};
+
+
+//////////////////////////////////////////////////////////////////////
+
+
 QScreen::QScreen(QWidget *parent) :
     QWidget(parent)
 {
@@ -25,7 +39,7 @@ void QScreen::saveScreenshot(QString strFileName)
 
 void QScreen::paintEvent(QPaintEvent *event)
 {
-    Emulator_PrepareScreenRGB32(m_image->bits());
+    Emulator_PrepareScreenRGB32(m_image->bits(), ScreenView_StandardRGBColors);
 
     QPainter painter(this);
     painter.drawImage(0, 0, *m_image);

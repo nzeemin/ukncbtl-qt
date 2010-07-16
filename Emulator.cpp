@@ -41,16 +41,6 @@ int m_EmulatorKeyQueueCount = 0;
 
 
 //////////////////////////////////////////////////////////////////////
-// Colors
-
-// Table for color conversion yrgb (4 bits) -> DWORD (32 bits)
-const DWORD ScreenView_StandardRGBColors[16] = {
-    0x000000, 0x000080, 0x008000, 0x008080, 0x800000, 0x800080, 0x808000, 0x808080,
-    0x000000, 0x0000FF, 0x00FF00, 0x00FFFF, 0xFF0000, 0xFF00FF, 0xFFFF00, 0xFFFFFF,
-};
-
-
-//////////////////////////////////////////////////////////////////////
 
 
 const LPCTSTR FILE_NAME_UKNC_ROM = _T("uknc_rom.bin");
@@ -292,13 +282,10 @@ void Emulator_LoadROMCartridge(int slot, LPCTSTR sFilePath)
     ::fclose(fpFile);
 }
 
-void Emulator_PrepareScreenRGB32(void* pImageBits)
+void Emulator_PrepareScreenRGB32(void* pImageBits, const DWORD* colors)
 {
     if (pImageBits == NULL) return;
     if (!g_okEmulatorInitialized) return;
-
-    const DWORD* colors = ScreenView_StandardRGBColors;
-    //TODO
 
     // Tag parsing loop
     BYTE cursorYRGB;
