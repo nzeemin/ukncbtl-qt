@@ -3,6 +3,12 @@
 
 #include <QWidget>
 
+enum ScreenViewMode {
+    RGBScreen = 1,
+    GrayScreen = 2,
+    GRBScreen = 3,
+};
+
 class QScreen : public QWidget
 {
     Q_OBJECT
@@ -12,6 +18,8 @@ public:
 
 public:
     void saveScreenshot(QString strFileName);
+    void setMode(ScreenViewMode mode);
+    ScreenViewMode mode() const { return m_mode; }
 
 protected:
     void paintEvent(QPaintEvent *event);
@@ -20,6 +28,7 @@ protected:
 
 private:
     QImage* m_image;
+    ScreenViewMode m_mode;
 
 private:
     unsigned char TranslateQtKeyToUkncKey(int qtkey);

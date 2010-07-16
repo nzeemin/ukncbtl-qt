@@ -46,6 +46,8 @@ public slots:
     void debugMemoryView();
     void debugStepInto();
     void debugStepOver();
+    void viewRgbScreen();
+    void viewGrayscaleScreen();
 
 protected:
     void changeEvent(QEvent *e);
