@@ -184,6 +184,17 @@ void MainWindow::UpdateAllViews()
 
     UpdateMenu();
 }
+
+void MainWindow::setCurrentProc(bool okProc)
+{
+    if (m_debug != NULL)
+        m_debug->setCurrentProc(okProc);
+    if (m_disasm != NULL)
+        m_disasm->setCurrentProc(okProc);
+    if (m_console != NULL)
+        m_console->setCurrentProc(okProc);
+}
+
 void MainWindow::fileScreenshot()
 {
     QFileDialog dlg;

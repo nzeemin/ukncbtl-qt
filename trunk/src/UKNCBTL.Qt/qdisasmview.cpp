@@ -17,6 +17,12 @@ QDisasmView::QDisasmView()
     this->setMinimumSize(cxChar * 55, cyLine * 10 + cyLine / 2);
 }
 
+void QDisasmView::setCurrentProc(bool okProc)
+{
+    m_okDisasmProcessor = okProc;
+    this->updateData();
+}
+
 void QDisasmView::updateData()
 {
     CProcessor* pDisasmPU = (m_okDisasmProcessor) ? g_pBoard->GetCPU() : g_pBoard->GetPPU();

@@ -21,6 +21,12 @@ QDebugView::QDebugView(QWidget *parent) :
     this->setMaximumHeight(cyLine * 14 + cyLine / 2);
 }
 
+void QDebugView::setCurrentProc(bool okProc)
+{
+    m_okDebugProcessor = okProc;
+    this->updateData();
+}
+
 void QDebugView::updateData()
 {
     CProcessor* pCPU = g_pBoard->GetCPU();
