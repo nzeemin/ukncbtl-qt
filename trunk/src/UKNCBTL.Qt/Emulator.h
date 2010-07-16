@@ -33,7 +33,7 @@ void Emulator_Stop();
 void Emulator_Reset();
 int Emulator_SystemFrame();
 
-void Emulator_PrepareScreenRGB32(void* pBits);
+void Emulator_PrepareScreenRGB32(void* pBits, const DWORD* colors);
 
 void Emulator_KeyEvent(BYTE keyPressed, BOOL pressed);
 WORD Emulator_GetKeyEventFromQueue();
