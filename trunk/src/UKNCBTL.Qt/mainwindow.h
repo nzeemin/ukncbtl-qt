@@ -9,6 +9,7 @@ class QConsoleView;
 class QDebugView;
 class QDisasmView;
 class QMemoryView;
+class QLabel;
 
 namespace Ui {
     class MainWindow;
@@ -25,6 +26,8 @@ public:
     void UpdateAllViews();
     void setCurrentProc(bool okProc);
     void restoreSettings();
+    void showUptime(int uptimeMillisec);
+    void showFps(double framesPerSecond);
 
 public slots:
     void fileScreenshot();
@@ -66,6 +69,10 @@ private:
     QDockWidget* m_dockDisasm;
     QMemoryView * m_memory;
     QDockWidget* m_dockMemory;
+
+    QLabel* m_statusLabelInfo;
+    QLabel* m_statusLabelFrames;
+    QLabel* m_statusLabelUptime;
 
     void emulatorCartridge(int slot);
     void emulatorHardDrive(int slot);

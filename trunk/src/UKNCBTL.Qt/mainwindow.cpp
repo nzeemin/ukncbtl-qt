@@ -5,6 +5,7 @@
 #include <QSettings>
 #include <QVBoxLayout>
 #include <QDockWidget>
+#include <QLabel>
 #include "main.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -84,6 +85,13 @@ MainWindow::MainWindow(QWidget *parent) :
     this->addDockWidget(Qt::RightDockWidgetArea, m_dockDisasm, Qt::Vertical);
     this->addDockWidget(Qt::RightDockWidgetArea, m_dockMemory, Qt::Vertical);
     this->addDockWidget(Qt::BottomDockWidgetArea, m_dockConsole);
+
+    m_statusLabelInfo = new QLabel();
+    m_statusLabelFrames = new QLabel();
+    m_statusLabelUptime = new QLabel();
+    statusBar()->addWidget(m_statusLabelInfo, 600);
+    statusBar()->addPermanentWidget(m_statusLabelFrames, 150);
+    statusBar()->addPermanentWidget(m_statusLabelUptime, 150);
 
     this->setFocusProxy(m_screen);
 }
@@ -198,6 +206,31 @@ void MainWindow::setCurrentProc(bool okProc)
         m_disasm->setCurrentProc(okProc);
     if (m_console != NULL)
         m_console->setCurrentProc(okProc);
+}
+
+void MainWindow::showUptime(int uptimeMillisec)
+{
+    int seconds = (int) (uptimeMillisec % 60);
+    int minutes = (int) (uptimeMillisec / 60 % 60);
+    int hours   = (int) (uptimeMillisec / 3600 % 60);
+
+    TCHAR buffer[20];
+    _sntprintf(buffer, 20, _T("Uptime: %02d:%02d:%02d"), hours, minutes, seconds);
+
+    m_statusLabelUptime->setText(buffer);
+}
+void MainWindow::showFps(double framesPerSecond)
+{
+    if (framesPerSecond <= 0)
+    {
+        m_statusLabelFrames->setText(_T(""));
+    }
+    else
+    {
+        TCHAR buffer[16];
+        _sntprintf(buffer, 16, _T("FPS: %05.2f"), framesPerSecond);
+        m_statusLabelFrames->setText(buffer);
+    }
 }
 
 void MainWindow::fileScreenshot()
