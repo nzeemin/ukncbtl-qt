@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 
     QTimer timerFrame;
     QObject::connect(&timerFrame, SIGNAL(timeout()), &w, SLOT(emulatorFrame()), Qt::AutoConnection);
-    timerFrame.start(20);
+    timerFrame.start(32);
 
     int result = application.exec();
 
@@ -77,6 +77,15 @@ void Global_UpdateMenu()
 void Global_SetCurrentProc(bool okProc)
 {
     Global_getMainWindow()->setCurrentProc(okProc);
+}
+
+void Global_showUptime(int uptimeMillisec)
+{
+    Global_getMainWindow()->showUptime(uptimeMillisec);
+}
+void Global_showFps(double framesPerSecond)
+{
+    Global_getMainWindow()->showFps(framesPerSecond);
 }
 
 void RestoreSettings()
