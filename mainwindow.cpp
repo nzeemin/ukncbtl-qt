@@ -44,6 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionDebugMemoryView, SIGNAL(triggered()), this, SLOT(debugMemoryView()));
     QObject::connect(ui->actionDebugStepInto, SIGNAL(triggered()), this, SLOT(debugStepInto()));
     QObject::connect(ui->actionDebugStepOver, SIGNAL(triggered()), this, SLOT(debugStepOver()));
+    QObject::connect(ui->actionHelpAbout, SIGNAL(triggered()), this, SLOT(helpAbout()));
     QObject::connect(ui->actionHelpAboutQt, SIGNAL(triggered()), this, SLOT(helpAboutQt()));
     QObject::connect(ui->actionViewRgbScreen, SIGNAL(triggered()), this, SLOT(viewRgbScreen()));
     QObject::connect(ui->actionViewGrayscaleScreen, SIGNAL(triggered()), this, SLOT(viewGrayscaleScreen()));
@@ -246,6 +247,16 @@ void MainWindow::fileScreenshot()
     m_screen->saveScreenshot(strFileName);
 }
 
+void MainWindow::helpAbout()
+{
+    QMessageBox::about(this, _T("About"), _T(
+        "QtUkncBtl Version 1.0\n"
+        "Copyright (C) 2007-2010\n\n"
+        "http://www.felixl.com/Uknc\r\nhttp://code.google.com/p/ukncbtl/\n\n"
+        "Authors:\r\nNikita Zeemin (nzeemin@gmail.com)\nFelix Lazarev (felix.lazarev@gmail.com)\nAlexey Kisly\n\n"
+        "Special thanks to:\nArseny Gordin\n\n"
+        "Build date:\t" __DATE__ __TIME__));
+}
 void MainWindow::helpAboutQt()
 {
     QMessageBox::aboutQt(this, _T("About Qt"));

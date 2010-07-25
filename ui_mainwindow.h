@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Fri Jul 16 20:41:29 2010
+** Created: Sun Jul 25 17:41:28 2010
 **      by: Qt User Interface Compiler version 4.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -48,6 +48,7 @@ public:
     QAction *actionDebugConsoleView;
     QAction *actionViewRgbScreen;
     QAction *actionViewGrayscaleScreen;
+    QAction *actionHelpAbout;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -142,6 +143,8 @@ public:
         actionViewGrayscaleScreen = new QAction(MainWindow);
         actionViewGrayscaleScreen->setObjectName(QString::fromUtf8("actionViewGrayscaleScreen"));
         actionViewGrayscaleScreen->setCheckable(true);
+        actionHelpAbout = new QAction(MainWindow);
+        actionHelpAbout->setObjectName(QString::fromUtf8("actionHelpAbout"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         MainWindow->setCentralWidget(centralWidget);
@@ -193,6 +196,7 @@ public:
         menuDrives->addAction(actionDrivesHard1);
         menuDrives->addAction(actionDrivesCartridge2);
         menuDrives->addAction(actionDrivesHard2);
+        menuHelp->addAction(actionHelpAbout);
         menuHelp->addAction(actionHelpAboutQt);
         menuDebug->addAction(actionDebugConsoleView);
         menuDebug->addSeparator();
@@ -253,6 +257,7 @@ public:
         actionDebugConsoleView->setText(QApplication::translate("MainWindow", "Debug Views", 0, QApplication::UnicodeUTF8));
         actionViewRgbScreen->setText(QApplication::translate("MainWindow", "RGB Screen", 0, QApplication::UnicodeUTF8));
         actionViewGrayscaleScreen->setText(QApplication::translate("MainWindow", "Grayscale Screen", 0, QApplication::UnicodeUTF8));
+        actionHelpAbout->setText(QApplication::translate("MainWindow", "About", 0, QApplication::UnicodeUTF8));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0, QApplication::UnicodeUTF8));
         menuEmulator->setTitle(QApplication::translate("MainWindow", "Emulator", 0, QApplication::UnicodeUTF8));
         menuDrives->setTitle(QApplication::translate("MainWindow", "Drives", 0, QApplication::UnicodeUTF8));
