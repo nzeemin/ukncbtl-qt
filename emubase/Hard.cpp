@@ -34,6 +34,7 @@
 #define IDE_COMMAND_READ_MULTIPLE       0x20
 #define IDE_COMMAND_SET_CONFIG          0x91
 #define IDE_COMMAND_WRITE_MULTIPLE      0x30
+#define IDE_COMMAND_IDENTIFY            0xec
 
 #define IDE_ERROR_NONE					0x00
 #define IDE_ERROR_DEFAULT				0x01
@@ -48,6 +49,19 @@ enum TimeoutEvent
     TIMEEVT_READ_SECTOR_DONE = 2,
     TIMEEVT_WRITE_SECTOR_DONE = 3,
 };
+
+//////////////////////////////////////////////////////////////////////
+
+// Inverts 512 bytes in the buffer
+static void InvertBuffer(void* buffer)
+{
+    DWORD* p = (DWORD*) buffer;
+    for (int i = 0; i < 128; i++)
+    {
+        *p = ~(*p);
+        p++;
+    }
+}
 
 //////////////////////////////////////////////////////////////////////
 
@@ -112,6 +126,16 @@ BOOL CHardDrive::AttachImage(LPCTSTR sFileName)
     DWORD dwBytesRead = ::fread(m_buffer, 1, 512, m_fpFile);
     if (dwBytesRead != 512)
         return FALSE;
+
+    // Autodetect inverted image
+    m_okInverted = FALSE;
+    BYTE test = 0xff;
+    for (int i = 0x1f0; i <= 0x1fb; i++)
+        test &= m_buffer[i];
+    m_okInverted = (test == 0xff);
+    // Invert the buffer if needed
+    if (m_okInverted)
+        InvertBuffer(m_buffer);
     
     // Calculate geometry
     m_numsectors = *(m_buffer + 0);
@@ -149,7 +173,8 @@ WORD CHardDrive::ReadPort(WORD port)
         if (m_status & IDE_STATUS_BUFFER_READY)
         {
             data = *((WORD*)(m_buffer + m_bufferoffset));
-            data = ~data;  // Image stored non-inverted, but QBUS inverts the bits
+            if (!m_okInverted)
+                data = ~data;  // Image stored non-inverted, but QBUS inverts the bits
             m_bufferoffset += 2;
 
             if (m_bufferoffset >= IDE_DISK_SECTOR_SIZE)
@@ -201,7 +226,8 @@ void CHardDrive::WritePort(WORD port, WORD data)
     case IDE_PORT_DATA:
         if (m_status & IDE_STATUS_BUFFER_READY)
         {
-            data = ~data;  // Image stored non-inverted, but QBUS inverts the bits
+            if (!m_okInverted)
+                data = ~data;  // Image stored non-inverted, but QBUS inverts the bits
             *((WORD*)(m_buffer + m_bufferoffset)) = data;
             m_bufferoffset += 2;
 
@@ -234,8 +260,8 @@ void CHardDrive::WritePort(WORD port, WORD data)
         break;
     case IDE_PORT_HEAD_NUMBER:
         data &= 0x0ff;
-		m_curhead = data & 0x0f;
-		m_curheadreg = data;
+        m_curhead = data & 0x0f;
+        m_curheadreg = data;
         break;
     case IDE_PORT_STATUS_COMMAND:
         data &= 0x0ff;
@@ -304,6 +330,8 @@ void CHardDrive::HandleCommand(BYTE command)
             m_bufferoffset = 0;
             m_status |= IDE_STATUS_BUFFER_READY;
             break;
+
+        //TODO: case IDE_COMMAND_IDENTIFY
 
         default:
 #if !defined(PRODUCT)
