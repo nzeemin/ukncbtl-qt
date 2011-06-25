@@ -45,8 +45,8 @@ typedef const wchar_t * LPCTSTR;
 typedef const char * LPCTSTR;
 #endif
 
-typedef long LONG;
-typedef unsigned long DWORD;
+typedef int LONG;
+typedef unsigned int DWORD;
 typedef unsigned short WORD;
 typedef unsigned char BYTE;
 

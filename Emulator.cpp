@@ -269,7 +269,11 @@ void Emulator_LoadROMCartridge(int slot, LPCTSTR sFilePath)
     BYTE* pImage = (BYTE*) ::malloc(24 * 1024);
 
     DWORD dwBytesRead = ::fread(pImage, 1, 24 * 1024, fpFile);
-    ASSERT(dwBytesRead == 24 * 1024);
+    if (dwBytesRead != 24 * 1024)
+    {
+        AlertWarning(_T("Failed to load ROM cartridge image."));
+        return;
+    }
 
     g_pBoard->LoadROMCartridge(slot, pImage);
 
