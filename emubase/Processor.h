@@ -1,5 +1,15 @@
+/*  This file is part of UKNCBTL.
+    UKNCBTL is free software: you can redistribute it and/or modify it under the terms
+of the GNU Lesser General Public License as published by the Free Software Foundation,
+either version 3 of the License, or (at your option) any later version.
+    UKNCBTL is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU Lesser General Public License for more details.
+    You should have received a copy of the GNU Lesser General Public License along with
+UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
+
 // Processor.h
-//
+// KM1801VM2 processor
 
 #pragma once
 
@@ -84,7 +94,7 @@ public:
 public:  // Register control
     WORD        GetPSW() const { return m_psw; }
     WORD        GetCPSW() const { return m_savepsw; }
-    BYTE		GetLPSW() {return LOBYTE(m_psw); }
+    BYTE		GetLPSW() const { return LOBYTE(m_psw); }
     void        SetPSW(WORD word)
     {
         m_psw = word & 0777;
@@ -96,13 +106,13 @@ public:  // Register control
         m_psw = (m_psw & 0xFF00) | (WORD)byte;
         if ((m_psw & 0600) != 0600) m_savepsw = m_psw;
     }
-    WORD        GetReg(int regno) { return m_R[regno]; }
+    WORD        GetReg(int regno) const { return m_R[regno]; }
     void        SetReg(int regno, WORD word)
     {
         m_R[regno] = word;
         if ((regno == 7) && ((m_psw & 0600)!=0600))	m_savepc = word;
     }
-    BYTE		GetLReg(int regno) { return LOBYTE(m_R[regno]); }
+    BYTE		GetLReg(int regno) const { return LOBYTE(m_R[regno]); }
     void		SetLReg(int regno, BYTE byte)
     {
         m_R[regno] = (m_R[regno] & 0xFF00) | (WORD)byte;

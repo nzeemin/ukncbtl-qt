@@ -1,3 +1,13 @@
+/*  This file is part of UKNCBTL.
+    UKNCBTL is free software: you can redistribute it and/or modify it under the terms
+of the GNU Lesser General Public License as published by the Free Software Foundation,
+either version 3 of the License, or (at your option) any later version.
+    UKNCBTL is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU Lesser General Public License for more details.
+    You should have received a copy of the GNU Lesser General Public License along with
+UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
+
 // Memory.h
 //
 
@@ -68,7 +78,7 @@ protected:
     //   okHaltMode - processor mode (USER/HALT)
     //   okExec - TRUE: read instruction for execution; FALSE: read memory
     //   pOffset - result - offset in memory plane
-    virtual int TranslateAddress(WORD address, BOOL okHaltMode, BOOL okExec, WORD* pOffset) = 0;
+    virtual int TranslateAddress(WORD address, BOOL okHaltMode, BOOL okExec, WORD* pOffset, BOOL okView = FALSE) = 0;
 protected:  // Access to I/O ports
     virtual WORD GetPortWord(WORD address) = 0;
     virtual void SetPortWord(WORD address, WORD word) = 0;
@@ -78,27 +88,32 @@ protected:  // Access to I/O ports
 
 class CFirstMemoryController : public CMemoryController  // CPU memory control device
 {
+    friend class CMotherboard;
 public:
     CFirstMemoryController();
     virtual void DCLO_Signal();  // DCLO signal
     virtual void ResetDevices();  // INIT signal
 public:
-    virtual int TranslateAddress(WORD address, BOOL okHaltMode, BOOL okExec, WORD* pOffset);
+    virtual int TranslateAddress(WORD address, BOOL okHaltMode, BOOL okExec, WORD* pOffset, BOOL okView);
     virtual WORD GetSelRegister() { return 0160000; }
     virtual WORD GetPortView(WORD address);
 protected:  // Access to I/O ports
     virtual WORD GetPortWord(WORD address);
     virtual void SetPortWord(WORD address, WORD word);
-    virtual BYTE GetPortByte(WORD address) ;  //TODO
-    virtual void SetPortByte(WORD address, BYTE byte) ;  //TODO
+    virtual BYTE GetPortByte(WORD address);
+    virtual void SetPortByte(WORD address, BYTE byte);
 public:  // Saving/loading emulator status (64 bytes)
     virtual void SaveToImage(BYTE* pImage);
     virtual void LoadFromImage(const BYTE* pImage);
+public:  // CPU specific
+    BOOL SerialInput(BYTE inputByte);
     
 protected:  // Implementation
     WORD        m_Port176640;  // Plane address register
     WORD        m_Port176642;  // Plane 1 & 2 data register
-    WORD        m_Port176570;  // RS-232 receiver state
+    WORD		m_Port176644;
+	WORD		m_Port176646;
+	WORD        m_Port176570;  // RS-232 receiver state
     WORD        m_Port176572;  // RS-232 receiver data (bits 0-7)
     WORD        m_Port176574;  // RS-232 translator state
     WORD        m_Port176576;  // RS-232 translator data (bits 0-7)
@@ -106,6 +121,7 @@ protected:  // Implementation
 
 class CSecondMemoryController : public CMemoryController  // PPU memory control device
 {
+    friend class CMotherboard;
 public:
     CSecondMemoryController();
     virtual void DCLO_Signal();  // DCLO signal
@@ -113,7 +129,7 @@ public:
     virtual void DCLO_177716();
     virtual void Init_177716();
 public:
-    virtual int TranslateAddress(WORD address, BOOL okHaltMode, BOOL okExec, WORD* pOffset);
+    virtual int TranslateAddress(WORD address, BOOL okHaltMode, BOOL okExec, WORD* pOffset, BOOL okView);
     virtual WORD GetSelRegister() { return 0160000; }
     virtual WORD GetPortView(WORD address);
 protected:  // Access to I/O ports
@@ -144,6 +160,10 @@ protected:  // Implementation
     WORD        m_Port177716;  // System control register
 
     WORD		m_Port177054;  // address space control
+
+    BYTE        m_Port177100;  // i8255 port A -- Parallel port output data
+    BYTE        m_Port177101;  // i8255 port B
+    BYTE        m_Port177102;  // i8255 port C
 };
 
 
