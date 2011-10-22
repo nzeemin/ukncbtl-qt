@@ -1,3 +1,13 @@
+/*  This file is part of UKNCBTL.
+    UKNCBTL is free software: you can redistribute it and/or modify it under the terms
+of the GNU Lesser General Public License as published by the Free Software Foundation,
+either version 3 of the License, or (at your option) any later version.
+    UKNCBTL is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU Lesser General Public License for more details.
+    You should have received a copy of the GNU Lesser General Public License along with
+UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
+
 // Board.cpp
 //
 
@@ -48,6 +58,9 @@ CMotherboard::CMotherboard ()
     m_TapeWriteCallback = NULL;
     m_nTapeSampleRate = 0;
     m_SoundGenCallback = NULL;
+    m_SerialInCallback = NULL;
+    m_SerialOutCallback = NULL;
+    m_ParallelOutCallback = NULL;
 
     // Allocate memory for RAM and ROM
     m_pRAM[0] = (BYTE*) malloc(65536);  memset(m_pRAM[0], 0, 65536);
@@ -102,6 +115,15 @@ void CMotherboard::Reset ()
 
     m_chan0disabled = 0;
 
+    int i;
+    m_scanned_key = 0;
+    for (i=0; i<=15; i++)
+    {
+        m_kbd_matrix[i].processed = FALSE;
+        m_kbd_matrix[i].row_Y = 0;
+    }
+    m_kbd_matrix[3].row_Y = 0xFF;
+
     //ChanResetByCPU();
     //ChanResetByPPU();
 
@@ -136,13 +158,13 @@ void CMotherboard::LoadRAM(int plan, const BYTE* pBuffer)  // Load 32 KB RAM ima
 
 // Floppy ////////////////////////////////////////////////////////////
 
-BOOL CMotherboard::IsFloppyImageAttached(int slot)
+BOOL CMotherboard::IsFloppyImageAttached(int slot) const
 {
     ASSERT(slot >= 0 && slot < 4);
     return m_pFloppyCtl->IsAttached(slot);
 }
 
-BOOL CMotherboard::IsFloppyReadOnly(int slot)
+BOOL CMotherboard::IsFloppyReadOnly(int slot) const
 {
     ASSERT(slot >= 0 && slot < 4);
     return m_pFloppyCtl->IsReadOnly(slot);
@@ -163,7 +185,7 @@ void CMotherboard::DetachFloppyImage(int slot)
 
 // ROM cartridge /////////////////////////////////////////////////////
 
-BOOL CMotherboard::IsROMCartridgeLoaded(int cartno)
+BOOL CMotherboard::IsROMCartridgeLoaded(int cartno) const
 {
     ASSERT(cartno == 1 || cartno == 2);  // Only two cartridges, #1 and #2
     int cartindex = cartno - 1;
@@ -477,12 +499,14 @@ void CMotherboard::DebugTicks()
 ** ѕерва€ невидима€ строка (#0) начинает рисоватьс€ на 96-ой тик
 ** ѕерва€ видима€ строка (#18) начинает рисоватьс€ на 672-й тик
 * 625 тиков FDD - каждый 32-й тик
+* 48 тиков обмена с COM-портом - каждый 416 тик
 */
 BOOL CMotherboard::SystemFrame()
 {
     int frameticks = 0;  // 20000 ticks
-    
     int audioticks = 20286/(SAMPLERATE/25);
+    const int serialOutTicks = 20000 / (9600 / 25);
+    int serialTxCount = 0;
 
     int tapeSamplesPerFrame, tapeBrasErr;
     if (m_TapeReadCallback != NULL || m_TapeWriteCallback != NULL)
@@ -527,6 +551,43 @@ BOOL CMotherboard::SystemFrame()
             m_pFloppyCtl->Periodic();
         }
 
+        if (frameticks % 32 == 0)	// Keyboard tick
+        {
+            CSecondMemoryController* pMemCtl = (CSecondMemoryController*) m_pSecondMemCtl;
+            if ((pMemCtl->m_Port177700 & 0200) == 0)
+            {
+                BYTE row_Y = m_scanned_key & 0xF;
+                BYTE col_X = (m_scanned_key & 0x70) >> 4;
+                BYTE bit_X = 1 << col_X;
+                pMemCtl->m_Port177702 = m_scanned_key;
+                if ((m_scanned_key & 0200) == 0)
+                {
+                    if ((m_kbd_matrix[row_Y].processed == FALSE) && ((m_kbd_matrix[row_Y].row_Y & bit_X) != 0))
+                    {
+                        pMemCtl->m_Port177700 |= 0200;
+                        m_kbd_matrix[row_Y].processed = TRUE;
+                        if (pMemCtl->m_Port177700 & 0100)
+                            m_pPPU->InterruptVIRQ(3, 0300);
+                    }
+                    else
+                        m_scanned_key++;
+                }
+                else
+                {
+                    if ((m_kbd_matrix[row_Y].processed == TRUE) && (m_kbd_matrix[row_Y].row_Y == 0))
+                    {
+                        pMemCtl->m_Port177700 |= 0200;
+                        m_kbd_matrix[row_Y].processed = FALSE;
+                        if (pMemCtl->m_Port177700 & 0100)
+                            m_pPPU->InterruptVIRQ(3, 0300);
+                        pMemCtl->m_Port177702 = m_scanned_key & 0x8F;
+                    }
+                    else
+                        m_scanned_key++;
+                }
+            }
+        }
+
         if (m_pHardDrives[0] != NULL)
             m_pHardDrives[0]->Periodic();
         if (m_pHardDrives[1] != NULL)
@@ -560,6 +621,61 @@ BOOL CMotherboard::SystemFrame()
             }
         }
 
+        if (m_SerialInCallback != NULL && frameticks % 416 == 0)
+        {
+            CFirstMemoryController* pMemCtl = (CFirstMemoryController*) m_pFirstMemCtl;
+            if ((pMemCtl->m_Port176574 & 004) == 0)  // Not loopback?
+            {
+                BYTE b;
+                if (m_SerialInCallback(&b))
+                {
+                    if (pMemCtl->SerialInput(b))
+                        m_pCPU->InterruptVIRQ(3, 0370);
+                }
+            }
+        }
+        if (m_SerialOutCallback != NULL && frameticks % serialOutTicks)
+        {
+            CFirstMemoryController* pMemCtl = (CFirstMemoryController*) m_pFirstMemCtl;
+            if (serialTxCount > 0)
+            {
+                serialTxCount--;
+                if (serialTxCount == 0)  // Translation countdown finished - the byte translated
+                {
+                    if ((pMemCtl->m_Port176574 & 004) == 0)  // Not loopback?
+                        (*m_SerialOutCallback)(pMemCtl->m_Port176576 & 0xff);
+                    else  // Loopback
+                    {
+                        if (pMemCtl->SerialInput(pMemCtl->m_Port176576 & 0xff))
+                            m_pCPU->InterruptVIRQ(3, 0370);
+                    }
+                    pMemCtl->m_Port176574 |= 0200;  // Set Ready flag
+                    if (pMemCtl->m_Port176574 & 0100)  // Interrupt?
+                         m_pCPU->InterruptVIRQ(3, 374);
+                }
+            }
+            else if ((pMemCtl->m_Port176574 & 0200) == 0)  // Ready is 0?
+            {
+                serialTxCount = 8;  // Start translation countdown
+            }
+        }
+
+        if (m_ParallelOutCallback != NULL)
+        {
+            CSecondMemoryController* pMemCtl = (CSecondMemoryController*) m_pSecondMemCtl;
+            if ((pMemCtl->m_Port177102 & 0x80) == 0x80 && (pMemCtl->m_Port177101 & 0x80) == 0x80)
+            {  // Strobe set, Printer Ack set => reset Printer Ack
+                pMemCtl->m_Port177101 &= ~0x80;
+                // Now printer waits for a next byte
+            }
+            else if ((pMemCtl->m_Port177102 & 0x80) == 0 && (pMemCtl->m_Port177101 & 0x80) == 0)
+            {  // Strobe reset, Printer Ack reset => byte is ready, print it
+                (*m_ParallelOutCallback)(pMemCtl->m_Port177100);
+                pMemCtl->m_Port177101 |= 0x80;  // Set Printer Acknowledge
+                // Now the printer waits for Strobe
+            }
+        }
+
         frameticks++;
     }
     while (frameticks < 20000);
@@ -570,8 +686,15 @@ BOOL CMotherboard::SystemFrame()
 // Key pressed or released
 void CMotherboard::KeyboardEvent(BYTE scancode, BOOL okPressed)
 {
-    CSecondMemoryController* pMemCtl = (CSecondMemoryController*) m_pSecondMemCtl;
-    pMemCtl->KeyboardEvent(scancode, okPressed);
+    // CSecondMemoryController* pMemCtl = (CSecondMemoryController*) m_pSecondMemCtl;
+    // pMemCtl->KeyboardEvent(scancode, okPressed);
+    BYTE	row_Y = scancode & 0xF;
+    BYTE	col_X = (scancode & 0x70) >> 4;
+    BYTE	bit_X = 1 << col_X;
+    if (okPressed)
+        m_kbd_matrix[row_Y].row_Y |= bit_X;
+    else
+        m_kbd_matrix[row_Y].row_Y &= ~bit_X;
 }
 
 
@@ -682,7 +805,6 @@ void CMotherboard::ChanWriteByPPU(BYTE chan, BYTE data)
     chan &= 3;
     ASSERT(chan<2); 
 
-
 //	if((chan==0)&&(m_chan0disabled))
 //		return;
 
@@ -726,10 +848,8 @@ BYTE CMotherboard::ChanReadByPPU(BYTE chan)
     chan &= 3;
     ASSERT(chan<3); 
 
-
     //if((chan==0)&&(m_chan0disabled))
     //	return 0;
-
 
     res = m_chanppurx[chan].data;
     m_chanppurx[chan].ready = 0;
@@ -1291,6 +1411,21 @@ void CMotherboard::SetSerialCallbacks(SERIALINCALLBACK incallback, SERIALOUTCALL
         m_SerialInCallback = incallback;
         m_SerialOutCallback = outcallback;
         //TODO: Set port value to indicate we are ready to translate
+    }
+}
+
+void CMotherboard::SetParallelOutCallback(PARALLELOUTCALLBACK outcallback)
+{
+    CSecondMemoryController* pMemCtl = (CSecondMemoryController*) m_pSecondMemCtl;
+    if (outcallback == NULL)  // Reset callback
+    {
+        pMemCtl->m_Port177101 &= ~2;  // Reset OnLine flag
+        m_ParallelOutCallback = NULL;
+    }
+    else
+    {
+        pMemCtl->m_Port177101 |= 2;  // Set OnLine flag
+        m_ParallelOutCallback = outcallback;
     }
 }
 

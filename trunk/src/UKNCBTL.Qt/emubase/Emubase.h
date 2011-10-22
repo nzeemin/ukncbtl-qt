@@ -1,3 +1,13 @@
+/*  This file is part of UKNCBTL.
+    UKNCBTL is free software: you can redistribute it and/or modify it under the terms
+of the GNU Lesser General Public License as published by the Free Software Foundation,
+either version 3 of the License, or (at your option) any later version.
+    UKNCBTL is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU Lesser General Public License for more details.
+    You should have received a copy of the GNU Lesser General Public License along with
+UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
+
 // Emubase.h  Header for use of all emubase classes
 //
 
@@ -97,8 +107,8 @@ public:
 public:
     BOOL AttachImage(int drive, LPCTSTR sFileName);
     void DetachImage(int drive);
-    BOOL IsAttached(int drive) { return (m_drivedata[drive].fpFile != NULL); }
-    BOOL IsReadOnly(int drive) { return m_drivedata[drive].okReadOnly; } // return (m_status & FLOPPY_STATUS_WRITEPROTECT) != 0; }
+    BOOL IsAttached(int drive) const { return (m_drivedata[drive].fpFile != NULL); }
+    BOOL IsReadOnly(int drive) const { return m_drivedata[drive].okReadOnly; }
     BOOL IsEngineOn() { return (m_flags & FLOPPY_CMD_ENGINESTART) != 0; }
 	WORD GetData(void);         // Reading port 177132 - data
 	WORD GetState(void);        // Reading port 177130 - device status
@@ -146,7 +156,7 @@ public:
     void Reset();
     BOOL AttachImage(LPCTSTR sFileName);
     void DetachImage();
-    BOOL IsReadOnly();
+    BOOL IsReadOnly() const { return m_okReadOnly; }
 
 public:
     WORD ReadPort(WORD port);
@@ -154,14 +164,16 @@ public:
     void Periodic();
 
 private:
-    DWORD CalculateOffset();  // Calculate sector offset in the HDD image
+    DWORD CalculateOffset() const;  // Calculate sector offset in the HDD image
     void HandleCommand(BYTE command);  // Handle IDE command
     void ReadNextSector();
     void ReadSectorDone();
     void WriteSectorDone();
-    void NextSector();
+    void NextSector();          // Advance to the next sector, CHS-based
     void ContinueRead();
     void ContinueWrite();
+    void IdentifyDrive();       // Prepare m_buffer for the IDENTIFY DRIVE command
 };
+
 
 //////////////////////////////////////////////////////////////////////

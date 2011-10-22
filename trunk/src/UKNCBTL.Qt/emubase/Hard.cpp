@@ -1,13 +1,20 @@
+/*  This file is part of UKNCBTL.
+    UKNCBTL is free software: you can redistribute it and/or modify it under the terms
+of the GNU Lesser General Public License as published by the Free Software Foundation,
+either version 3 of the License, or (at your option) any later version.
+    UKNCBTL is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU Lesser General Public License for more details.
+    You should have received a copy of the GNU Lesser General Public License along with
+UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
+
 // Hard.cpp
-//
+// Hard disk drive emulation
+// See defines in header file Emubase.h
 
 #include "stdafx.h"
 #include <sys/stat.h>
 #include "Emubase.h"
-
-#ifdef _MSC_VER
-#pragma warning( disable: 4996 )  //NOTE: I know, we use unsafe functions
-#endif
 
 
 //////////////////////////////////////////////////////////////////////
@@ -32,8 +39,10 @@
 #define IDE_STATUS_BUSY					0x80
 
 #define IDE_COMMAND_READ_MULTIPLE       0x20
+#define IDE_COMMAND_READ_MULTIPLE1      0x21
 #define IDE_COMMAND_SET_CONFIG          0x91
 #define IDE_COMMAND_WRITE_MULTIPLE      0x30
+#define IDE_COMMAND_WRITE_MULTIPLE1     0x31
 #define IDE_COMMAND_IDENTIFY            0xec
 
 #define IDE_ERROR_NONE					0x00
@@ -95,11 +104,6 @@ void CHardDrive::Reset()
     m_timeoutevent = TIMEEVT_RESET_DONE;
 }
 
-BOOL CHardDrive::IsReadOnly()
-{
-    return m_okReadOnly;
-}
-
 BOOL CHardDrive::AttachImage(LPCTSTR sFileName)
 {
     ASSERT(sFileName != NULL);
@@ -140,6 +144,8 @@ BOOL CHardDrive::AttachImage(LPCTSTR sFileName)
     // Calculate geometry
     m_numsectors = *(m_buffer + 0);
     m_numheads   = *(m_buffer + 1);
+    if (m_numsectors == 0 || m_numheads == 0)
+        return FALSE;  // Geometry params are not defined
     m_numcylinders = dwFileSize / 512 / m_numsectors / m_numheads;
     if (m_numcylinders == 0 || m_numcylinders > 1024)
         return FALSE;
@@ -303,6 +309,7 @@ void CHardDrive::HandleCommand(BYTE command)
     switch (command)
     {
         case IDE_COMMAND_READ_MULTIPLE:
+        case IDE_COMMAND_READ_MULTIPLE1:
 #if !defined(PRODUCT)
             DebugPrintFormat(_T("HDD COMMAND %02x (READ MULT): C=%d, H=%d, SN=%d, SC=%d\r\n"),
                     command, m_curcylinder, m_curhead, m_cursector, m_sectorcount);
@@ -323,6 +330,7 @@ void CHardDrive::HandleCommand(BYTE command)
             break;
 
         case IDE_COMMAND_WRITE_MULTIPLE:
+        case IDE_COMMAND_WRITE_MULTIPLE1:
 #if !defined(PRODUCT)
             DebugPrintFormat(_T("HDD COMMAND %02x (WRITE MULT): C=%d, H=%d, SN=%d, SC=%d\r\n"),
                     command, m_curcylinder, m_curhead, m_cursector, m_sectorcount);
@@ -331,7 +339,17 @@ void CHardDrive::HandleCommand(BYTE command)
             m_status |= IDE_STATUS_BUFFER_READY;
             break;
 
-        //TODO: case IDE_COMMAND_IDENTIFY
+        case IDE_COMMAND_IDENTIFY:
+#if !defined(PRODUCT)
+            DebugPrintFormat(_T("HDD COMMAND %02x (IDENTIFY)\r\n"), command);
+#endif
+            IdentifyDrive();  // Prepare the buffer
+            m_bufferoffset = 0;
+            m_sectorcount = 1;
+            m_status |= IDE_STATUS_BUFFER_READY | IDE_STATUS_SEEK_COMPLETE | IDE_STATUS_DRIVE_READY;
+            m_status &= ~IDE_STATUS_BUSY;
+            m_status &= ~IDE_STATUS_ERROR;
+            break;
 
         default:
 #if !defined(PRODUCT)
@@ -343,7 +361,45 @@ void CHardDrive::HandleCommand(BYTE command)
     }
 }
 
-DWORD CHardDrive::CalculateOffset()
+// Copy the string to the destination, swapping bytes in every word
+// For use in CHardDrive::IdentifyDrive() method.
+static void swap_strncpy(BYTE* dst, const char* src, int words)
+{
+	int i;
+	for (i = 0; i < (int)strlen(src); i++)
+		dst[i ^ 1] = src[i];
+	for ( ; i < words * 2; i++)
+		dst[i ^ 1] = ' ';
+}
+
+void CHardDrive::IdentifyDrive()
+{
+    DWORD totalsectors = (DWORD)m_numcylinders * (DWORD)m_numheads * (DWORD)m_numsectors;
+
+    memset(m_buffer, 0, IDE_DISK_SECTOR_SIZE);
+
+    WORD* pwBuffer = (WORD*)m_buffer;
+    pwBuffer[0]  = 0x045a;  // Configuration: fixed disk
+    pwBuffer[1]  = (WORD)m_numcylinders;
+    pwBuffer[3]  = (WORD)m_numheads;
+    pwBuffer[6]  = (WORD)m_numsectors;
+    swap_strncpy((BYTE*)(pwBuffer + 10), "0000000000", 10);  // Serial number
+    swap_strncpy((BYTE*)(pwBuffer + 23), "1.0", 4);  // Firmware version
+    swap_strncpy((BYTE*)(pwBuffer + 27), "UKNCBTL Hard Disk", 20);  // Model
+    pwBuffer[47] = 0x8001;  // Read/write multiple support
+    pwBuffer[49] = 0x2f00;  // Capabilities: bit9 = LBA
+    pwBuffer[53] = 1;  // Words 54-58 are valid
+    pwBuffer[54] = (WORD)m_numcylinders;
+    pwBuffer[55] = (WORD)m_numheads;
+    pwBuffer[56] = (WORD)m_numsectors;
+    *(DWORD*)(pwBuffer + 57) = (DWORD)m_numheads * (DWORD)m_numsectors;
+    *(DWORD*)(pwBuffer + 60) = totalsectors;
+    *(DWORD*)(pwBuffer + 100) = totalsectors;
+
+    InvertBuffer(m_buffer);
+}
+
+DWORD CHardDrive::CalculateOffset() const
 {
     int sector = (m_curcylinder * m_numheads + m_curhead) * m_numsectors + (m_cursector - 1);
     return sector * IDE_DISK_SECTOR_SIZE;

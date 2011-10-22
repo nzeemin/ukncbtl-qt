@@ -1,3 +1,13 @@
+/*  This file is part of UKNCBTL.
+    UKNCBTL is free software: you can redistribute it and/or modify it under the terms
+of the GNU Lesser General Public License as published by the Free Software Foundation,
+either version 3 of the License, or (at your option) any later version.
+    UKNCBTL is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU Lesser General Public License for more details.
+    You should have received a copy of the GNU Lesser General Public License along with
+UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
+
 // Floppy.cpp
 // Floppy controller and drives emulation
 // See defines in header file Emubase.h
@@ -6,9 +16,6 @@
 #include <sys/stat.h>
 #include "Emubase.h"
 
-#ifdef _MSC_VER
-#pragma warning( disable: 4996 )  //NOTE: I know, we use unsafe functions
-#endif
 
 //////////////////////////////////////////////////////////////////////
 
@@ -17,8 +24,8 @@ const WORD FLOPPY_CMD_MASKSTORED =
     FLOPPY_CMD_CORRECTION250 | FLOPPY_CMD_CORRECTION500 | FLOPPY_CMD_SIDEUP | FLOPPY_CMD_DIR | FLOPPY_CMD_SKIPSYNC |
     FLOPPY_CMD_ENGINESTART;
 
-static void EncodeTrackData(BYTE* pSrc, BYTE* data, BYTE* marker, WORD track, WORD side);
-static BOOL DecodeTrackData(BYTE* pRaw, BYTE* pDest);
+static void EncodeTrackData(const BYTE* pSrc, BYTE* data, BYTE* marker, WORD track, WORD side);
+static BOOL DecodeTrackData(const BYTE* pRaw, BYTE* pDest);
 
 //////////////////////////////////////////////////////////////////////
 
@@ -40,7 +47,7 @@ void CFloppyDrive::Reset()
 
 //////////////////////////////////////////////////////////////////////
 
-    
+
 CFloppyController::CFloppyController()
 {
     m_drive = m_side = m_track = 0;
@@ -280,7 +287,7 @@ void CFloppyController::WriteData(WORD data)
 
 void CFloppyController::Periodic()
 {
-    if (!IsEngineOn()) return;  // Вращаем дискеты только если включен мотор
+    //if (!IsEngineOn()) return;  // Вращаем дискеты только если включен мотор
 
     // Вращаем дискеты во всех драйвах сразу
     for (int drive = 0; drive < 4; drive++)
@@ -472,7 +479,7 @@ void CFloppyController::FlushChanges()
 
 
 // Fill data array and marker array with marked data
-static void EncodeTrackData(BYTE* pSrc, BYTE* data, BYTE* marker, WORD track, WORD side)
+static void EncodeTrackData(const BYTE* pSrc, BYTE* data, BYTE* marker, WORD track, WORD side)
 {
     memset(data, 0, FLOPPY_RAWTRACKSIZE);
     memset(marker, 0, FLOPPY_RAWMARKERSIZE);
@@ -521,7 +528,7 @@ static void EncodeTrackData(BYTE* pSrc, BYTE* data, BYTE* marker, WORD track, WO
 // pRaw is array of FLOPPY_RAWTRACKSIZE bytes
 // pDest is array of 5120 bytes
 // Returns: TRUE - decoded, FALSE - parse error
-static BOOL DecodeTrackData(BYTE* pRaw, BYTE* pDest)
+static BOOL DecodeTrackData(const BYTE* pRaw, BYTE* pDest)
 {
     WORD dataptr = 0;  // Offset in m_data array
     WORD destptr = 0;  // Offset in data array

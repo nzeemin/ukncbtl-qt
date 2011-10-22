@@ -1,3 +1,13 @@
+/*  This file is part of UKNCBTL.
+    UKNCBTL is free software: you can redistribute it and/or modify it under the terms
+of the GNU Lesser General Public License as published by the Free Software Foundation,
+either version 3 of the License, or (at your option) any later version.
+    UKNCBTL is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU Lesser General Public License for more details.
+    You should have received a copy of the GNU Lesser General Public License along with
+UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
+
 // Board.h
 //
 
@@ -33,6 +43,12 @@ typedef struct chan_tag
     BYTE	rdwr;
 } chan_stc;
 
+typedef struct kbd_row_tag
+{
+	BOOL	processed;
+	BYTE	row_Y;
+} kbd_row;
+
 // Tape emulator callback used to read a tape recorded data.
 // Input:
 //   samples    Number of samples to play.
@@ -60,6 +76,13 @@ typedef BOOL (CALLBACK* SERIALINCALLBACK)(BYTE* pbyte);
 // Output:
 //   result     TRUE means we translated the byte successfully, FALSE means we have an error
 typedef BOOL (CALLBACK* SERIALOUTCALLBACK)(BYTE byte);
+
+// Parallel port output callback
+// Input:
+//   byte       An output byte
+// Output:
+//   result     TRUE means OK, FALSE means we have an error
+typedef BOOL (CALLBACK* PARALLELOUTCALLBACK)(BYTE byte);
 
 
 class CFloppyController;
@@ -168,14 +191,14 @@ public:  // System control
     
     BOOL        AttachFloppyImage(int slot, LPCTSTR sFileName);
     void        DetachFloppyImage(int slot);
-    BOOL        IsFloppyImageAttached(int slot);
-    BOOL        IsFloppyReadOnly(int slot);
+    BOOL        IsFloppyImageAttached(int slot) const;
+    BOOL        IsFloppyReadOnly(int slot) const;
     WORD		GetFloppyState();
     WORD		GetFloppyData();
     void		SetFloppyState(WORD val);
     void		SetFloppyData(WORD val);
 
-    BOOL        IsROMCartridgeLoaded(int cartno);
+    BOOL        IsROMCartridgeLoaded(int cartno) const;
     void        UnloadROMCartridge(int cartno);
 
     BOOL        AttachHardImage(int slot, LPCTSTR sFileName);
@@ -189,6 +212,7 @@ public:  // System control
     void        SetTapeWriteCallback(TAPEWRITECALLBACK callback, int sampleRate);
     void		SetSoundGenCallback(SOUNDGENCALLBACK callback);
     void		SetSerialCallbacks(SERIALINCALLBACK incallback, SERIALOUTCALLBACK outcallback);
+    void		SetParallelOutCallback(PARALLELOUTCALLBACK outcallback);
 
 public:  // Saving/loading emulator status
     void        SaveToImage(BYTE* pImage);
@@ -219,12 +243,17 @@ private:
     BYTE		m_chan0disabled;
     BYTE		m_irq_cpureset;
 
+	BYTE		m_scanned_key;
+	kbd_row		m_kbd_matrix[16];
+
+private:
     TAPEREADCALLBACK m_TapeReadCallback;
     TAPEWRITECALLBACK m_TapeWriteCallback;
     int			m_nTapeSampleRate;
     SOUNDGENCALLBACK m_SoundGenCallback;
     SERIALINCALLBACK    m_SerialInCallback;
     SERIALOUTCALLBACK   m_SerialOutCallback;
+    PARALLELOUTCALLBACK m_ParallelOutCallback;
 
     void DoSound(void);
     
