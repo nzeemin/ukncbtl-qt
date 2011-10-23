@@ -569,8 +569,6 @@ BOOL CMotherboard::SystemFrame()
                         if (pMemCtl->m_Port177700 & 0100)
                             m_pPPU->InterruptVIRQ(3, 0300);
                     }
-                    else
-                        m_scanned_key++;
                 }
                 else
                 {
@@ -582,9 +580,8 @@ BOOL CMotherboard::SystemFrame()
                             m_pPPU->InterruptVIRQ(3, 0300);
                         pMemCtl->m_Port177702 = m_scanned_key & 0x8F;
                     }
-                    else
-                        m_scanned_key++;
                 }
+                m_scanned_key++;
             }
         }
 
@@ -688,9 +685,9 @@ void CMotherboard::KeyboardEvent(BYTE scancode, BOOL okPressed)
 {
     // CSecondMemoryController* pMemCtl = (CSecondMemoryController*) m_pSecondMemCtl;
     // pMemCtl->KeyboardEvent(scancode, okPressed);
-    BYTE	row_Y = scancode & 0xF;
-    BYTE	col_X = (scancode & 0x70) >> 4;
-    BYTE	bit_X = 1 << col_X;
+    BYTE row_Y = scancode & 0xF;
+    BYTE col_X = (scancode & 0x70) >> 4;
+    BYTE bit_X = 1 << col_X;
     if (okPressed)
         m_kbd_matrix[row_Y].row_Y |= bit_X;
     else
@@ -1037,7 +1034,6 @@ void CMotherboard::ChanTxStateSetPPU(BYTE state)
         m_chanpputx[1].rdwr = 0;
         m_pPPU->InterruptVIRQ(8, 0334);
     }
-
 }
 
 void CMotherboard::ChanResetByCPU()
