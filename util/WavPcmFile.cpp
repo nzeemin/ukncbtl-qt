@@ -13,7 +13,6 @@ UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
 #include "stdafx.h"
 #include "WavPcmFile.h"
 #include <stdio.h>
-#include <Share.h>
 
 
 //////////////////////////////////////////////////////////////////////
@@ -89,7 +88,7 @@ HWAVPCMFILE WavPcmFile_Create(LPCTSTR filename, int sampleRate)
     const int channels = 1;
     const int blockAlign = channels * bitsPerSample / 8;
 
-    FILE* fpFileNew = ::_tfsopen(filename, _T("w+b"), _SH_DENYWR);
+    FILE* fpFileNew = ::_tfopen(filename, _T("w+b"));
     if (fpFileNew == NULL)
         return (HWAVPCMFILE) INVALID_HANDLE_VALUE;  // Failed to create file
 
@@ -137,7 +136,7 @@ HWAVPCMFILE WavPcmFile_Create(LPCTSTR filename, int sampleRate)
 
 HWAVPCMFILE WavPcmFile_Open(LPCTSTR filename)
 {
-    FILE* fpFileOpen = ::_tfsopen(filename, _T("rb"), _SH_DENYWR);
+    FILE* fpFileOpen = ::_tfopen(filename, _T("rb"));
     if (fpFileOpen == NULL)
         return (HWAVPCMFILE) INVALID_HANDLE_VALUE;  // Failed to open file
 
@@ -271,24 +270,27 @@ void WavPcmFile_Close(HWAVPCMFILE wavpcmfile)
     ::free(pWavPcm);
 }
 
-void WavPcmFile_WriteOne(HWAVPCMFILE wavpcmfile, unsigned int value)
+BOOL WavPcmFile_WriteOne(HWAVPCMFILE wavpcmfile, unsigned int value)
 {
     if (wavpcmfile == INVALID_HANDLE_VALUE)
-        return;
+        return FALSE;
 
     WAVPCMFILE* pWavPcm = (WAVPCMFILE*) wavpcmfile;
     if (!pWavPcm->okWriting)
-        return;
+        return FALSE;
     ASSERT(pWavPcm->nBitsPerSample == 8);
     ASSERT(pWavPcm->nChannels == 1);
 
     BYTE data = (value >> 24) & 0xff;
 
-    DWORD bytesWritten = ::fwrite(&data, 1, 1, pWavPcm->fpFile);
-    //TODO: Проверка на ошибки записи
+    size_t bytesWritten = ::fwrite(&data, 1, 1, pWavPcm->fpFile);
+    if (bytesWritten != 1)
+        return FALSE;
 
     pWavPcm->dwCurrentPosition++;
     pWavPcm->dwDataSize += pWavPcm->nBlockAlign;
+
+    return TRUE;
 }
 
 unsigned int WavPcmFile_ReadOne(HWAVPCMFILE wavpcmfile)

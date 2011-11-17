@@ -30,7 +30,7 @@ void QDisasmView::updateData()
     m_wDisasmBaseAddr = pDisasmPU->GetPC();
 }
 
-void QDisasmView::paintEvent(QPaintEvent *event)
+void QDisasmView::paintEvent(QPaintEvent * /*event*/)
 {
     if (g_pBoard == NULL) return;
 
@@ -60,7 +60,7 @@ void QDisasmView::DrawDisassemble(QPainter &painter, CProcessor *pProc, unsigned
     WORD current = base;
 
     // Читаем из памяти процессора в буфер
-    const int nWindowSize = this->height() / cyLine;
+    const int nWindowSize = 30; //this->height() / cyLine;
     WORD memory[nWindowSize + 2];
     for (int idx = 0; idx < nWindowSize; idx++) {
         int addrtype;

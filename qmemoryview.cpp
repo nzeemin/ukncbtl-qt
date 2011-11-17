@@ -66,7 +66,7 @@ void QMemoryView::scrollValueChanged()
     this->repaint();
 }
 
-void QMemoryView::paintEvent(QPaintEvent *event)
+void QMemoryView::paintEvent(QPaintEvent * /*event*/)
 {
     if (g_pBoard == NULL) return;
 
