@@ -53,7 +53,7 @@ void QScreen::saveScreenshot(QString strFileName)
     m_image->save(strFileName, _T("PNG"), -1);
 }
 
-void QScreen::paintEvent(QPaintEvent *event)
+void QScreen::paintEvent(QPaintEvent * /*event*/)
 {
     const DWORD* colors;
     switch (m_mode)

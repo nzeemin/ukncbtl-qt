@@ -33,7 +33,7 @@ typedef char TCHAR;
 #define _T(x)       x
 #endif
 
-#ifndef __MINGW32__
+#ifdef __GNUC__
 #define _stat       stat
 #define _stricmp    strcasecmp
 #define _snprintf   snprintf
@@ -81,8 +81,8 @@ typedef void *HANDLE;
 
 #ifdef _DEBUG
 
-BOOL AssertFailedLine(LPCSTR lpszFileName, int nLine);
-#define ASSERT(f)          (void) ((f) || !AssertFailedLine(__FILE__, __LINE__) || (DebugBreak(), 0))
+BOOL AssertFailedLine(const char * lpszFileName, int nLine);
+#define ASSERT(f)          (void) ((f) || !AssertFailedLine(__FILE__, __LINE__) || (__debugbreak(), 0))
 #define VERIFY(f)          ASSERT(f)
 
 #else   // _DEBUG

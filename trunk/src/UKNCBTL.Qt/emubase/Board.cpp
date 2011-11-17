@@ -20,28 +20,20 @@ UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
 
 CMotherboard::CMotherboard ()
 {
+    memset(freq_per, 0, sizeof(freq_per));
+    memset(freq_out, 0, sizeof(freq_out));
+    memset(freq_enable, 0, sizeof(freq_enable));
+    m_multiply = 1;
+
+    m_TapeReadCallback = NULL;
+    m_TapeWriteCallback = NULL;
+    m_nTapeSampleRate = 0;
+    m_SoundGenCallback = NULL;
+    m_SerialInCallback = NULL;
+    m_SerialOutCallback = NULL;
+    m_ParallelOutCallback = NULL;
+
     // Create devices
-    freq_per[0]=0;
-    freq_per[1]=0;
-    freq_per[2]=0;
-    freq_per[3]=0;
-    freq_per[4]=0;
-
-    freq_out[0]=0;
-    freq_out[1]=0;
-    freq_out[2]=0;
-    freq_out[3]=0;
-    freq_out[4]=0;
-
-    freq_enable[0]=0;
-    freq_enable[1]=0;
-    freq_enable[2]=0;
-    freq_enable[3]=0;
-    freq_enable[4]=0;
-    freq_enable[5]=0;
-
-    m_multiply=1;
-
     m_pCPU = new CProcessor(_T("CPU"));
     m_pPPU = new CProcessor(_T("PPU"));
     m_pFirstMemCtl = new CFirstMemoryController();
@@ -53,14 +45,6 @@ CMotherboard::CMotherboard ()
     m_pFirstMemCtl->Attach(this, m_pCPU);
     m_pPPU->AttachMemoryController(m_pSecondMemCtl);
     m_pSecondMemCtl->Attach(this, m_pPPU);
-
-    m_TapeReadCallback = NULL;
-    m_TapeWriteCallback = NULL;
-    m_nTapeSampleRate = 0;
-    m_SoundGenCallback = NULL;
-    m_SerialInCallback = NULL;
-    m_SerialOutCallback = NULL;
-    m_ParallelOutCallback = NULL;
 
     // Allocate memory for RAM and ROM
     m_pRAM[0] = (BYTE*) malloc(65536);  memset(m_pRAM[0], 0, 65536);
@@ -259,7 +243,7 @@ void CMotherboard::SetHardPortWord(int slot, WORD port, WORD data)
 }
 
 
-// Работа с памятью //////////////////////////////////////////////////
+// Memory control ////////////////////////////////////////////////////
 
 WORD CMotherboard::GetRAMWord(int plan, WORD offset)
 {
@@ -462,15 +446,6 @@ void CMotherboard::SetTimerState(WORD val) // Sets timer state
     }
 }
 
-/* void CMotherboard::DebugTicks()
-{
-    m_pPPU->SetInternalTick(0);
-    m_pPPU->Execute();
-    m_pCPU->SetInternalTick(0);
-    m_pCPU->Execute();
-    m_pFloppyCtl->Periodic();
-} */
-
 void CMotherboard::DebugTicks()
 {
     if (!m_pPPU->IsStopped())
@@ -626,7 +601,7 @@ BOOL CMotherboard::SystemFrame()
                 BYTE b;
                 if (m_SerialInCallback(&b))
                 {
-                    if (pMemCtl->SerialInput(b))
+                    if (pMemCtl->SerialInput(b) && (pMemCtl->m_Port176570 & 0100))
                         m_pCPU->InterruptVIRQ(3, 0370);
                 }
             }
@@ -643,12 +618,12 @@ BOOL CMotherboard::SystemFrame()
                         (*m_SerialOutCallback)(pMemCtl->m_Port176576 & 0xff);
                     else  // Loopback
                     {
-                        if (pMemCtl->SerialInput(pMemCtl->m_Port176576 & 0xff))
+                        if (pMemCtl->SerialInput(pMemCtl->m_Port176576 & 0xff) && (pMemCtl->m_Port176570 & 0100))
                             m_pCPU->InterruptVIRQ(3, 0370);
                     }
                     pMemCtl->m_Port176574 |= 0200;  // Set Ready flag
                     if (pMemCtl->m_Port176574 & 0100)  // Interrupt?
-                         m_pCPU->InterruptVIRQ(3, 374);
+                         m_pCPU->InterruptVIRQ(3, 0374);
                 }
             }
             else if ((pMemCtl->m_Port176574 & 0200) == 0)  // Ready is 0?
@@ -683,8 +658,6 @@ BOOL CMotherboard::SystemFrame()
 // Key pressed or released
 void CMotherboard::KeyboardEvent(BYTE scancode, BOOL okPressed)
 {
-    // CSecondMemoryController* pMemCtl = (CSecondMemoryController*) m_pSecondMemCtl;
-    // pMemCtl->KeyboardEvent(scancode, okPressed);
     BYTE row_Y = scancode & 0xF;
     BYTE col_X = (scancode & 0x70) >> 4;
     BYTE bit_X = 1 << col_X;
@@ -1219,25 +1192,19 @@ void CMotherboard::ChanResetByPPU()
 //}
 
 
-WORD	CMotherboard::GetFloppyState()
+WORD CMotherboard::GetFloppyState()
 {
     return m_pFloppyCtl->GetState();
 }
-WORD	CMotherboard::GetFloppyData()
+WORD CMotherboard::GetFloppyData()
 {
     return m_pFloppyCtl->GetData();
 }
-void	CMotherboard::SetFloppyState(WORD val)
+void CMotherboard::SetFloppyState(WORD val)
 {
-    //if(val&02000)
-    //{
-    //	m_currentdrive=(val&3)^3;
-    //}
-    ////m_currentdrive=0;
-    //m_pFloppyCtl[m_currentdrive]->SetCommand(val&~3); // it should not get select :)
     m_pFloppyCtl->SetCommand(val);
 }
-void	CMotherboard::SetFloppyData(WORD val)
+void CMotherboard::SetFloppyData(WORD val)
 {
     m_pFloppyCtl->WriteData(val);
 }
@@ -1275,11 +1242,7 @@ WORD CMotherboard::GetKeyboardRegister(void)
 
 void CMotherboard::DoSound(void)
 {
-/*		int freq_per[6];
-    int freq_out[6];
-    int freq_enable[6];*/
     int global;
-
 
     freq_out[0]=(m_timer>>3)&1; //8000
     if(m_multiply>=4)
@@ -1290,7 +1253,6 @@ void CMotherboard::DoSound(void)
     freq_out[2]=(m_timer>>7)&1;//500
     freq_out[3]=(m_timer>>8)&1;//250
     freq_out[4]=(m_timer>>10)&1;//60
-    
 
     global=0;
     global= !(freq_out[0]&freq_enable[0]) & ! (freq_out[1]&freq_enable[1]) & !(freq_out[2]&freq_enable[2]) & !(freq_out[3]&freq_enable[3]) & !(freq_out[4]&freq_enable[4]);
@@ -1301,13 +1263,6 @@ void CMotherboard::DoSound(void)
         if( (!freq_enable[0]) && (!freq_enable[1]) && (!freq_enable[2]) && (!freq_enable[3]) && (!freq_enable[4]))
             global=1;
     }
-
-//	global=(freq_out[0]);
-//	global=(freq_out[4]);
-    //global|=(freq_out[2]&freq_enable[2]);
-//	global|=(freq_out[3]&freq_enable[3]);
-//	global|=(freq_out[4]&freq_enable[4]);
-//	global&=freq_enable[5];
 
     if (m_SoundGenCallback != NULL)
     {

@@ -122,7 +122,7 @@ WORD SOB_TIMING=0x002D;
 WORD SOB_LAST_TIMING=0x0019; //last iteration of SOB
 WORD BR_TIMING=0x0025;
 WORD MARK_TIMING=0x0041;
-WORD RESET_TIMING=0x0433;
+WORD RESET_TIMING = 105 + 968;  // ТО КМ1801ВМ2 стр. 134
 
 
 //////////////////////////////////////////////////////////////////////
@@ -588,113 +588,141 @@ void CProcessor::ExecuteWAIT ()  // WAIT - Wait for an interrupt
     m_waitmode = TRUE;
 }
 
-void CProcessor::ExecuteSTEP()
+void CProcessor::ExecuteSTEP()  // ШАГ
 {
-    if ((m_psw & PSW_HALT) == 0)
+    if ((m_psw & PSW_HALT) == 0)  // Эта команда выполняется только в режиме HALT
     {
         m_RSVDrq = TRUE;
         return;
     }
 
+    SetPC(m_savepc);        // СК <- КРСК
+    SetPSW(m_savepsw);      // РСП(8:0) <- КРСП(8:0)
     m_stepmode = TRUE;
-    SetPC(m_savepc);
-    SetPSW(m_savepsw);
 }
 
-void CProcessor::ExecuteRSEL()
+void CProcessor::ExecuteRSEL()  // ЧПТ
 {
-    if ((m_psw & PSW_HALT) == 0)
+    if ((m_psw & PSW_HALT) == 0)  // Эта команда выполняется только в режиме HALT
     {
         m_RSVDrq = TRUE;
         return;
     }
 
-    SetReg(0, GetMemoryController()->GetSelRegister());
-    //ASSERT(0);
+    SetReg(0, GetMemoryController()->GetSelRegister());  // R0 <- (SEL)
 }
 
 void CProcessor::Execute000030()  // Unknown command
 {
-    if ((m_psw & PSW_HALT) == 0)
+    if ((m_psw & PSW_HALT) == 0)  // Эта команда выполняется только в режиме HALT
     {
         m_RSVDrq = TRUE;
         return;
     }
 
-    //TODO: Реализовать команду
-    //m_RPLYrq = TRUE;
+    // Описание: По этой команде сперва очищается регистр R0. Далее исполняется цикл, окончанием которого
+    //           является установка в разряде 07 R0 или R2 единицы. В цикле над регистрами проводятся
+    //           следующие действия: регистры с R1 по R3 сдвигаются влево, при этом в R1 в младший разряд
+    //           вдвигается ноль, а в R2 и R3 – содержимое разряда C, при этом старшая часть R2 расширяется
+    //           знаковым разрядом младшей части, R0 инкрементируется. Так как останов исполнения команды
+    //           производится при наличии единицы в разряде 7 в R0 или R2, то после исполнения команды R0
+    //           может принимать значения от 0 до 108 или 2008. Значение 2008 получается в том случае,
+    //           если до исполнения операции младшая часть R2 была равна нулю и был сброшен бит С.
+    // Признаки: N – очищается,
+    //           Z – устанавливается, если значение в R0 равно нулю, в противном случае очищается,
+    //           V – очищается,
+    //           C – очищается.
+
+    SetReg(0, 0);
+    while ((GetReg(0) & 0200) == 0 && (GetReg(2) & 0200) == 0)
+    {
+        SetReg(1, GetReg(1) << 1);
+        SetReg(2, (((WORD)GetLReg(2)) << 1) | (GetC() ? 1 : 0));
+        SetReg(2, ((GetReg(2) & 0200) ? 0xff00 : 0) | GetLReg(2));
+        SetReg(3, (GetReg(3) << 1) | (GetC() ? 1 : 0));
+        SetReg(0, GetReg(0) + 1);
+    }
+    SetN(0);
+    SetZ(GetReg(0) == 0);
+    SetV(0);
+    SetC(0);
 }
 
-void CProcessor::ExecuteFIS()  // Floating point instruction set
+void CProcessor::ExecuteFIS()  // Floating point instruction set: FADD, FSUB, FMUL, FDIV
 {
-    m_FIS_rq = TRUE;
+    if (GetMemoryController()->GetSelRegister() & 0200)
+        m_RSVDrq = TRUE;
+    else
+        m_FIS_rq = TRUE;
 }
 
-void CProcessor::ExecuteRUN()
+void CProcessor::ExecuteRUN()  // ПУСК
 {
-    if ((m_psw & PSW_HALT) == 0)
+    if ((m_psw & PSW_HALT) == 0)  // Эта команда выполняется только в режиме HALT
     {
         m_RSVDrq = TRUE;
         return;
     }
 
-    SetPC(m_savepc);
-    SetPSW(m_savepsw);
+    SetPC(m_savepc);        // СК <- КРСК
+    SetPSW(m_savepsw);      // РСП(8:0) <- КРСП(8:0)
 }
 
 void CProcessor::ExecuteHALT ()  // HALT - Останов
 {
     m_HALTrq = TRUE;
 }
-void CProcessor::ExecuteRCPC	()
+
+void CProcessor::ExecuteRCPC()  // ЧКСК
 {
-    if ((m_psw & PSW_HALT) == 0)
+    if ((m_psw & PSW_HALT) == 0)  // Эта команда выполняется только в режиме HALT
     {
         m_RSVDrq = TRUE;
         return;
     }
 
-    SetReg(0,m_savepc);
-    m_internalTick=NOP_TIMING;
+    SetReg(0, m_savepc);        // R0 <- КРСК
+    m_internalTick = NOP_TIMING;
 }
-void CProcessor::ExecuteRCPS	()
+void CProcessor::ExecuteRCPS()  // ЧКСП
 {
-    if ((m_psw & PSW_HALT) == 0)
+    if ((m_psw & PSW_HALT) == 0)  // Эта команда выполняется только в режиме HALT
     {
         m_RSVDrq = TRUE;
         return;
     }
 
-    SetReg(0,m_savepsw);
-    m_internalTick=NOP_TIMING;
+    SetReg(0, m_savepsw);       // R0 <- КРСП
+    m_internalTick = NOP_TIMING;
 }
-void CProcessor::ExecuteWCPC	()
+void CProcessor::ExecuteWCPC()  // ЗКСК
 {
-    if ((m_psw & PSW_HALT) == 0)
+    if ((m_psw & PSW_HALT) == 0)  // Эта команда выполняется только в режиме HALT
     {
         m_RSVDrq = TRUE;
         return;
     }
 
-    m_savepc=GetReg(0);
-    m_internalTick=NOP_TIMING;
+    m_savepc = GetReg(0);       // КРСК <- R0
+    m_internalTick = NOP_TIMING;
 }
-void CProcessor::ExecuteWCPS	()
+void CProcessor::ExecuteWCPS()  // ЗКСП
 {
-    if ((m_psw & PSW_HALT) == 0)
+    if ((m_psw & PSW_HALT) == 0)  // Эта команда выполняется только в режиме HALT
     {
         m_RSVDrq = TRUE;
         return;
     }
 
-    m_savepsw=GetReg(0);
-    m_internalTick=NOP_TIMING;
+    m_savepsw = GetReg(0);      // КРСП <- R0
+    m_internalTick = NOP_TIMING;
 }
 
-void CProcessor::ExecuteMFUS () //move from user space
+void CProcessor::ExecuteMFUS ()  // ЧЧП, move from user space
 {
     WORD word;
-    if ((m_psw & PSW_HALT) == 0)
+
+    if ((m_psw & PSW_HALT) == 0)  // Эта команда выполняется только в режиме HALT
     {
         m_RSVDrq = TRUE;
         return;
@@ -707,23 +735,23 @@ void CProcessor::ExecuteMFUS () //move from user space
     SetReg(5,GetReg(5)+2);
     if (!m_RPLYrq) 	SetReg(0, word);
 
-    m_internalTick=MOV_TIMING[0][2];
+    m_internalTick = MOV_TIMING[0][2];
 }
 
-void CProcessor::ExecuteMTUS () //move to user space
+void CProcessor::ExecuteMTUS()  // ЗЧП, move to user space
 {
-    if ((m_psw & PSW_HALT) == 0)
+    if ((m_psw & PSW_HALT) == 0)  // Эта команда выполняется только в режиме HALT
     {
         m_RSVDrq = TRUE;
         return;
     }
 
-    //-(r5)=r0
-    SetReg(5,GetReg(5)-2);
+    // -(r5) = r0
+    SetReg(5, GetReg(5) - 2);
     SetHALT(FALSE);
-    SetWord(GetReg(5),GetReg(0));
+    SetWord(GetReg(5), GetReg(0));
     SetHALT(TRUE);
-    m_internalTick=MOV_TIMING[0][2];
+    m_internalTick = MOV_TIMING[0][2];
 }
 
 void CProcessor::ExecuteRTI ()  // RTI - Возврат из прерывания
@@ -743,7 +771,7 @@ void CProcessor::ExecuteRTI ()  // RTI - Возврат из прерывания
     m_internalTick=RTI_TIMING;
 }
 
-void CProcessor::ExecuteRTT ()  // RTT - return from trace trap
+void CProcessor::ExecuteRTT ()  // RTT - Return from Trace Trap -- Возврат из прерывания
 {
     WORD word;
     word = GetWord(GetSP());
@@ -2510,38 +2538,48 @@ void CProcessor::ExecuteMARK ()  // MARK
 //////////////////////////////////////////////////////////////////////
 //
 // CPU image format (32 bytes):
-//   2 bytes        PSW
+//   2   bytes      PSW
 //   2*8 bytes      Registers R0..R7
 //   2*2 bytes      Saved PC and PSW
-//   2 bytes        Stopped flag: !0 - stopped, 0 - not stopped
+//   2   byte       Stopped flag: 1 - stopped, 0 - not stopped
+//   2   bytes      Internal tick count
+//   1*6 bytes      Step mode, Bus error, HALT, DCLO, ACLO, WAIT
 
-void CProcessor::SaveToImage(BYTE* pImage)
+void CProcessor::SaveToImage(BYTE* pImage) const
 {
     WORD* pwImage = (WORD*) pImage;
-    // PSW
-    *pwImage++ = m_psw;
-    // Registers R0..R7
-    memcpy(pwImage, m_R, 2 * 8);
+    *pwImage++ = m_psw;  // PSW
+    memcpy(pwImage, m_R, 2 * 8);  // Registers R0..R7
     pwImage += 2 * 8;
-    // Saved PC and PSW
     *pwImage++ = m_savepc;
     *pwImage++ = m_savepsw;
-    // Stopped flag
     *pwImage++ = (m_okStopped ? 1 : 0);
+    *pwImage++ = m_internalTick;
+    BYTE* pbImage = (BYTE*) pwImage;
+    *pbImage++ = (m_stepmode  ? 1 : 0);
+    *pbImage++ = (m_buserror  ? 1 : 0);
+    *pbImage++ = (m_haltpin   ? 1 : 0);
+    *pbImage++ = (m_DCLOpin   ? 1 : 0);
+    *pbImage++ = (m_ACLOpin   ? 1 : 0);
+    *pbImage++ = (m_waitmode  ? 1 : 0);
 }
 
 void CProcessor::LoadFromImage(const BYTE* pImage)
 {
-    WORD* pwImage = (WORD*) pImage;
-    // PSW
-    m_psw = *pwImage++;
-    // Registers R0..R7
-    memcpy(m_R, pwImage, 2 * 8);
-    // Saved PC and PSW
-    m_savepc= *pwImage++;
-    m_savepsw= *pwImage++;
-    // Stopped flag
+    const WORD* pwImage = (const WORD*) pImage;
+    m_psw = *pwImage++;  // PSW
+    memcpy(m_R, pwImage, 2 * 8);  // Registers R0..R7
+    m_savepc    = *pwImage++;
+    m_savepsw   = *pwImage++;
     m_okStopped = (*pwImage++ != 0);
+    m_internalTick = *pwImage++;
+    const BYTE* pbImage = (const BYTE*) pwImage;
+    m_stepmode  = (*pbImage++ != 0);
+    m_buserror  = (*pbImage++ != 0);
+    m_haltpin   = (*pbImage++ != 0);
+    m_DCLOpin   = (*pbImage++ != 0);
+    m_ACLOpin   = (*pbImage++ != 0);
+    m_waitmode  = (*pbImage++ != 0);
 }
 
 WORD CProcessor::GetWordAddr (BYTE meth, BYTE reg)
