@@ -164,8 +164,8 @@ HWAVPCMFILE WavPcmFile_Open(LPCTSTR filename)
     BYTE tagHeader[8];
     BYTE formatTag[16];
     BOOL formatSpecified = FALSE;
-    int formatType, channels, bitsPerSample, blockAlign;
-    DWORD sampleFrequency, bytesPerSecond, dataOffset, dataSize;
+    int formatType, channels = 1, bitsPerSample, blockAlign;
+    DWORD sampleFrequency, bytesPerSecond, dataOffset, dataSize = 0;
     while (offset < statedSize)
     {
         bytesRead = ::fread(tagHeader, 1, sizeof(tagHeader), fpFileOpen);
@@ -313,7 +313,7 @@ unsigned int WavPcmFile_ReadOne(HWAVPCMFILE wavpcmfile)
     pWavPcm->dwCurrentPosition++;
 
     // Decode first channel
-    unsigned int value;
+    unsigned int value = 0;
     switch (pWavPcm->nBitsPerSample)
     {
     case 8:

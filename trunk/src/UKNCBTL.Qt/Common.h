@@ -34,7 +34,7 @@ typedef char TCHAR;
 #endif
 
 #ifdef __GNUC__
-#define _stat       stat
+//#define _stat       stat
 #define _stricmp    strcasecmp
 #define _snprintf   snprintf
 #endif
@@ -66,9 +66,13 @@ typedef int BOOL;
 #define HIBYTE(w)           ((BYTE)((((DWORD)(w)) >> 8) & 0xff))
 
 #ifdef __GNUC__
-#define CALLBACK __attribute__((stdcall))
+ #ifdef __APPLE__
+  #define CALLBACK
+ #else
+  #define CALLBACK __attribute__((stdcall))
+ #endif
 #else
-#define CALLBACK __stdcall
+ #define CALLBACK __stdcall
 #endif
 
 typedef void *HANDLE;

@@ -13,8 +13,12 @@
 BOOL AssertFailedLine(const char * lpszFileName, int nLine)
 {
     TCHAR buffer[360];
-    _snprintf(buffer, 360,
+    _sntprintf(buffer, 360,
+#ifdef _UNICODE
             _T("ASSERTION FAILED\n\nFile: %S\nLine: %d\n\n")
+#else
+            _T("ASSERTION FAILED\n\nFile: %s\nLine: %d\n\n")
+#endif
             _T("Press Abort to stop the program, Retry to break to the debugger, or Ignore to continue execution."),
             lpszFileName, nLine);
     int result = QMessageBox::question(NULL, _T("UKNC Back to Life"), buffer, QMessageBox::Abort, QMessageBox::Retry, QMessageBox::Ignore);
