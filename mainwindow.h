@@ -52,6 +52,8 @@ public slots:
     void debugStepOver();
     void viewRgbScreen();
     void viewGrayscaleScreen();
+    void viewSizeRegular();
+    void viewSizeUpscaled();
 
 protected:
     void changeEvent(QEvent *e);

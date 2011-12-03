@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Wed Nov 16 21:09:37 2011
+** Created: Sat Dec 3 15:19:34 2011
 **      by: Qt User Interface Compiler version 4.7.4
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -49,6 +49,8 @@ public:
     QAction *actionViewRgbScreen;
     QAction *actionViewGrayscaleScreen;
     QAction *actionHelpAbout;
+    QAction *actionViewSizeRegular;
+    QAction *actionViewSizeUpscaled;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -145,6 +147,12 @@ public:
         actionViewGrayscaleScreen->setCheckable(true);
         actionHelpAbout = new QAction(MainWindow);
         actionHelpAbout->setObjectName(QString::fromUtf8("actionHelpAbout"));
+        actionViewSizeRegular = new QAction(MainWindow);
+        actionViewSizeRegular->setObjectName(QString::fromUtf8("actionViewSizeRegular"));
+        actionViewSizeRegular->setCheckable(true);
+        actionViewSizeUpscaled = new QAction(MainWindow);
+        actionViewSizeUpscaled->setObjectName(QString::fromUtf8("actionViewSizeUpscaled"));
+        actionViewSizeUpscaled->setCheckable(true);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         MainWindow->setCentralWidget(centralWidget);
@@ -187,6 +195,9 @@ public:
         menuEmulator->addSeparator();
         menuEmulator->addAction(actionViewRgbScreen);
         menuEmulator->addAction(actionViewGrayscaleScreen);
+        menuEmulator->addSeparator();
+        menuEmulator->addAction(actionViewSizeRegular);
+        menuEmulator->addAction(actionViewSizeUpscaled);
         menuDrives->addAction(actionDrivesFloppy0);
         menuDrives->addAction(actionDrivesFloppy1);
         menuDrives->addAction(actionDrivesFloppy2);
@@ -258,6 +269,8 @@ public:
         actionViewRgbScreen->setText(QApplication::translate("MainWindow", "RGB Screen", 0, QApplication::UnicodeUTF8));
         actionViewGrayscaleScreen->setText(QApplication::translate("MainWindow", "Grayscale Screen", 0, QApplication::UnicodeUTF8));
         actionHelpAbout->setText(QApplication::translate("MainWindow", "About", 0, QApplication::UnicodeUTF8));
+        actionViewSizeRegular->setText(QApplication::translate("MainWindow", "Size Regular", 0, QApplication::UnicodeUTF8));
+        actionViewSizeUpscaled->setText(QApplication::translate("MainWindow", "Size Upscaled to 1.5", 0, QApplication::UnicodeUTF8));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0, QApplication::UnicodeUTF8));
         menuEmulator->setTitle(QApplication::translate("MainWindow", "Emulator", 0, QApplication::UnicodeUTF8));
         menuDrives->setTitle(QApplication::translate("MainWindow", "Drives", 0, QApplication::UnicodeUTF8));

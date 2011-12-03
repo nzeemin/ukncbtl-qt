@@ -26,16 +26,49 @@ const DWORD ScreenView_GrayColors[16] = {
 //////////////////////////////////////////////////////////////////////
 
 
-QScreen::QScreen(QWidget *parent) :
-    QWidget(parent)
+// Upscale screen from height 288 to 432
+static void UpscaleScreen(void* pImageBits)
 {
-    setMinimumSize(UKNC_SCREEN_WIDTH, UKNC_SCREEN_HEIGHT);
-    setMaximumSize(UKNC_SCREEN_WIDTH + 100, UKNC_SCREEN_HEIGHT + 20);
+    int ukncline = 287;
+    for (int line = 431; line > 0; line--)
+    {
+        DWORD* pdest = ((DWORD*)pImageBits) + line * UKNC_SCREEN_WIDTH;
+        if (line % 3 == 1)
+        {
+            BYTE* psrc1 = ((BYTE*)pImageBits) + ukncline * UKNC_SCREEN_WIDTH * 4;
+            BYTE* psrc2 = ((BYTE*)pImageBits) + (ukncline + 1) * UKNC_SCREEN_WIDTH * 4;
+            BYTE* pdst1 = (BYTE*)pdest;
+            for (int i = 0; i < UKNC_SCREEN_WIDTH * 4; i++)
+            {
+                if (i % 4 == 3)
+                    *pdst1 = 0;
+                else
+                    *pdst1 = (BYTE)((((WORD)*psrc1) + ((WORD)*psrc2)) / 2);
+                psrc1++;  psrc2++;  pdst1++;
+            }
+        }
+        else
+        {
+            DWORD* psrc = ((DWORD*)pImageBits) + ukncline * UKNC_SCREEN_WIDTH;
+            memcpy(pdest, psrc, UKNC_SCREEN_WIDTH * 4);
+            ukncline--;
+        }
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////
+
+
+QScreen::QScreen(QWidget *parent) :
+    QWidget(parent), m_image(0)
+{
     setFocusPolicy(Qt::StrongFocus);
 
-    m_image = new QImage(UKNC_SCREEN_WIDTH, UKNC_SCREEN_HEIGHT, QImage::Format_RGB32);
-
     m_mode = RGBScreen;
+    m_sizeMode = RegularScreen;
+
+    createDisplay();
 }
 
 QScreen::~QScreen()
@@ -48,9 +81,37 @@ void QScreen::setMode(ScreenViewMode mode)
     m_mode = mode;
 }
 
+void QScreen::setSizeMode(ScreenSizeMode mode)
+{
+    if (m_sizeMode == mode) return;
+
+    m_sizeMode = mode;
+
+    createDisplay();
+}
+
 void QScreen::saveScreenshot(QString strFileName)
 {
     m_image->save(strFileName, _T("PNG"), -1);
+}
+
+void QScreen::createDisplay()
+{
+    if (m_image != 0)
+    {
+        delete m_image;
+        m_image = 0;
+    }
+
+    int cxScreenWidth = UKNC_SCREEN_WIDTH;
+    int cyScreenHeight = UKNC_SCREEN_HEIGHT;
+    if (m_sizeMode == UpscaledScreen)
+        cyScreenHeight = 432;
+
+    m_image = new QImage(cxScreenWidth, cyScreenHeight, QImage::Format_RGB32);
+
+    setMinimumSize(cxScreenWidth, cyScreenHeight);
+    setMaximumSize(cxScreenWidth + 100, cyScreenHeight + 20);
 }
 
 void QScreen::paintEvent(QPaintEvent * /*event*/)
@@ -65,6 +126,8 @@ void QScreen::paintEvent(QPaintEvent * /*event*/)
     }
 
     Emulator_PrepareScreenRGB32(m_image->bits(), colors);
+    if (m_sizeMode == UpscaledScreen)
+        UpscaleScreen(m_image->bits());
 
     QPainter painter(this);
     painter.drawImage(0, 0, *m_image);
