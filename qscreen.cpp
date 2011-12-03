@@ -56,6 +56,20 @@ static void UpscaleScreen(void* pImageBits)
     }
 }
 
+// Upscale screen from height 288 to 576 with "interlaced" effect
+static void UpscaleScreen2(void* pImageBits)
+{
+    for (int ukncline = 287; ukncline >= 0; ukncline--)
+    {
+        DWORD* psrc = ((DWORD*)pImageBits) + ukncline * UKNC_SCREEN_WIDTH;
+        DWORD* pdest = ((DWORD*)pImageBits) + (ukncline * 2) * UKNC_SCREEN_WIDTH;
+        memcpy(pdest, psrc, UKNC_SCREEN_WIDTH * 4);
+
+        pdest += UKNC_SCREEN_WIDTH;
+        memset(pdest, 0, UKNC_SCREEN_WIDTH * 4);
+    }
+}
+
 
 //////////////////////////////////////////////////////////////////////
 
@@ -105,7 +119,9 @@ void QScreen::createDisplay()
 
     int cxScreenWidth = UKNC_SCREEN_WIDTH;
     int cyScreenHeight = UKNC_SCREEN_HEIGHT;
-    if (m_sizeMode == UpscaledScreen)
+    if (m_sizeMode == DoubleScreen)
+        cyScreenHeight = UKNC_SCREEN_HEIGHT * 2;
+    else if (m_sizeMode == UpscaledScreen)
         cyScreenHeight = 432;
 
     m_image = new QImage(cxScreenWidth, cyScreenHeight, QImage::Format_RGB32);
@@ -126,7 +142,9 @@ void QScreen::paintEvent(QPaintEvent * /*event*/)
     }
 
     Emulator_PrepareScreenRGB32(m_image->bits(), colors);
-    if (m_sizeMode == UpscaledScreen)
+    if (m_sizeMode == DoubleScreen)
+        UpscaleScreen2(m_image->bits());
+    else if (m_sizeMode == UpscaledScreen)
         UpscaleScreen(m_image->bits());
 
     QPainter painter(this);

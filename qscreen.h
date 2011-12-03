@@ -12,7 +12,7 @@ enum ScreenViewMode {
 enum ScreenSizeMode {
     RegularScreen = 1,
     DoubleScreen = 2,
-    UpscaledScreen = 2,
+    UpscaledScreen = 3,
 };
 
 class QScreen : public QWidget

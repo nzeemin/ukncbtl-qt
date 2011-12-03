@@ -54,6 +54,7 @@ public slots:
     void viewGrayscaleScreen();
     void viewSizeRegular();
     void viewSizeUpscaled();
+    void viewSizeDouble();
 
 protected:
     void changeEvent(QEvent *e);

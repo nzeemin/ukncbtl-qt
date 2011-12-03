@@ -49,6 +49,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionViewRgbScreen, SIGNAL(triggered()), this, SLOT(viewRgbScreen()));
     QObject::connect(ui->actionViewGrayscaleScreen, SIGNAL(triggered()), this, SLOT(viewGrayscaleScreen()));
     QObject::connect(ui->actionViewSizeRegular, SIGNAL(triggered()), this, SLOT(viewSizeRegular()));
+    QObject::connect(ui->actionViewSizeDouble, SIGNAL(triggered()), this, SLOT(viewSizeDouble()));
     QObject::connect(ui->actionViewSizeUpscaled, SIGNAL(triggered()), this, SLOT(viewSizeUpscaled()));
 
     // Screen and keyboard
@@ -155,6 +156,7 @@ void MainWindow::UpdateMenu()
     ui->actionViewGrayscaleScreen->setChecked(m_screen->mode() == GrayScreen);
     ui->actionViewSizeRegular->setChecked(m_screen->sizeMode() == RegularScreen);
     ui->actionViewSizeUpscaled->setChecked(m_screen->sizeMode() == UpscaledScreen);
+    ui->actionViewSizeDouble->setChecked(m_screen->sizeMode() == DoubleScreen);
 
     ui->actionDrivesFloppy0->setIcon(QIcon(
             g_pBoard->IsFloppyImageAttached(0) ? _T(":/images/iconFloppy.png") : _T(":/images/iconFloppySlot.png") ));
@@ -288,6 +290,14 @@ void MainWindow::viewSizeRegular()
 void MainWindow::viewSizeUpscaled()
 {
     m_screen->setSizeMode(UpscaledScreen);
+    UpdateMenu();
+
+    //Update centralWidget size
+    ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
+}
+void MainWindow::viewSizeDouble()
+{
+    m_screen->setSizeMode(DoubleScreen);
     UpdateMenu();
 
     //Update centralWidget size
