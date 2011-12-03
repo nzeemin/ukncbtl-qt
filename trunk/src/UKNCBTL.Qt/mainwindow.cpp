@@ -48,6 +48,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionHelpAboutQt, SIGNAL(triggered()), this, SLOT(helpAboutQt()));
     QObject::connect(ui->actionViewRgbScreen, SIGNAL(triggered()), this, SLOT(viewRgbScreen()));
     QObject::connect(ui->actionViewGrayscaleScreen, SIGNAL(triggered()), this, SLOT(viewGrayscaleScreen()));
+    QObject::connect(ui->actionViewSizeRegular, SIGNAL(triggered()), this, SLOT(viewSizeRegular()));
+    QObject::connect(ui->actionViewSizeUpscaled, SIGNAL(triggered()), this, SLOT(viewSizeUpscaled()));
 
     // Screen and keyboard
     m_screen = new QScreen();
@@ -151,6 +153,8 @@ void MainWindow::UpdateMenu()
     ui->actionEmulatorRun->setChecked(g_okEmulatorRunning);
     ui->actionViewRgbScreen->setChecked(m_screen->mode() == RGBScreen);
     ui->actionViewGrayscaleScreen->setChecked(m_screen->mode() == GrayScreen);
+    ui->actionViewSizeRegular->setChecked(m_screen->sizeMode() == RegularScreen);
+    ui->actionViewSizeUpscaled->setChecked(m_screen->sizeMode() == UpscaledScreen);
 
     ui->actionDrivesFloppy0->setIcon(QIcon(
             g_pBoard->IsFloppyImageAttached(0) ? _T(":/images/iconFloppy.png") : _T(":/images/iconFloppySlot.png") ));
@@ -271,6 +275,23 @@ void MainWindow::viewGrayscaleScreen()
 {
     m_screen->setMode(GrayScreen);
     UpdateMenu();
+}
+
+void MainWindow::viewSizeRegular()
+{
+    m_screen->setSizeMode(RegularScreen);
+    UpdateMenu();
+
+    //Update centralWidget size
+    ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
+}
+void MainWindow::viewSizeUpscaled()
+{
+    m_screen->setSizeMode(UpscaledScreen);
+    UpdateMenu();
+
+    //Update centralWidget size
+    ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
 }
 
 void MainWindow::emulatorFrame()

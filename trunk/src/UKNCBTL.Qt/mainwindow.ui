@@ -40,6 +40,9 @@
     <addaction name="separator"/>
     <addaction name="actionViewRgbScreen"/>
     <addaction name="actionViewGrayscaleScreen"/>
+    <addaction name="separator"/>
+    <addaction name="actionViewSizeRegular"/>
+    <addaction name="actionViewSizeUpscaled"/>
    </widget>
    <widget class="QMenu" name="menuDrives">
     <property name="title">
@@ -346,6 +349,22 @@
   <action name="actionHelpAbout">
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionViewSizeRegular">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Size Regular</string>
+   </property>
+  </action>
+  <action name="actionViewSizeUpscaled">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Size Upscaled to 1.5</string>
    </property>
   </action>
  </widget>
