@@ -45,7 +45,6 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionDebugStepInto, SIGNAL(triggered()), this, SLOT(debugStepInto()));
     QObject::connect(ui->actionDebugStepOver, SIGNAL(triggered()), this, SLOT(debugStepOver()));
     QObject::connect(ui->actionHelpAbout, SIGNAL(triggered()), this, SLOT(helpAbout()));
-    QObject::connect(ui->actionHelpAboutQt, SIGNAL(triggered()), this, SLOT(helpAboutQt()));
     QObject::connect(ui->actionViewRgbScreen, SIGNAL(triggered()), this, SLOT(viewRgbScreen()));
     QObject::connect(ui->actionViewGrayscaleScreen, SIGNAL(triggered()), this, SLOT(viewGrayscaleScreen()));
     QObject::connect(ui->actionViewSizeRegular, SIGNAL(triggered()), this, SLOT(viewSizeRegular()));
@@ -234,8 +233,9 @@ void MainWindow::showFps(double framesPerSecond)
     }
     else
     {
+        double speed = framesPerSecond / 25.0 * 100.0;
         TCHAR buffer[16];
-        _sntprintf(buffer, 16, _T("FPS: %05.2f"), framesPerSecond);
+        _sntprintf(buffer, 16, _T("%03.f%%"), speed);
         m_statusLabelFrames->setText(buffer);
     }
 }
@@ -261,11 +261,8 @@ void MainWindow::helpAbout()
         "http://www.felixl.com/Uknc\r\nhttp://code.google.com/p/ukncbtl/\n\n"
         "Authors:\r\nNikita Zeemin (nzeemin@gmail.com)\nFelix Lazarev (felix.lazarev@gmail.com)\nAlexey Kisly\n\n"
         "Special thanks to:\nArseny Gordin\n\n"
-        "Build date:\t" __DATE__ __TIME__));
-}
-void MainWindow::helpAboutQt()
-{
-    QMessageBox::aboutQt(this, _T("About Qt"));
+        "Build date:\t" __DATE__ " " __TIME__ "\n"
+        "Qt version:\t" QT_VERSION_STR));
 }
 
 void MainWindow::viewRgbScreen()

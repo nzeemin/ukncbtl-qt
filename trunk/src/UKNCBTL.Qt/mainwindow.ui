@@ -64,7 +64,6 @@
      <string>Help</string>
     </property>
     <addaction name="actionHelpAbout"/>
-    <addaction name="actionHelpAboutQt"/>
    </widget>
    <widget class="QMenu" name="menuDebug">
     <property name="title">
@@ -373,7 +372,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Double Screen</string>
+    <string>Double Interlaced</string>
    </property>
   </action>
  </widget>
