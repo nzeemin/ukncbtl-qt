@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtGlobal>
+
 class QFont;
 class QPainter;
 class QString;
@@ -45,10 +47,10 @@ typedef const wchar_t * LPCTSTR;
 typedef const char * LPCTSTR;
 #endif
 
-typedef int LONG;
-typedef unsigned int DWORD;
-typedef unsigned short WORD;
-typedef unsigned char BYTE;
+typedef qint32 LONG;
+typedef quint32 DWORD;
+typedef quint16 WORD;
+typedef quint8 BYTE;
 
 typedef int BOOL;
 #ifndef FALSE
@@ -76,7 +78,7 @@ typedef int BOOL;
 #endif
 
 typedef void *HANDLE;
-#define INVALID_HANDLE_VALUE ((HANDLE)(LONG)-1)
+#define INVALID_HANDLE_VALUE ((HANDLE)(qint32)-1)
 #define DECLARE_HANDLE(name) struct name##__ { int unused; }; typedef struct name##__ *name
 
 
