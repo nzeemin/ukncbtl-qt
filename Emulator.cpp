@@ -7,6 +7,7 @@
 #include "emubase/Emubase.h"
 //#include "SoundGen.h"
 #include <QTime>
+#include <QFile>
 
 
 //////////////////////////////////////////////////////////////////////
@@ -45,8 +46,6 @@ int m_EmulatorKeyQueueCount = 0;
 //////////////////////////////////////////////////////////////////////
 
 
-const LPCTSTR FILE_NAME_UKNC_ROM = _T("uknc_rom.bin");
-
 BOOL Emulator_Init()
 {
     ASSERT(g_pBoard == NULL);
@@ -60,15 +59,15 @@ BOOL Emulator_Init()
 
     // Load ROM file
     memset(buffer, 0, 32768);
-    FILE* fpRomFile = ::_tfopen(FILE_NAME_UKNC_ROM, _T("rb"));
-    if (fpRomFile == NULL)
+    QFile romFile(":/uknc_rom.bin");
+    if (!romFile.open(QIODevice::ReadOnly))
     {
         AlertWarning(_T("Failed to load ROM file."));
         return false;
     }
-    dwBytesRead = ::fread(buffer, 1, 32256, fpRomFile);
-    ASSERT(dwBytesRead == 32256);
-    ::fclose(fpRomFile);
+    qint64 bytesRead = romFile.read((char*)buffer, 32256);
+    ASSERT(bytesRead == 32256);
+    romFile.close();
 
     g_pBoard->LoadROM(buffer);
 

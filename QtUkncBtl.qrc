@@ -9,5 +9,6 @@
         <file>images/iconCartridgeSlot.png</file>
         <file>images/iconHdd.png</file>
         <file>images/iconHddSlot.png</file>
+        <file>uknc_rom.bin</file>
     </qresource>
 </RCC>
