@@ -131,6 +131,9 @@ void MainWindow::changeEvent(QEvent *e)
 
 void MainWindow::closeEvent(QCloseEvent *)
 {
+    Global_getSettings()->setValue("MainWindow/ScreenViewMode", m_screen->mode());
+    Global_getSettings()->setValue("MainWindow/ScreenSizeMode", m_screen->sizeMode());
+
     Global_getSettings()->setValue("MainWindow/Geometry", saveGeometry());
     Global_getSettings()->setValue("MainWindow/WindowState", saveState());
 
@@ -142,6 +145,12 @@ void MainWindow::closeEvent(QCloseEvent *)
 
 void MainWindow::restoreSettings()
 {
+    m_screen->setMode((ScreenViewMode)Global_getSettings()->value("MainWindow/ScreenViewMode").toInt());
+    m_screen->setSizeMode((ScreenSizeMode)Global_getSettings()->value("MainWindow/ScreenSizeMode").toInt());
+
+    //Update centralWidget size
+    ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
+
     restoreGeometry(Global_getSettings()->value("MainWindow/Geometry").toByteArray());
     restoreState(Global_getSettings()->value("MainWindow/WindowState").toByteArray());
 
