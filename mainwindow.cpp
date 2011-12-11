@@ -89,9 +89,9 @@ MainWindow::MainWindow(QWidget *parent) :
     this->addDockWidget(Qt::RightDockWidgetArea, m_dockMemory, Qt::Vertical);
     this->addDockWidget(Qt::BottomDockWidgetArea, m_dockConsole);
 
-    m_statusLabelInfo = new QLabel();
-    m_statusLabelFrames = new QLabel();
-    m_statusLabelUptime = new QLabel();
+    m_statusLabelInfo = new QLabel(this);
+    m_statusLabelFrames = new QLabel(this);
+    m_statusLabelUptime = new QLabel(this);
     statusBar()->addWidget(m_statusLabelInfo, 600);
     statusBar()->addPermanentWidget(m_statusLabelFrames, 150);
     statusBar()->addPermanentWidget(m_statusLabelUptime, 150);
@@ -112,6 +112,9 @@ MainWindow::~MainWindow()
     delete m_dockDebug;
     delete m_dockDisasm;
     delete m_dockMemory;
+    delete m_statusLabelInfo;
+    delete m_statusLabelFrames;
+    delete m_statusLabelUptime;
 }
 
 void MainWindow::changeEvent(QEvent *e)
