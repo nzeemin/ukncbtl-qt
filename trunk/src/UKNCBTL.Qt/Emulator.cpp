@@ -6,6 +6,7 @@
 #include "Emulator.h"
 #include "emubase/Emubase.h"
 //#include "SoundGen.h"
+#include "qsoundout.h"
 #include <QTime>
 #include <QFile>
 
@@ -14,6 +15,7 @@
 
 
 CMotherboard* g_pBoard = NULL;
+QSoundOut * g_sound=NULL;
 
 BOOL g_okEmulatorInitialized = FALSE;
 BOOL g_okEmulatorRunning = FALSE;
@@ -21,7 +23,7 @@ BOOL g_okEmulatorRunning = FALSE;
 WORD m_wEmulatorCPUBreakpoint = 0177777;
 WORD m_wEmulatorPPUBreakpoint = 0177777;
 
-BOOL m_okEmulatorSound = FALSE;
+BOOL m_okEmulatorSound = TRUE;
 
 long m_nFrameCount = 0;
 QTime m_emulatorTime;
@@ -41,10 +43,23 @@ WORD m_EmulatorKeyQueue[KEYEVENT_QUEUE_SIZE];
 int m_EmulatorKeyQueueTop = 0;
 int m_EmulatorKeyQueueBottom = 0;
 int m_EmulatorKeyQueueCount = 0;
+BOOL m_SoundEnabled=TRUE;
 
 
 //////////////////////////////////////////////////////////////////////
+void Emulator_FeedDAC(unsigned short l, unsigned short r)
+{
+    if(g_sound)
+    {
+        if(m_SoundEnabled)
+            g_sound->FeedDAC(l,r);
+    }
+}
 
+void Emulator_SetSound(BOOL enable)
+{
+    m_SoundEnabled=enable;
+}
 
 BOOL Emulator_Init()
 {
@@ -73,11 +88,13 @@ BOOL Emulator_Init()
 
     g_pBoard->Reset();
 
-    //if (m_okEmulatorSound)
-    //{
-    //    SoundGen_Initialize();
-    //    g_pBoard->SetSoundGenCallback(SoundGen_FeedDAC);
-    //}
+    if (m_okEmulatorSound)
+    {
+
+        //SoundGen_Initialize();
+        g_sound=new QSoundOut();
+        g_pBoard->SetSoundGenCallback(Emulator_FeedDAC);
+    }
 
     m_nUptimeFrameCount = 0;
     m_dwEmulatorUptime = 0;
@@ -100,6 +117,11 @@ void Emulator_Done()
     CProcessor::Done();
 
     g_pBoard->SetSoundGenCallback(NULL);
+    if(g_sound)
+    {
+        delete g_sound;
+        g_sound=NULL;
+    }
     //SoundGen_Finalize();
 
     delete g_pBoard;
