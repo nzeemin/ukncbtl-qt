@@ -1,6 +1,7 @@
 # -------------------------------------------------
 # Project created by QtCreator 2010-05-06T17:43:10
 # -------------------------------------------------
+QT += multimedia
 TARGET = QtUkncBtl
 TEMPLATE = app
 SOURCES += main.cpp \
@@ -20,7 +21,8 @@ SOURCES += main.cpp \
     qdebugview.cpp \
     qdisasmview.cpp \
     qconsoleview.cpp \
-    qmemoryview.cpp
+    qmemoryview.cpp \
+    qsoundout.cpp
 HEADERS += mainwindow.h \
     stdafx.h \
     util/WavPcmFile.h \
@@ -38,6 +40,7 @@ HEADERS += mainwindow.h \
     qdebugview.h \
     qdisasmview.h \
     qconsoleview.h \
-    qmemoryview.h
+    qmemoryview.h \
+    qsoundout.h
 FORMS += mainwindow.ui
 RESOURCES += QtUkncBtl.qrc

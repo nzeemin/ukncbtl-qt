@@ -44,6 +44,8 @@
     <addaction name="actionViewSizeRegular"/>
     <addaction name="actionViewSizeUpscaled"/>
     <addaction name="actionViewSizeDouble"/>
+    <addaction name="separator"/>
+    <addaction name="actionSoundEnabled"/>
    </widget>
    <widget class="QMenu" name="menuDrives">
     <property name="title">
@@ -373,6 +375,17 @@
    </property>
    <property name="text">
     <string>Double Interlaced</string>
+   </property>
+  </action>
+  <action name="actionSoundEnabled">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Sound Enabled</string>
    </property>
   </action>
  </widget>

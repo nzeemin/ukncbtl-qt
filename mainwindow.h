@@ -54,6 +54,7 @@ public slots:
     void viewSizeRegular();
     void viewSizeUpscaled();
     void viewSizeDouble();
+    void soundEnabled();
 
 protected:
     void changeEvent(QEvent *e);

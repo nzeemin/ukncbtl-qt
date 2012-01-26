@@ -347,6 +347,11 @@ void MainWindow::emulatorReset()
     m_screen->repaint();
 }
 
+void MainWindow::soundEnabled()
+{
+    Emulator_SetSound(ui->actionSoundEnabled->isChecked()?TRUE:FALSE);
+}
+
 void MainWindow::emulatorCartridge1() { emulatorCartridge(1); }
 void MainWindow::emulatorCartridge2() { emulatorCartridge(2); }
 void MainWindow::emulatorCartridge(int slot)
