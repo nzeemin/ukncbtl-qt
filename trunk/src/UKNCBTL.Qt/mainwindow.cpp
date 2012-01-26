@@ -50,6 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionViewSizeRegular, SIGNAL(triggered()), this, SLOT(viewSizeRegular()));
     QObject::connect(ui->actionViewSizeDouble, SIGNAL(triggered()), this, SLOT(viewSizeDouble()));
     QObject::connect(ui->actionViewSizeUpscaled, SIGNAL(triggered()), this, SLOT(viewSizeUpscaled()));
+    connect(ui->actionSoundEnabled,SIGNAL(triggered()),this,SLOT(soundEnabled()));
 
     // Screen and keyboard
     m_screen = new QScreen();
