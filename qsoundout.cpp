@@ -76,6 +76,8 @@ void QSoundOut::OnNotify()
 
 void QSoundOut::FeedDAC(unsigned short left, unsigned short right)
 {
+    if((m_dev==NULL)||(m_audio==NULL))
+        return;
     switch(SAMPLESIZE)
     {
         case 8:
