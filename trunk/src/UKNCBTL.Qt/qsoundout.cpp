@@ -19,7 +19,7 @@ QSoundOut::QSoundOut(QObject *parent) :
     fmt.setSampleType(QAudioFormat::SignedInt);
 
     m_audio=new QAudioOutput(fmt,this);
-    if(m_audio)
+    if(m_audio==NULL)
         return;
     connect(m_audio,SIGNAL(notify()),this,SLOT(OnNotify()));
     m_audio->setBufferSize(FRAMEBYTES*2);
