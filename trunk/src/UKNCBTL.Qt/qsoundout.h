@@ -7,12 +7,12 @@
 #include <QMutex>
 #include <QTimer>
 
-#define SAMPLERATE          44100
+#define SAMPLERATE          22050
 #define FRAMESAMPLES        (SAMPLERATE/25)
 #define SAMPLESIZE          16
 #define CHANNELS            2
 #define FRAMEBYTES          ((FRAMESAMPLES)*(SAMPLESIZE/8)*CHANNELS)
-#define BUFFERS             10
+#define BUFFERS             5
 
 class QSoundOut : public QObject
 {
