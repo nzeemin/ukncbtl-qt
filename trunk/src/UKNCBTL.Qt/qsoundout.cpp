@@ -92,15 +92,20 @@ void QSoundOut::FeedDAC(unsigned short left, unsigned short right)
     if(fptr>=FRAMEBYTES)
     {
         fptr=0;
-
-        while(rcnt>=BUFFERS); //wait untill there are some free buffers... Mutex in callback will prevent schedule
-
         m_lock.lock();
-            memcpy(&rbuf[rwr],fbuf,FRAMEBYTES);
-            rwr++;
-            if(rwr>=BUFFERS)
-                rwr=0;
-            rcnt++;
+        if(rcnt>=BUFFERS)
+        {
+            m_dev->write((const char*)&rbuf[rrd],(qint64)FRAMEBYTES);
+            rrd++;
+            if(rrd>=BUFFERS)
+                rrd=0;
+            rcnt--;
+        }
+        memcpy(&rbuf[rwr],fbuf,FRAMEBYTES);
+        rwr++;
+        if(rwr>=BUFFERS)
+            rwr=0;
+        rcnt++;
         m_lock.unlock();
     }
 }
