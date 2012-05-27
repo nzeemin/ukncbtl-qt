@@ -123,6 +123,8 @@
    <addaction name="actionDrivesHard1"/>
    <addaction name="actionDrivesCartridge2"/>
    <addaction name="actionDrivesHard2"/>
+   <addaction name="separator"/>
+   <addaction name="actionSoundEnabled"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionFileExit">
@@ -384,8 +386,15 @@
    <property name="checked">
     <bool>true</bool>
    </property>
+   <property name="icon">
+    <iconset resource="QtUkncBtl.qrc">
+     <normaloff>:/images/iconSound.png</normaloff>:/images/iconSound.png</iconset>
+   </property>
    <property name="text">
     <string>Sound Enabled</string>
+   </property>
+   <property name="iconText">
+    <string>Sound</string>
    </property>
   </action>
  </widget>
