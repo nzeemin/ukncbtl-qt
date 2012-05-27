@@ -5,7 +5,6 @@
 #include "mainwindow.h"
 #include "Emulator.h"
 #include "emubase/Emubase.h"
-//#include "SoundGen.h"
 #include "qsoundout.h"
 #include <QTime>
 #include <QFile>
@@ -47,7 +46,7 @@ BOOL m_SoundEnabled=TRUE;
 
 
 //////////////////////////////////////////////////////////////////////
-void Emulator_FeedDAC(unsigned short l, unsigned short r)
+void CALLBACK Emulator_FeedDAC(unsigned short l, unsigned short r)
 {
     if(g_sound)
     {
@@ -90,9 +89,8 @@ BOOL Emulator_Init()
 
     if (m_okEmulatorSound)
     {
-
         //SoundGen_Initialize();
-        g_sound=new QSoundOut();
+        g_sound = new QSoundOut();
         g_pBoard->SetSoundGenCallback(Emulator_FeedDAC);
     }
 
@@ -120,7 +118,7 @@ void Emulator_Done()
     if(g_sound)
     {
         delete g_sound;
-        g_sound=NULL;
+        g_sound = NULL;
     }
     //SoundGen_Finalize();
 

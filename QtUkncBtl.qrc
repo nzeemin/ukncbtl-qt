@@ -10,5 +10,6 @@
         <file>images/iconHdd.png</file>
         <file>images/iconHddSlot.png</file>
         <file>uknc_rom.bin</file>
+        <file>images/iconSound.png</file>
     </qresource>
 </RCC>
