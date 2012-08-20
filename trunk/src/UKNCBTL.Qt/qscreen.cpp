@@ -70,6 +70,57 @@ static void UpscaleScreen2(void* pImageBits)
     }
 }
 
+// Upscale screen width 640->960, height 288->576 with "interlaced" effect
+static void UpscaleScreen3(void* pImageBits)
+{
+    for (int ukncline = 287; ukncline >= 0; ukncline--)
+    {
+        DWORD* psrc = ((DWORD*)pImageBits) + ukncline * UKNC_SCREEN_WIDTH;
+        psrc += UKNC_SCREEN_WIDTH - 1;
+        DWORD* pdest = ((DWORD*)pImageBits) + (ukncline * 2) * 960;
+        pdest += 960 - 1;
+        for (int i = 0; i < UKNC_SCREEN_WIDTH / 2; i++)
+        {
+            DWORD c1 = *psrc;  psrc--;
+            DWORD c2 = *psrc;  psrc--;
+            DWORD c12 =
+                (((c1 & 0xff) + (c2 & 0xff)) >> 1) |
+                (((c1 & 0xff00) + (c2 & 0xff00)) >> 1) & 0xff00 |
+                (((c1 & 0xff0000) + (c2 & 0xff0000)) >> 1) & 0xff0000;
+            *pdest = c1;  pdest--;
+            *pdest = c12; pdest--;
+            *pdest = c2;  pdest--;
+        }
+
+        pdest += 960;
+        memset(pdest, 0, 960 * 4);
+    }
+}
+
+// Upscale screen width 640->1280, height 288->864 with "interlaced" effect
+static void UpscaleScreen4(void* pImageBits)
+{
+    for (int ukncline = 287; ukncline >= 0; ukncline--)
+    {
+        DWORD* psrc = ((DWORD*)pImageBits) + ukncline * UKNC_SCREEN_WIDTH;
+        DWORD* pdest = ((DWORD*)pImageBits) + (ukncline * 3) * 1280;
+        psrc += UKNC_SCREEN_WIDTH - 1;
+        pdest += 1280 - 1;
+        DWORD* pdest2 = pdest + 1280;
+        DWORD* pdest3 = pdest2 + 1280;
+        for (int i = 0; i < UKNC_SCREEN_WIDTH; i++)
+        {
+            DWORD color = *psrc;  psrc--;
+            *pdest = color;  pdest--;
+            *pdest = color;  pdest--;
+            *pdest2 = color;  pdest2--;
+            *pdest2 = color;  pdest2--;
+            *pdest3 = 0;  pdest3--;
+            *pdest3 = 0;  pdest3--;
+        }
+    }
+}
+
 
 //////////////////////////////////////////////////////////////////////
 
@@ -124,6 +175,16 @@ void QScreen::createDisplay()
         cyScreenHeight = UKNC_SCREEN_HEIGHT * 2;
     else if (m_sizeMode == UpscaledScreen)
         cyScreenHeight = 432;
+    else if (m_sizeMode == UpscaledScreen3)
+    {
+        cxScreenWidth = 960;
+        cyScreenHeight = UKNC_SCREEN_HEIGHT * 2;
+    }
+    else if (m_sizeMode == UpscaledScreen4)
+    {
+        cxScreenWidth = UKNC_SCREEN_WIDTH * 2;
+        cyScreenHeight = UKNC_SCREEN_HEIGHT * 3;
+    }
 
     m_image = new QImage(cxScreenWidth, cyScreenHeight, QImage::Format_RGB32);
 
@@ -147,6 +208,10 @@ void QScreen::paintEvent(QPaintEvent * /*event*/)
         UpscaleScreen2(m_image->bits());
     else if (m_sizeMode == UpscaledScreen)
         UpscaleScreen(m_image->bits());
+    else if (m_sizeMode == UpscaledScreen3)
+        UpscaleScreen3(m_image->bits());
+    else if (m_sizeMode == UpscaledScreen4)
+        UpscaleScreen4(m_image->bits());
 
     QPainter painter(this);
     painter.drawImage(0, 0, *m_image);

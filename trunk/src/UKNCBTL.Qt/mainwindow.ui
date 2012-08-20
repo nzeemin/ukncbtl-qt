@@ -40,14 +40,16 @@
     <addaction name="actionEmulatorRun"/>
     <addaction name="actionEmulatorReset"/>
     <addaction name="separator"/>
+    <addaction name="actionSoundEnabled"/>
+    <addaction name="separator"/>
     <addaction name="actionViewRgbScreen"/>
     <addaction name="actionViewGrayscaleScreen"/>
     <addaction name="separator"/>
     <addaction name="actionViewSizeRegular"/>
     <addaction name="actionViewSizeUpscaled"/>
     <addaction name="actionViewSizeDouble"/>
-    <addaction name="separator"/>
-    <addaction name="actionSoundEnabled"/>
+    <addaction name="actionViewSizeUpscaled3"/>
+    <addaction name="actionViewSizeUpscaled4"/>
    </widget>
    <widget class="QMenu" name="menuDrives">
     <property name="title">
@@ -370,7 +372,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Upscaled to 1.5</string>
+    <string>Upscaled to 1 x 1.5</string>
    </property>
   </action>
   <action name="actionViewSizeDouble">
@@ -402,6 +404,22 @@
   <action name="actionScriptRun">
    <property name="text">
     <string>Run Script...</string>
+   </property>
+  </action>
+  <action name="actionViewSizeUpscaled3">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Upscaled to 1.5 x 2</string>
+   </property>
+  </action>
+  <action name="actionViewSizeUpscaled4">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Upscaled to 2 x 3</string>
    </property>
   </action>
  </widget>

@@ -52,6 +52,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionViewSizeRegular, SIGNAL(triggered()), this, SLOT(viewSizeRegular()));
     QObject::connect(ui->actionViewSizeDouble, SIGNAL(triggered()), this, SLOT(viewSizeDouble()));
     QObject::connect(ui->actionViewSizeUpscaled, SIGNAL(triggered()), this, SLOT(viewSizeUpscaled()));
+    QObject::connect(ui->actionViewSizeUpscaled3, SIGNAL(triggered()), this, SLOT(viewSizeUpscaled3()));
+    QObject::connect(ui->actionViewSizeUpscaled4, SIGNAL(triggered()), this, SLOT(viewSizeUpscaled4()));
     connect(ui->actionSoundEnabled,SIGNAL(triggered()),this,SLOT(soundEnabled()));
 
     // Screen and keyboard
@@ -157,6 +159,7 @@ void MainWindow::restoreSettings()
 
     //Update centralWidget size
     ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
+    ui->centralWidget->setMaximumWidth(m_screen->maximumWidth());
 
     restoreGeometry(Global_getSettings()->value("MainWindow/Geometry").toByteArray());
     restoreState(Global_getSettings()->value("MainWindow/WindowState").toByteArray());
@@ -177,6 +180,8 @@ void MainWindow::UpdateMenu()
     ui->actionViewSizeRegular->setChecked(m_screen->sizeMode() == RegularScreen);
     ui->actionViewSizeUpscaled->setChecked(m_screen->sizeMode() == UpscaledScreen);
     ui->actionViewSizeDouble->setChecked(m_screen->sizeMode() == DoubleScreen);
+    ui->actionViewSizeUpscaled3->setChecked(m_screen->sizeMode() == UpscaledScreen3);
+    ui->actionViewSizeUpscaled4->setChecked(m_screen->sizeMode() == UpscaledScreen4);
 
     ui->actionDrivesFloppy0->setIcon(QIcon(
             g_pBoard->IsFloppyImageAttached(0) ? _T(":/images/iconFloppy.png") : _T(":/images/iconFloppySlot.png") ));
@@ -308,6 +313,7 @@ void MainWindow::viewSizeRegular()
 
     //Update centralWidget size
     ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
+    ui->centralWidget->setMaximumWidth(m_screen->maximumWidth());
 }
 void MainWindow::viewSizeUpscaled()
 {
@@ -316,6 +322,7 @@ void MainWindow::viewSizeUpscaled()
 
     //Update centralWidget size
     ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
+    ui->centralWidget->setMaximumWidth(m_screen->maximumWidth());
 }
 void MainWindow::viewSizeDouble()
 {
@@ -324,6 +331,25 @@ void MainWindow::viewSizeDouble()
 
     //Update centralWidget size
     ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
+    ui->centralWidget->setMaximumWidth(m_screen->maximumWidth());
+}
+void MainWindow::viewSizeUpscaled3()
+{
+    m_screen->setSizeMode(UpscaledScreen3);
+    UpdateMenu();
+
+    //Update centralWidget size
+    ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
+    ui->centralWidget->setMaximumWidth(m_screen->maximumWidth());
+}
+void MainWindow::viewSizeUpscaled4()
+{
+    m_screen->setSizeMode(UpscaledScreen4);
+    UpdateMenu();
+
+    //Update centralWidget size
+    ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
+    ui->centralWidget->setMaximumWidth(m_screen->maximumWidth());
 }
 
 void MainWindow::emulatorFrame()
