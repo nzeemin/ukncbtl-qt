@@ -27,6 +27,8 @@ int main(int argc, char *argv[])
     MainWindow w;
     g_MainWindow = &w;
 
+    Emulator_SetSound(Settings_GetSound());
+
     if (!Emulator_Init())
         return 255;
 

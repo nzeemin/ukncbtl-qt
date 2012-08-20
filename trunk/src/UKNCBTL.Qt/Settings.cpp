@@ -51,6 +51,17 @@ QString Settings_GetHardFilePath(int slot)
     return value.toString();
 }
 
+void Settings_SetSound(bool flag)
+{
+    Global_getSettings()->setValue(_T("Sound"), flag);
+}
+
+bool Settings_GetSound()
+{
+    QVariant value = Global_getSettings()->value(_T("Sound"), false);
+    return value.toBool();
+}
+
 
 
 //////////////////////////////////////////////////////////////////////

@@ -27,7 +27,6 @@ void Emulator_Done();
 void Emulator_SetCPUBreakpoint(WORD address);
 void Emulator_SetPPUBreakpoint(WORD address);
 BOOL Emulator_IsBreakpoint();
-//void Emulator_SetSound(BOOL soundOnOff);
 void Emulator_Start();
 void Emulator_Stop();
 void Emulator_Reset();

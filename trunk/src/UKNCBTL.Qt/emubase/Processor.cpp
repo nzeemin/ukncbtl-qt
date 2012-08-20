@@ -574,9 +574,9 @@ void CProcessor::TranslateInstruction ()
 
 void CProcessor::ExecuteUNKNOWN ()  // Нет такой инструкции - просто вызывается TRAP 10
 {
-#if !defined(PRODUCT)
-    DebugPrintFormat(_T(">>Invalid OPCODE = %06o @ %06o\r\n"), m_instruction, GetPC()-2);
-#endif
+//#if !defined(PRODUCT)
+//    DebugPrintFormat(_T(">>Invalid OPCODE = %06o @ %06o\r\n"), m_instruction, GetPC()-2);
+//#endif
 
     m_RSVDrq = TRUE;
 }
@@ -2550,8 +2550,8 @@ void CProcessor::SaveToImage(BYTE* pImage) const
 {
     // Processor data                               // Offset Size
     WORD* pwImage = (WORD*) pImage;                 //    0    --
-    *pwImage++ = m_psw;  // PSW                     //    0     2
-    memcpy(pwImage, m_R, 2 * 8); // Registers R0-R7 //    2    16
+    *pwImage++ = m_psw;                             //    0     2   PSW
+    memcpy(pwImage, m_R, 2 * 8);  pwImage += 8;     //    2    16   Registers R0-R7
     pwImage += 2 * 8;
     *pwImage++ = m_savepc;                          //   18     2
     *pwImage++ = m_savepsw;                         //   20     2
@@ -2570,7 +2570,7 @@ void CProcessor::LoadFromImage(const BYTE* pImage)
 {
     const WORD* pwImage = (const WORD*) pImage;
     m_psw = *pwImage++;  // PSW
-    memcpy(m_R, pwImage, 2 * 8);  // Registers R0..R7
+    memcpy(m_R, pwImage, 2 * 8);  pwImage += 8;  // Registers R0..R7
     m_savepc    = *pwImage++;
     m_savepsw   = *pwImage++;
     m_okStopped = (*pwImage++ != 0);

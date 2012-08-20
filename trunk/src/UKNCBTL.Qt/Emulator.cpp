@@ -14,7 +14,7 @@
 
 
 CMotherboard* g_pBoard = NULL;
-QSoundOut * g_sound=NULL;
+QSoundOut * g_sound = NULL;
 
 BOOL g_okEmulatorInitialized = FALSE;
 BOOL g_okEmulatorRunning = FALSE;
@@ -22,7 +22,7 @@ BOOL g_okEmulatorRunning = FALSE;
 WORD m_wEmulatorCPUBreakpoint = 0177777;
 WORD m_wEmulatorPPUBreakpoint = 0177777;
 
-BOOL m_okEmulatorSound = TRUE;
+BOOL m_okEmulatorSound = FALSE;
 
 long m_nFrameCount = 0;
 QTime m_emulatorTime;
@@ -42,23 +42,12 @@ WORD m_EmulatorKeyQueue[KEYEVENT_QUEUE_SIZE];
 int m_EmulatorKeyQueueTop = 0;
 int m_EmulatorKeyQueueBottom = 0;
 int m_EmulatorKeyQueueCount = 0;
-BOOL m_SoundEnabled=TRUE;
+
+
+void CALLBACK Emulator_FeedDAC(unsigned short l, unsigned short r);
 
 
 //////////////////////////////////////////////////////////////////////
-void CALLBACK Emulator_FeedDAC(unsigned short l, unsigned short r)
-{
-    if(g_sound)
-    {
-        if(m_SoundEnabled)
-            g_sound->FeedDAC(l,r);
-    }
-}
-
-void Emulator_SetSound(BOOL enable)
-{
-    m_SoundEnabled=enable;
-}
 
 BOOL Emulator_Init()
 {
@@ -69,7 +58,6 @@ BOOL Emulator_Init()
     g_pBoard = new CMotherboard();
 
     BYTE buffer[32768];
-    DWORD dwBytesRead;
 
     // Load ROM file
     memset(buffer, 0, 32768);
@@ -87,10 +75,9 @@ BOOL Emulator_Init()
 
     g_pBoard->Reset();
 
+    g_sound = new QSoundOut();
     if (m_okEmulatorSound)
     {
-        //SoundGen_Initialize();
-        g_sound = new QSoundOut();
         g_pBoard->SetSoundGenCallback(Emulator_FeedDAC);
     }
 
@@ -120,7 +107,6 @@ void Emulator_Done()
         delete g_sound;
         g_sound = NULL;
     }
-    //SoundGen_Finalize();
 
     delete g_pBoard;
     g_pBoard = NULL;
@@ -448,6 +434,27 @@ void Emulator_ProcessKeyEvent()
         BOOL pressed = ((keyevent & 0x8000) != 0);
         BYTE ukncscan = LOBYTE(keyevent);
         g_pBoard->KeyboardEvent(ukncscan, pressed);
+    }
+}
+
+void CALLBACK Emulator_FeedDAC(unsigned short l, unsigned short r)
+{
+    if (g_sound)
+    {
+        if (m_okEmulatorSound)
+            g_sound->FeedDAC(l,r);
+    }
+}
+
+void Emulator_SetSound(BOOL enable)
+{
+    m_okEmulatorSound = enable;
+    if (g_pBoard != 0)
+    {
+        if (enable)
+            g_pBoard->SetSoundGenCallback(Emulator_FeedDAC);
+        else
+            g_pBoard->SetSoundGenCallback(0);
     }
 }
 
