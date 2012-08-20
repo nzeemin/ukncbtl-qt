@@ -146,8 +146,12 @@ void MainWindow::closeEvent(QCloseEvent *)
 
 void MainWindow::restoreSettings()
 {
-    m_screen->setMode((ScreenViewMode)Global_getSettings()->value("MainWindow/ScreenViewMode").toInt());
-    m_screen->setSizeMode((ScreenSizeMode)Global_getSettings()->value("MainWindow/ScreenSizeMode").toInt());
+    ScreenViewMode scrViewMode = (ScreenViewMode)Global_getSettings()->value("MainWindow/ScreenViewMode").toInt();
+    if (scrViewMode == 0) scrViewMode = RGBScreen;
+    m_screen->setMode(scrViewMode);
+    ScreenSizeMode scrSizeMode = (ScreenSizeMode)Global_getSettings()->value("MainWindow/ScreenSizeMode").toInt();
+    if (scrSizeMode == 0) scrSizeMode = RegularScreen;
+    m_screen->setSizeMode(scrSizeMode);
 
     //Update centralWidget size
     ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
@@ -159,6 +163,8 @@ void MainWindow::restoreSettings()
     m_dockDebug->setVisible(Global_getSettings()->value("MainWindow/DebugView", false).toBool());
     m_dockDisasm->setVisible(Global_getSettings()->value("MainWindow/DisasmView", false).toBool());
     m_dockMemory->setVisible(Global_getSettings()->value("MainWindow/MemoryView", false).toBool());
+
+    ui->actionSoundEnabled->setChecked(Settings_GetSound());
 }
 
 void MainWindow::UpdateMenu()
@@ -270,7 +276,7 @@ void MainWindow::helpAbout()
 {
     QMessageBox::about(this, _T("About"), _T(
         "QtUkncBtl Version 1.0\n"
-        "Copyright (C) 2007-2011\n\n"
+        "Copyright (C) 2007-2012\n\n"
         "http://www.felixl.com/Uknc\r\nhttp://code.google.com/p/ukncbtl/\n\n"
         "Authors:\r\nNikita Zeemin (nzeemin@gmail.com)\nFelix Lazarev (felix.lazarev@gmail.com)\nAlexey Kisly\n\n"
         "Special thanks to:\nArseny Gordin\n\n"
@@ -350,7 +356,9 @@ void MainWindow::emulatorReset()
 
 void MainWindow::soundEnabled()
 {
-    Emulator_SetSound(ui->actionSoundEnabled->isChecked()?TRUE:FALSE);
+    bool sound = ui->actionSoundEnabled->isChecked();
+    Emulator_SetSound(sound ? TRUE : FALSE);
+    Settings_SetSound(sound);
 }
 
 void MainWindow::emulatorCartridge1() { emulatorCartridge(1); }

@@ -27,6 +27,8 @@ void Settings_SetCartridgeFilePath(int slot, LPCTSTR sFilePath);
 QString Settings_GetCartridgeFilePath(int slot);
 void Settings_SetHardFilePath(int slot, LPCTSTR sFilePath);
 QString Settings_GetHardFilePath(int slot);
+void Settings_SetSound(bool flag);
+bool Settings_GetSound();
 
 
 //////////////////////////////////////////////////////////////////////
