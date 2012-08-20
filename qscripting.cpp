@@ -4,11 +4,19 @@
 #include "main.h"
 #include "mainwindow.h"
 #include "Emulator.h"
+#include "emubase/Processor.h"
 #include "qscripting.h"
 
 
 //////////////////////////////////////////////////////////////////////
 // QEmulator
+
+QEmulator::QEmulator(QScriptWindow * window) :
+    m_window(window),
+    m_cpu(g_pBoard->GetCPU()),
+    m_ppu(g_pBoard->GetPPU())
+{
+}
 
 void QEmulator::reset()
 {
@@ -41,6 +49,11 @@ bool QEmulator::run(int frames)
     Global_getMainWindow()->UpdateAllViews();
 
     return result;
+}
+
+float QEmulator::getUptime()
+{
+    return Emulator_GetUptime();
 }
 
 void QEmulator::setBreakpoint(quint16 address)
@@ -77,6 +90,35 @@ void QEmulator::detachFloppy(int slot)
 {
     //TODO: Check slot param
     Global_getMainWindow()->detachFloppy(slot);
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// QEmulatorProcessor
+
+QEmulatorProcessor::QEmulatorProcessor(CProcessor* processor)
+    : m_processor(processor)
+{
+}
+
+QString QEmulatorProcessor::getName()
+{
+    return QString(m_processor->GetName());
+}
+
+ushort QEmulatorProcessor::getReg(int regno)
+{
+    //TODO: Check regno param
+    return m_processor->GetReg(regno);
+}
+ushort QEmulatorProcessor::getPSW()
+{
+    return m_processor->GetPSW();
+}
+
+bool QEmulatorProcessor::isHalt()
+{
+    return m_processor->IsHaltMode();
 }
 
 
