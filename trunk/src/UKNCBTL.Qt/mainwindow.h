@@ -30,7 +30,8 @@ public:
     void showFps(double framesPerSecond);
 
 public slots:
-    void fileScreenshot();
+    void saveScreenshot();
+    void saveScreenshot(const QString&);
     void helpAbout();
     void emulatorFrame();
     void emulatorRun();

@@ -27,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setWindowTitle(_T("UKNC Back to Life"));
 
     // Assign signals
-    QObject::connect(ui->actionFileScreenshot, SIGNAL(triggered()), this, SLOT(fileScreenshot()));
+    QObject::connect(ui->actionFileScreenshot, SIGNAL(triggered()), this, SLOT(saveScreenshot()));
     QObject::connect(ui->actionScriptRun, SIGNAL(triggered()), this, SLOT(scriptRun()));
     QObject::connect(ui->actionFileExit, SIGNAL(triggered()), this, SLOT(close()));
     QObject::connect(ui->actionEmulatorRun, SIGNAL(triggered()), this, SLOT(emulatorRun()));
@@ -261,7 +261,7 @@ void MainWindow::showFps(double framesPerSecond)
     }
 }
 
-void MainWindow::fileScreenshot()
+void MainWindow::saveScreenshot()
 {
     QFileDialog dlg;
     dlg.setAcceptMode(QFileDialog::AcceptSave);
@@ -271,6 +271,10 @@ void MainWindow::fileScreenshot()
 
     QString strFileName = dlg.selectedFiles().at(0);
 
+    saveScreenshot(strFileName);
+}
+void MainWindow::saveScreenshot(const QString& strFileName)
+{
     m_screen->saveScreenshot(strFileName);
 }
 

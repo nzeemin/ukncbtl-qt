@@ -54,7 +54,7 @@ bool QEmulator::isBreakpoint()
 
 void QEmulator::saveScreenshot(QString filename)
 {
-    //TODO: Global_getMainWindow()->saveScreenshot(filename);
+    Global_getMainWindow()->saveScreenshot(filename);
 }
 
 
