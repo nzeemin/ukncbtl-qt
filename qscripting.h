@@ -40,12 +40,29 @@ public slots:
     /**
       Save screenshot to PNG file.
       */
-    void saveScreenshot(QString filename);
+    void saveScreenshot(const QString& filename);
+    /**
+      Load the cartridge image file.
+      */
+    bool attachCartridge(int slot, const QString& filename);
+    /**
+      Empty the cartridge slot.
+      */
+    void detachCartridge(int slot);
+    /**
+      Attach the floppy image file -- insert the disk.
+      */
+    bool attachFloppy(int slot, const QString& filename);
+    /**
+      Detach the floppy image file -- remove the disk.
+      */
+    void detachFloppy(int slot);
 
-    //TODO: Load BIN
-    //TODO: Configurations
-    //TODO: Disks
-    //TODO: Change screen mode
+    //TODO: Keyboard keys press/release
+    //TODO: getUptime()
+    //TODO: Attach/detach hard disk images
+    //TODO: CPU/PPU registers, memory
+    //TODO: Change screen modes, sound on/off
 
 private:
     QScriptWindow * m_window;
