@@ -55,6 +55,7 @@ public slots:
     void viewSizeUpscaled();
     void viewSizeDouble();
     void soundEnabled();
+    void scriptRun();
 
 protected:
     void changeEvent(QEvent *e);

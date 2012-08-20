@@ -29,6 +29,8 @@
     </property>
     <addaction name="actionFileScreenshot"/>
     <addaction name="separator"/>
+    <addaction name="actionScriptRun"/>
+    <addaction name="separator"/>
     <addaction name="actionFileExit"/>
    </widget>
    <widget class="QMenu" name="menuEmulator">
@@ -395,6 +397,11 @@
    </property>
    <property name="iconText">
     <string>Sound</string>
+   </property>
+  </action>
+  <action name="actionScriptRun">
+   <property name="text">
+    <string>Run Script...</string>
    </property>
   </action>
  </widget>
