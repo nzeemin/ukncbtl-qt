@@ -15,6 +15,7 @@
 #include "qdebugview.h"
 #include "qdisasmview.h"
 #include "qmemoryview.h"
+#include "qscripting.h"
 #include "Emulator.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -27,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Assign signals
     QObject::connect(ui->actionFileScreenshot, SIGNAL(triggered()), this, SLOT(fileScreenshot()));
+    QObject::connect(ui->actionScriptRun, SIGNAL(triggered()), this, SLOT(scriptRun()));
     QObject::connect(ui->actionFileExit, SIGNAL(triggered()), this, SLOT(close()));
     QObject::connect(ui->actionEmulatorRun, SIGNAL(triggered()), this, SLOT(emulatorRun()));
     QObject::connect(ui->actionEmulatorReset, SIGNAL(triggered()), this, SLOT(emulatorReset()));
@@ -498,4 +500,24 @@ void MainWindow::debugStepOver()
 {
     if (!g_okEmulatorRunning)
         m_console->execConsoleCommand(_T("so"));
+}
+
+void MainWindow::scriptRun()
+{
+    if (g_okEmulatorRunning)
+        emulatorRun();  // Stop the emulator
+
+    QFileDialog dlg;
+    dlg.setAcceptMode(QFileDialog::AcceptOpen);
+    dlg.setNameFilter(_T("Script files (*.js)"));
+    if (dlg.exec() == QDialog::Rejected)
+        return;
+
+    QString strFileName = dlg.selectedFiles().at(0);
+    QFile file(strFileName);
+    file.open(QIODevice::ReadOnly);
+    QString strScript = file.readAll();
+
+    QScriptWindow window(this);
+    window.runScript(strScript);
 }

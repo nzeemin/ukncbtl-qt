@@ -22,7 +22,8 @@ SOURCES += main.cpp \
     qdisasmview.cpp \
     qconsoleview.cpp \
     qmemoryview.cpp \
-    qsoundout.cpp
+    qsoundout.cpp \
+    qscripting.cpp
 HEADERS += mainwindow.h \
     stdafx.h \
     util/WavPcmFile.h \
@@ -41,6 +42,8 @@ HEADERS += mainwindow.h \
     qdisasmview.h \
     qconsoleview.h \
     qmemoryview.h \
-    qsoundout.h
+    qsoundout.h \
+    qscripting.h
 FORMS += mainwindow.ui
 RESOURCES += QtUkncBtl.qrc
+QT += script
