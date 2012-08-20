@@ -399,8 +399,7 @@ void MainWindow::emulatorCartridge(int slot)
 {
     if (g_pBoard->IsROMCartridgeLoaded(slot))
     {
-        g_pBoard->UnloadROMCartridge(slot);
-        Settings_SetCartridgeFilePath(slot, NULL);
+        detachCartridge(slot);
     }
     else
     {
@@ -410,12 +409,27 @@ void MainWindow::emulatorCartridge(int slot)
             return;
 
         QString strFileName = dlg.selectedFiles().at(0);
-        LPCTSTR sFileName = qPrintable(strFileName);
-
-        Emulator_LoadROMCartridge(slot, sFileName);
-
-        Settings_SetCartridgeFilePath(slot, sFileName);
+        attachCartridge(slot, strFileName);
+        //TODO: Check result
     }
+}
+bool MainWindow::attachCartridge(int slot, const QString & strFileName)
+{
+    LPCTSTR sFileName = qPrintable(strFileName);
+    Emulator_LoadROMCartridge(slot, sFileName);
+    //TODO: Check result
+
+    Settings_SetCartridgeFilePath(slot, sFileName);
+
+    UpdateMenu();
+
+    return true;
+}
+void MainWindow::detachCartridge(int slot)
+{
+    g_pBoard->UnloadROMCartridge(slot);
+
+    Settings_SetCartridgeFilePath(slot, NULL);
 
     UpdateMenu();
 }
@@ -428,8 +442,7 @@ void MainWindow::emulatorFloppy(int slot)
 {
     if (g_pBoard->IsFloppyImageAttached(slot))
     {
-        g_pBoard->DetachFloppyImage(slot);
-        Settings_SetFloppyFilePath(slot, NULL);
+        detachFloppy(slot);
     }
     else
     {
@@ -439,16 +452,31 @@ void MainWindow::emulatorFloppy(int slot)
             return;
 
         QString strFileName = dlg.selectedFiles().at(0);
-        LPCTSTR sFileName = qPrintable(strFileName);
 
-        if (! g_pBoard->AttachFloppyImage(slot, sFileName))
+        if (! attachFloppy(slot, strFileName))
         {
             AlertWarning(_T("Failed to attach floppy image."));
             return;
         }
-
-        Settings_SetFloppyFilePath(slot, sFileName);
     }
+}
+bool MainWindow::attachFloppy(int slot, const QString & strFileName)
+{
+    LPCTSTR sFileName = qPrintable(strFileName);
+    if (! g_pBoard->AttachFloppyImage(slot, sFileName))
+        return false;
+
+    Settings_SetFloppyFilePath(slot, sFileName);
+
+    UpdateMenu();
+
+    return true;
+}
+void MainWindow::detachFloppy(int slot)
+{
+    g_pBoard->DetachFloppyImage(slot);
+
+    Settings_SetFloppyFilePath(slot, NULL);
 
     UpdateMenu();
 }

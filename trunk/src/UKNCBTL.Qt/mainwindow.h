@@ -29,9 +29,15 @@ public:
     void showUptime(int uptimeMillisec);
     void showFps(double framesPerSecond);
 
+public:
+    void saveScreenshot(const QString& filename);
+    bool attachFloppy(int slot, const QString& filename);
+    void detachFloppy(int slot);
+    bool attachCartridge(int slot, const QString& filename);
+    void detachCartridge(int slot);
+
 public slots:
     void saveScreenshot();
-    void saveScreenshot(const QString&);
     void helpAbout();
     void emulatorFrame();
     void emulatorRun();

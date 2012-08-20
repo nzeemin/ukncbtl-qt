@@ -52,9 +52,31 @@ bool QEmulator::isBreakpoint()
     return Emulator_IsBreakpoint();
 }
 
-void QEmulator::saveScreenshot(QString filename)
+void QEmulator::saveScreenshot(const QString &filename)
 {
     Global_getMainWindow()->saveScreenshot(filename);
+}
+
+bool QEmulator::attachCartridge(int slot, const QString & filename)
+{
+    //TODO: Check slot param
+    return Global_getMainWindow()->attachCartridge(slot, filename);
+}
+void QEmulator::detachCartridge(int slot)
+{
+    //TODO: Check slot param
+    Global_getMainWindow()->detachCartridge(slot);
+}
+
+bool QEmulator::attachFloppy(int slot, const QString & filename)
+{
+    //TODO: Check slot param
+    return Global_getMainWindow()->attachFloppy(slot, filename);
+}
+void QEmulator::detachFloppy(int slot)
+{
+    //TODO: Check slot param
+    Global_getMainWindow()->detachFloppy(slot);
 }
 
 
