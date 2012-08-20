@@ -55,6 +55,8 @@ public slots:
     void viewSizeRegular();
     void viewSizeUpscaled();
     void viewSizeDouble();
+    void viewSizeUpscaled3();
+    void viewSizeUpscaled4();
     void soundEnabled();
     void scriptRun();
 

@@ -6,13 +6,15 @@
 enum ScreenViewMode {
     RGBScreen = 1,
     GrayScreen = 2,
-    GRBScreen = 3,
+    GRBScreen = 3
 };
 
 enum ScreenSizeMode {
     RegularScreen = 1,
     DoubleScreen = 2,
     UpscaledScreen = 3,
+    UpscaledScreen3 = 4,
+    UpscaledScreen4 = 5
 };
 
 class QScreen : public QWidget
