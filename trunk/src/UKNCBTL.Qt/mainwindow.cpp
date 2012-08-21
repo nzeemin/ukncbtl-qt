@@ -487,8 +487,7 @@ void MainWindow::emulatorHardDrive(int slot)
 {
     if (g_pBoard->IsHardImageAttached(slot))
     {
-        g_pBoard->DetachHardImage(slot);
-        Settings_SetHardFilePath(slot, NULL);
+        detachHardDrive(slot);
     }
     else
     {
@@ -507,15 +506,32 @@ void MainWindow::emulatorHardDrive(int slot)
             return;
 
         QString strFileName = dlg.selectedFiles().at(0);
-        LPCTSTR sFileName = qPrintable(strFileName);
-
-        // Attach HDD disk image
-        g_pBoard->AttachHardImage(slot, sFileName);
-
-        Settings_SetHardFilePath(slot, sFileName);
+        if (! attachHardDrive(slot, strFileName))
+        {
+            AlertWarning(_T("Failed to attach hard drive image."));
+            return;
+        }
     }
+}
+bool MainWindow::attachHardDrive(int slot, const QString & strFileName)
+{
+    if (!g_pBoard->IsROMCartridgeLoaded(slot))
+        return false;
+
+    LPCTSTR sFileName = qPrintable(strFileName);
+    if (!g_pBoard->AttachHardImage(slot, sFileName))
+        return false;
+
+    Settings_SetHardFilePath(slot, sFileName);
 
     UpdateMenu();
+
+    return true;
+}
+void MainWindow::detachHardDrive(int slot)
+{
+    g_pBoard->DetachHardImage(slot);
+    Settings_SetHardFilePath(slot, NULL);
 }
 
 void MainWindow::debugConsoleView()
