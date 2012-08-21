@@ -35,6 +35,8 @@ public:
     void detachFloppy(int slot);
     bool attachCartridge(int slot, const QString& filename);
     void detachCartridge(int slot);
+    bool attachHardDrive(int slot, const QString& filename);
+    void detachHardDrive(int slot);
 
 public slots:
     void saveScreenshot();

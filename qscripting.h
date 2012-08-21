@@ -22,7 +22,7 @@ class QEmulatorProcessor : public QObject
     Q_PROPERTY(ushort psw READ getPSW)
     Q_PROPERTY(bool halt READ isHalt)
 public:
-    QEmulatorProcessor(CProcessor* processor);
+    QEmulatorProcessor(QScriptEngine* engine, CProcessor* processor);
 
 public slots:
     /**
@@ -41,10 +41,21 @@ public slots:
       Get HALT/USER mode flag.
       */
     bool isHalt();
+    /**
+      Read word from the processor memory.
+      */
+    ushort readWord(ushort addr);
 
-    //TODO: Memory access -- readWord(addr), readByte(addr)
+    //TODO: uchar readByte(ushort addr);
+
+    /**
+      Disassemble one instruction at the given address.
+      Return value is array: { address, instruction, arguments, instruction length }.
+      */
+    QScriptValue disassemble(ushort addr);
 
 private:
+    QScriptEngine* m_engine;
     CProcessor* m_processor;
 };
 
@@ -100,6 +111,14 @@ public slots:
       */
     void detachFloppy(int slot);
     /**
+      Attach the hard drive image file.
+      */
+    bool attachHard(int slot, const QString& filename);
+    /**
+      Detach the hard drive image file.
+      */
+    void detachHard(int slot);
+    /**
       Get CPU object.
       */
     QObject* getCPU() { return &m_cpu; }
@@ -120,7 +139,6 @@ public slots:
       */
     void keyString(QString str);
 
-    //TODO: Attach/detach hard disk images
     //TODO: Change screen modes, sound on/off
 
 private:
@@ -144,6 +162,7 @@ public:
 public:
     void runScript(const QString & script);
     bool isAborted() const { return m_aborted; }
+    QScriptEngine* getEngine() { return &m_engine; }
 
 public slots:
     void reject();

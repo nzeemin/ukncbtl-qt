@@ -4,6 +4,7 @@
 #include "main.h"
 #include "mainwindow.h"
 #include "Emulator.h"
+#include "emubase/Emubase.h"
 #include "emubase/Processor.h"
 #include "qscripting.h"
 
@@ -13,8 +14,8 @@
 
 QEmulator::QEmulator(QScriptWindow * window) :
     m_window(window),
-    m_cpu(g_pBoard->GetCPU()),
-    m_ppu(g_pBoard->GetPPU())
+    m_cpu(window->getEngine(), g_pBoard->GetCPU()),
+    m_ppu(window->getEngine(), g_pBoard->GetPPU())
 {
 }
 
@@ -72,24 +73,35 @@ void QEmulator::saveScreenshot(const QString &filename)
 
 bool QEmulator::attachCartridge(int slot, const QString & filename)
 {
-    //TODO: Check slot param
+    if (slot < 1 || slot > 2) return false;
     return Global_getMainWindow()->attachCartridge(slot, filename);
 }
 void QEmulator::detachCartridge(int slot)
 {
-    //TODO: Check slot param
+    if (slot < 1 || slot > 2) return;
     Global_getMainWindow()->detachCartridge(slot);
 }
 
 bool QEmulator::attachFloppy(int slot, const QString & filename)
 {
-    //TODO: Check slot param
+    if (slot < 0 || slot > 3) return false;
     return Global_getMainWindow()->attachFloppy(slot, filename);
 }
 void QEmulator::detachFloppy(int slot)
 {
-    //TODO: Check slot param
+    if (slot < 0 || slot > 3) return;
     Global_getMainWindow()->detachFloppy(slot);
+}
+
+bool QEmulator::attachHard(int slot, const QString &filename)
+{
+    if (slot < 1 || slot > 2) return false;
+    return Global_getMainWindow()->attachHardDrive(slot, filename);
+}
+void QEmulator::detachHard(int slot)
+{
+    if (slot < 1 || slot > 2) return;
+    Global_getMainWindow()->detachHardDrive(slot);
 }
 
 void QEmulator::keyScan(uchar ukncscan, int timeout)
@@ -166,8 +178,8 @@ void QEmulator::keyString(QString str)
 //////////////////////////////////////////////////////////////////////
 // QEmulatorProcessor
 
-QEmulatorProcessor::QEmulatorProcessor(CProcessor* processor)
-    : m_processor(processor)
+QEmulatorProcessor::QEmulatorProcessor(QScriptEngine *engine, CProcessor *processor)
+    : m_engine(engine), m_processor(processor)
 {
 }
 
@@ -178,7 +190,7 @@ QString QEmulatorProcessor::getName()
 
 ushort QEmulatorProcessor::getReg(int regno)
 {
-    //TODO: Check regno param
+    if (regno < 0 || regno > 7) return 0;
     return m_processor->GetReg(regno);
 }
 ushort QEmulatorProcessor::getPSW()
@@ -189,6 +201,35 @@ ushort QEmulatorProcessor::getPSW()
 bool QEmulatorProcessor::isHalt()
 {
     return m_processor->IsHaltMode();
+}
+
+ushort QEmulatorProcessor::readWord(ushort addr)
+{
+    BOOL okValid;
+    return m_processor->GetMemoryController()->GetWordView(addr, m_processor->IsHaltMode(), FALSE, &okValid);
+}
+
+QScriptValue QEmulatorProcessor::disassemble(ushort addr)
+{
+    CMemoryController* pMemCtl = m_processor->GetMemoryController();
+    WORD buffer[4];
+    WORD current = addr;
+    for (int i = 0; i < 4; i++)
+    {
+        BOOL okValid;
+        buffer[i] = pMemCtl->GetWordView(current, m_processor->IsHaltMode(), FALSE, &okValid);
+        current += 2;
+    }
+
+    TCHAR instr[8], args[32];
+    int instrlen = DisassembleInstruction(buffer, addr, instr, args);
+
+    QScriptValue list = m_engine->newArray(4);
+    list.setProperty(0, m_engine->newVariant(addr));
+    list.setProperty(1, m_engine->newVariant(instr));
+    list.setProperty(2, m_engine->newVariant(args));
+    list.setProperty(3, m_engine->newVariant(instrlen));
+    return list;
 }
 
 
