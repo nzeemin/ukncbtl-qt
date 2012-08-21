@@ -6,7 +6,7 @@
 //////////////////////////////////////////////////////////////////////
 
 
-void Settings_SetFloppyFilePath(int slot, LPCTSTR sFilePath)
+void Settings_SetFloppyFilePath(int slot, const QString & sFilePath)
 {
     TCHAR bufValueName[] = _T("Floppy0");
     bufValueName[6] = slot + _T('0');
@@ -21,7 +21,7 @@ QString Settings_GetFloppyFilePath(int slot)
     return value.toString();
 }
 
-void Settings_SetCartridgeFilePath(int slot, LPCTSTR sFilePath)
+void Settings_SetCartridgeFilePath(int slot, const QString &sFilePath)
 {
     TCHAR bufValueName[] = _T("Cartridge1");
     bufValueName[9] = slot + _T('0');
@@ -36,7 +36,7 @@ QString Settings_GetCartridgeFilePath(int slot)
     return value.toString();
 }
 
-void Settings_SetHardFilePath(int slot, LPCTSTR sFilePath)
+void Settings_SetHardFilePath(int slot, const QString &sFilePath)
 {
     TCHAR bufValueName[] = _T("Hard1");
     bufValueName[4] = slot + _T('0');
