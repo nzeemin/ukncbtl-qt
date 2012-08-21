@@ -27,6 +27,8 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setWindowTitle(_T("UKNC Back to Life"));
 
     // Assign signals
+    QObject::connect(ui->actionSaveStateImage, SIGNAL(triggered()), this, SLOT(saveStateImage()));
+    QObject::connect(ui->actionLoadStateImage, SIGNAL(triggered()), this, SLOT(loadStateImage()));
     QObject::connect(ui->actionFileScreenshot, SIGNAL(triggered()), this, SLOT(saveScreenshot()));
     QObject::connect(ui->actionScriptRun, SIGNAL(triggered()), this, SLOT(scriptRun()));
     QObject::connect(ui->actionFileExit, SIGNAL(triggered()), this, SLOT(close()));
@@ -264,6 +266,42 @@ void MainWindow::showFps(double framesPerSecond)
         _sntprintf(buffer, 16, _T("%03.f%%"), speed);
         m_statusLabelFrames->setText(buffer);
     }
+}
+
+void MainWindow::saveStateImage()
+{
+    QFileDialog dlg;
+    dlg.setAcceptMode(QFileDialog::AcceptSave);
+    dlg.setNameFilter(_T("UKNC state images (*.uknc)"));
+    if (dlg.exec() == QDialog::Rejected)
+        return;
+
+    QString strFileName = dlg.selectedFiles().at(0);
+
+    saveStateImage(strFileName);
+}
+void MainWindow::saveStateImage(const QString& strFileName)
+{
+    LPCTSTR sFileName = qPrintable(strFileName);
+    Emulator_SaveImage(sFileName);
+}
+void MainWindow::loadStateImage()
+{
+    QFileDialog dlg;
+    dlg.setNameFilter(_T("UKNC state images (*.uknc)"));
+    if (dlg.exec() == QDialog::Rejected)
+        return;
+
+    QString strFileName = dlg.selectedFiles().at(0);
+
+    loadStateImage(strFileName);
+}
+void MainWindow::loadStateImage(const QString& strFileName)
+{
+    LPCTSTR sFileName = qPrintable(strFileName);
+    Emulator_LoadImage(sFileName);
+
+    UpdateAllViews();
 }
 
 void MainWindow::saveScreenshot()
