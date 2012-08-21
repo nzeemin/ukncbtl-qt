@@ -140,6 +140,8 @@ public slots:
     void keyString(QString str);
 
     //TODO: Change screen modes, sound on/off
+    //TODO: Save/restore state
+    //TODO: Debugger: Step Into, Step Over
 
 private:
     void keyChar(char ch, int timeout = 3);

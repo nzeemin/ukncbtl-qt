@@ -48,6 +48,9 @@ bool QEmulator::run(int frames)
     }
 
     Global_getMainWindow()->UpdateAllViews();
+    Global_getApplication()->processEvents();
+    if (m_window->isAborted())
+        return false;
 
     return result;
 }
@@ -171,6 +174,8 @@ void QEmulator::keyString(QString str)
     {
         char ch = str[i].toAscii();
         keyChar(ch);
+        if (m_window->isAborted())
+            return;
     }
 }
 
@@ -275,7 +280,7 @@ void QScriptWindow::runScript(const QString & script)
         QScriptSyntaxCheckResult checkResult = QScriptEngine::checkSyntax(script);
         if (checkResult.state() != QScriptSyntaxCheckResult::Valid)
         {
-            message.append("Syntax check FAILED:\n\n%1\n\nat line %2 column %3.")
+            message = QString("Syntax check FAILED:\n\n%1\n\nat line %2 column %3.")
                 .arg(checkResult.errorMessage())
                 .arg(checkResult.errorLineNumber())
                 .arg(checkResult.errorColumnNumber());

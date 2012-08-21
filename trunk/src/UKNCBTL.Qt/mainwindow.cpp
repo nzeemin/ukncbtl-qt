@@ -409,17 +409,20 @@ void MainWindow::emulatorCartridge(int slot)
             return;
 
         QString strFileName = dlg.selectedFiles().at(0);
-        attachCartridge(slot, strFileName);
-        //TODO: Check result
+        if (!attachCartridge(slot, strFileName))
+            return;
     }
 }
 bool MainWindow::attachCartridge(int slot, const QString & strFileName)
 {
-    LPCTSTR sFileName = qPrintable(strFileName);
+    QFileInfo fi(strFileName);
+    QString strFullName(fi.canonicalFilePath());  // Get absolute file name
+
+    LPCTSTR sFileName = qPrintable(strFullName);
     Emulator_LoadROMCartridge(slot, sFileName);
     //TODO: Check result
 
-    Settings_SetCartridgeFilePath(slot, sFileName);
+    Settings_SetCartridgeFilePath(slot, strFullName);
 
     UpdateMenu();
 
@@ -462,11 +465,14 @@ void MainWindow::emulatorFloppy(int slot)
 }
 bool MainWindow::attachFloppy(int slot, const QString & strFileName)
 {
-    LPCTSTR sFileName = qPrintable(strFileName);
+    QFileInfo fi(strFileName);
+    QString strFullName(fi.canonicalFilePath());  // Get absolute file name
+
+    LPCTSTR sFileName = qPrintable(strFullName);
     if (! g_pBoard->AttachFloppyImage(slot, sFileName))
         return false;
 
-    Settings_SetFloppyFilePath(slot, sFileName);
+    Settings_SetFloppyFilePath(slot, strFullName);
 
     UpdateMenu();
 
@@ -518,11 +524,14 @@ bool MainWindow::attachHardDrive(int slot, const QString & strFileName)
     if (!g_pBoard->IsROMCartridgeLoaded(slot))
         return false;
 
-    LPCTSTR sFileName = qPrintable(strFileName);
+    QFileInfo fi(strFileName);
+    QString strFullName(fi.canonicalFilePath());  // Get absolute file name
+
+    LPCTSTR sFileName = qPrintable(strFullName);
     if (!g_pBoard->AttachHardImage(slot, sFileName))
         return false;
 
-    Settings_SetHardFilePath(slot, sFileName);
+    Settings_SetHardFilePath(slot, strFullName);
 
     UpdateMenu();
 
