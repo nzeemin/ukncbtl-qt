@@ -156,10 +156,10 @@ void QDebugView::drawMemoryForRegister(QPainter &painter, int reg, CProcessor *p
     for (int idx = 0; idx < 16; idx++) {
         int addrtype;
         memory[idx] = pMemCtl->GetWordView(
-                current + idx * 2 - 14, pProc->IsHaltMode(), okExec, &addrtype);
+                current + idx * 2 - 16, pProc->IsHaltMode(), okExec, &addrtype);
     }
 
-    WORD address = current - 10;
+    WORD address = current - 16;
     for (int index = 0; index < 16; index++) {  // Рисуем строки
         // Адрес
         DrawOctalValue(painter, x + 4 * cxChar, y, address);

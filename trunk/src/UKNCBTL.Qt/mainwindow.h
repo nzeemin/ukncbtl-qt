@@ -30,6 +30,8 @@ public:
     void showFps(double framesPerSecond);
 
 public:
+    void saveStateImage(const QString& filename);
+    void loadStateImage(const QString& filename);
     void saveScreenshot(const QString& filename);
     bool attachFloppy(int slot, const QString& filename);
     void detachFloppy(int slot);
@@ -39,6 +41,8 @@ public:
     void detachHardDrive(int slot);
 
 public slots:
+    void saveStateImage();
+    void loadStateImage();
     void saveScreenshot();
     void helpAbout();
     void emulatorFrame();

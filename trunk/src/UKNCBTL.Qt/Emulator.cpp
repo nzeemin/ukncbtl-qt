@@ -465,3 +465,84 @@ void Emulator_SetSound(BOOL enable)
 
 
 //////////////////////////////////////////////////////////////////////
+// Save/restore state
+
+void Emulator_SaveImage(const QString& sFilePath)
+{
+    QFile file(sFilePath);
+    if (! file.open(QIODevice::Truncate | QIODevice::WriteOnly))
+    {
+        AlertWarning(_T("Failed to save image file."));
+        return;
+    }
+
+    // Allocate memory
+    BYTE* pImage = (BYTE*) ::malloc(UKNCIMAGE_SIZE);
+    memset(pImage, 0, UKNCIMAGE_SIZE);
+    // Prepare header
+    DWORD* pHeader = (DWORD*) pImage;
+    *pHeader++ = UKNCIMAGE_HEADER1;
+    *pHeader++ = UKNCIMAGE_HEADER2;
+    *pHeader++ = UKNCIMAGE_VERSION;
+    *pHeader++ = UKNCIMAGE_SIZE;
+    // Store emulator state to the image
+    g_pBoard->SaveToImage(pImage);
+    *(DWORD*)(pImage + 16) = m_dwEmulatorUptime;
+
+    // Save image to the file
+    qint64 bytesWritten = file.write((const char *)pImage, UKNCIMAGE_SIZE);
+    if (bytesWritten != UKNCIMAGE_SIZE)
+    {
+        AlertWarning(_T("Failed to save image file data."));
+        return;
+    }
+
+    // Free memory, close file
+    ::free(pImage);
+    file.close();
+}
+
+void Emulator_LoadImage(const QString &sFilePath)
+{
+    QFile file(sFilePath);
+    if (! file.open(QIODevice::ReadOnly))
+    {
+        AlertWarning(_T("Failed to load image file."));
+        return;
+    }
+
+    Emulator_Stop();
+
+    // Read header
+    DWORD bufHeader[UKNCIMAGE_HEADER_SIZE / sizeof(DWORD)];
+    qint64 bytesRead = file.read((char*)bufHeader, UKNCIMAGE_HEADER_SIZE);
+    //TODO: Check if bytesRead != UKNCIMAGE_HEADER_SIZE
+
+    //TODO: Check version and size
+
+    // Allocate memory
+    BYTE* pImage = (BYTE*) ::malloc(UKNCIMAGE_SIZE);
+
+    // Read image
+    file.seek(0);
+    bytesRead = file.read((char*)pImage, UKNCIMAGE_SIZE);
+    if (bytesRead != UKNCIMAGE_SIZE)
+    {
+        AlertWarning(_T("Failed to load image file data."));
+        return;
+    }
+    else
+    {
+        // Restore emulator state from the image
+        g_pBoard->LoadFromImage(pImage);
+
+        m_dwEmulatorUptime = *(DWORD*)(pImage + 16);
+    }
+
+    // Free memory, close file
+    ::free(pImage);
+    file.close();
+}
+
+
+//////////////////////////////////////////////////////////////////////
