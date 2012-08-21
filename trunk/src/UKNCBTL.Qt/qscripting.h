@@ -107,10 +107,24 @@ public slots:
       Get PPU object.
       */
     QObject* getPPU() { return &m_ppu; }
+    /**
+      Press the key (by scan code), wait timeout frames, release the key, wait 3 frames.
+      */
+    void keyScan(uchar ukncscan, int timeout = 3);
+    /**
+      Press SHIFT, press the key, wait timeout frames, release the key, release SHIFT, wait 3 frames.
+      */
+    void keyScanShift(uchar ukncscan, int timeout = 3);
+    /**
+      Type the key sequence.
+      */
+    void keyString(QString str);
 
-    //TODO: Keyboard keys press/release
     //TODO: Attach/detach hard disk images
     //TODO: Change screen modes, sound on/off
+
+private:
+    void keyChar(char ch, int timeout = 3);
 
 private:
     QScriptWindow * m_window;
