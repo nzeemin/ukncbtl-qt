@@ -60,9 +60,13 @@ float QEmulator::getUptime()
     return Emulator_GetUptime();
 }
 
-void QEmulator::setBreakpoint(quint16 address)
+void QEmulator::setCPUBreakpoint(quint16 address)
 {
     Emulator_SetCPUBreakpoint((WORD)address);
+}
+void QEmulator::setPPUBreakpoint(quint16 address)
+{
+    Emulator_SetPPUBreakpoint((WORD)address);
 }
 bool QEmulator::isBreakpoint()
 {
@@ -177,6 +181,16 @@ void QEmulator::keyString(QString str)
         if (m_window->isAborted())
             return;
     }
+}
+
+void QEmulator::saveState(const QString &filename)
+{
+    Global_getMainWindow()->saveStateImage(filename);
+}
+
+void QEmulator::loadState(const QString &filename)
+{
+    Global_getMainWindow()->loadStateImage(filename);
 }
 
 

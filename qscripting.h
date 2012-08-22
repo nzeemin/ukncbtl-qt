@@ -54,6 +54,10 @@ public slots:
       */
     QScriptValue disassemble(ushort addr);
 
+    //TODO: setReg(regno, value); setPC(value); setSP(value); setPSW(value);
+    //TODO: writeWord(addr, value);
+    //TODO: stepInto(); stepOver();
+
 private:
     QScriptEngine* m_engine;
     CProcessor* m_processor;
@@ -83,9 +87,13 @@ public slots:
       */
     float getUptime();
     /**
-      Sets breakpoint address for the next run() call.
+      Sets CPU breakpoint address for the next run() call.
       */
-    void setBreakpoint(quint16 address);
+    void setCPUBreakpoint(quint16 address);
+    /**
+      Sets PPU breakpoint address for the next run() call.
+      */
+    void setPPUBreakpoint(quint16 address);
     /**
       Check if the emulator stopped on a breakpoint.
       */
@@ -138,10 +146,16 @@ public slots:
       Type the key sequence.
       */
     void keyString(QString str);
+    /**
+      Save state image to the file.
+      */
+    void saveState(const QString& filename);
+    /**
+      Restore state image from the file.
+      */
+    void loadState(const QString& filename);
 
-    //TODO: Change screen modes, sound on/off
-    //TODO: Save/restore state
-    //TODO: Debugger: Step Into, Step Over
+    //TODO: Change screen modes, enableSound()
 
 private:
     void keyChar(char ch, int timeout = 3);

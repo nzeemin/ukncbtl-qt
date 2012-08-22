@@ -323,7 +323,10 @@ void QConsoleView::execConsoleCommand(const QString &command)
         int instrLength = this->printDisassemble(pProc, pProc->GetPC(), TRUE, FALSE);
         WORD bpaddress = pProc->GetPC() + instrLength * 2;
 
-        Emulator_SetCPUBreakpoint(bpaddress);
+        if (m_okCurrentProc)
+            Emulator_SetCPUBreakpoint(bpaddress);
+        else
+            Emulator_SetPPUBreakpoint(bpaddress);
         Emulator_Start();
 
         okUpdateMenu = TRUE;
@@ -383,7 +386,10 @@ void QConsoleView::execConsoleCommand(const QString &command)
             this->print(MESSAGE_WRONG_VALUE);
         else
         {
-            Emulator_SetCPUBreakpoint(value);
+            if (m_okCurrentProc)
+                Emulator_SetCPUBreakpoint(value);
+            else
+                Emulator_SetPPUBreakpoint(value);
             Emulator_Start();
 
             okUpdateMenu = TRUE;
