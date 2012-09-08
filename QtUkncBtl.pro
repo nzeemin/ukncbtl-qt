@@ -23,7 +23,8 @@ SOURCES += main.cpp \
     qconsoleview.cpp \
     qmemoryview.cpp \
     qsoundout.cpp \
-    qscripting.cpp
+    qscripting.cpp \
+    UnitTests.cpp
 HEADERS += mainwindow.h \
     stdafx.h \
     util/WavPcmFile.h \
@@ -43,7 +44,9 @@ HEADERS += mainwindow.h \
     qconsoleview.h \
     qmemoryview.h \
     qsoundout.h \
-    qscripting.h
+    qscripting.h \
+    UnitTests.h
 FORMS += mainwindow.ui
 RESOURCES += QtUkncBtl.qrc
 QT += script
+CONFIG += qtestlib 
