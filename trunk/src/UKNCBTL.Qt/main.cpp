@@ -15,9 +15,20 @@ QApplication *g_Application;
 MainWindow *g_MainWindow;
 QSettings *g_Settings;
 
+#if !defined(QT_NO_DEBUG)
+extern void UnitTests_ExecuteAll();  // Defined in UnitTests.cpp
+#endif
 
 int main(int argc, char *argv[])
 {
+#if !defined(QT_NO_DEBUG)
+    if (argc > 1 && _stricmp(argv[1], "-test") == 0)
+    {
+        UnitTests_ExecuteAll();
+        return 0;
+    }
+#endif
+
     QApplication application(argc, argv);
     g_Application = &application;
 
