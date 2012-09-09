@@ -228,6 +228,15 @@ ushort QEmulatorProcessor::readWord(ushort addr)
     return m_processor->GetMemoryController()->GetWordView(addr, m_processor->IsHaltMode(), FALSE, &okValid);
 }
 
+uchar QEmulatorProcessor::readByte(ushort addr)
+{
+    BOOL okValid;
+    ushort word = m_processor->GetMemoryController()->GetWordView(addr, m_processor->IsHaltMode(), FALSE, &okValid);
+    if (!okValid)
+        return 0;
+    return (addr & 1) ? word & 0xff : (word >> 8) & 0xff;
+}
+
 QScriptValue QEmulatorProcessor::disassemble(ushort addr)
 {
     CMemoryController* pMemCtl = m_processor->GetMemoryController();
