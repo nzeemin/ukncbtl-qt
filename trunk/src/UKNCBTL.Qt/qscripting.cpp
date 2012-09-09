@@ -281,6 +281,7 @@ QScriptWindow::QScriptWindow(QWidget * parent)
 
     m_emulator = new QEmulator(this);
     m_engine.globalObject().setProperty("emulator", m_engine.newQObject(m_emulator));
+    m_engine.globalObject().setProperty("emu", m_engine.newQObject(m_emulator));
 }
 
 QScriptWindow::~QScriptWindow()
