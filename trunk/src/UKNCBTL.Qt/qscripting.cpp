@@ -193,6 +193,11 @@ void QEmulator::loadState(const QString &filename)
     Global_getMainWindow()->loadStateImage(filename);
 }
 
+void QEmulator::consolePrint(const QString &message)
+{
+    Global_getMainWindow()->consolePrint(message);
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // QEmulatorProcessor

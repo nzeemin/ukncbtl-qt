@@ -148,8 +148,11 @@ public slots:
     /// \brief Restore state image from the file.
     void loadState(const QString& filename);
 
+    /// \brief Print a message to debug console window.
+    /// \param message The message to print.
+    void consolePrint(const QString& message);
+
     //TODO: Change screen modes, enableSound()
-    //TODO: Print message to debug console
 
 private:
     void keyChar(char ch, int timeout = 3);

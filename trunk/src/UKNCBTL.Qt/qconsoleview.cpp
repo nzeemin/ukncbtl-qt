@@ -64,11 +64,16 @@ void QConsoleView::setCurrentProc(bool okProc)
 
 void QConsoleView::print(const QString &message)
 {
-    // Put selection to the end of text
     m_log->moveCursor(QTextCursor::End);
-    // Insert the message
     m_log->insertPlainText(message);
-    //TODO: Scroll to caret
+    m_log->moveCursor(QTextCursor::End);
+}
+void QConsoleView::printLine(const QString &message)
+{
+    m_log->moveCursor(QTextCursor::End);
+    m_log->insertPlainText(message);
+    m_log->insertPlainText(_T("\r\n"));
+    m_log->moveCursor(QTextCursor::End);
 }
 
 void QConsoleView::printConsolePrompt()
@@ -228,8 +233,7 @@ void QConsoleView::execConsoleCommand(const QString &command)
     if (g_okEmulatorRunning) return;
 
     // Echo command to the log
-    this->print(command);
-    this->print(_T("\r\n"));
+    this->printLine(command);
 
     BOOL okUpdateAllViews = FALSE;  // Flag - need to update all debug views
     BOOL okUpdateMenu = FALSE;  // Flag - need to update main menu

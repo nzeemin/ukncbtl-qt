@@ -71,6 +71,7 @@ public slots:
     void viewSizeUpscaled4();
     void soundEnabled();
     void scriptRun();
+    void consolePrint(const QString&);
 
 protected:
     void changeEvent(QEvent *e);
