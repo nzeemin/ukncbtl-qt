@@ -227,6 +227,18 @@ bool QEmulatorProcessor::isHalt()
     return m_processor->IsHaltMode();
 }
 
+void QEmulatorProcessor::setReg(int regno, ushort value)
+{
+    if (regno < 0 || regno > 7) return;
+    m_processor->SetReg(regno, value);
+    Global_getMainWindow()->UpdateAllViews();
+}
+void QEmulatorProcessor::setPSW(ushort value)
+{
+    m_processor->SetPSW(value);
+    Global_getMainWindow()->UpdateAllViews();
+}
+
 ushort QEmulatorProcessor::readWord(ushort addr)
 {
     BOOL okValid;
