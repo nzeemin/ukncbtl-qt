@@ -19,16 +19,18 @@ class CProcessor;
 class QEmulatorProcessor : public QObject
 {
     Q_OBJECT
+
     /// \brief Get the name of the processor: "CPU" or "PPU", short form for getName().
     Q_PROPERTY(QString name READ getName)
     /// \brief Get the processor stack register value, short form for getSP().
-    Q_PROPERTY(ushort sp READ getSP)
+    Q_PROPERTY(ushort sp READ getSP WRITE setSP)
     /// \brief Get the processor PC register value, short form for getPC().
-    Q_PROPERTY(ushort pc READ getPC)
+    Q_PROPERTY(ushort pc READ getPC WRITE setPC)
     /// \brief Get the processor status word value, short form for getPSW().
-    Q_PROPERTY(ushort psw READ getPSW)
+    Q_PROPERTY(ushort psw READ getPSW WRITE setPSW)
     /// \brief Get the processor HALT/USER mode flag, short form for isHalt().
     Q_PROPERTY(bool halt READ isHalt)
+
 public:
     QEmulatorProcessor(QScriptEngine* engine, CProcessor* processor);
 
@@ -51,6 +53,17 @@ public slots:
     /// \brief Get the processor HALT/USER mode flag.
     bool isHalt();
 
+    /// \brief Put the given value to the given processor register.
+    /// \param regno 0..7 */
+    /// \param value Value to put in the processor register. */
+    void setReg(int regno, ushort value);
+    /// \brief Set the processor SP register value.
+    void setSP(ushort value) { setReg(6, value); }
+    /// \brief Set the processor PC register value.
+    void setPC(ushort value) { setReg(7, value); }
+    /// \brief Set the processor PSW register value.
+    void setPSW(ushort value);
+
     /// \brief Read word from the processor memory.
     /// \param addr memory address */
     ushort readWord(ushort addr);
@@ -63,7 +76,6 @@ public slots:
     /// \return Array of four: { address, instruction, arguments, instruction length }.
     QScriptValue disassemble(ushort addr);
 
-    //TODO: setReg(regno, value); setPC(value); setSP(value); setPSW(value);
     //TODO: writeWord(addr, value);
     //TODO: stepInto(); stepOver();
 
@@ -78,12 +90,14 @@ private:
 class QEmulator : public QObject
 {
     Q_OBJECT
+
     /// \brief Get emulator uptime, in seconds, short for for getUptime().
     Q_PROPERTY(float uptime READ getUptime)
     /// \brief Get CPU object, short form for getCPU().
     Q_PROPERTY(QObject* cpu READ getCPU)
     /// \brief Get PPU object, short form for getPPU().
     Q_PROPERTY(QObject* ppu READ getPPU)
+
 public:
     QEmulator(QScriptWindow * window);
 
