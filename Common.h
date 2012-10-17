@@ -137,6 +137,7 @@ void DrawHexValue(QPainter &painter, int x, int y, WORD value);
 void DrawBinaryValue(QPainter &painter, int x, int y, WORD value);
 BOOL ParseOctalValue(LPCTSTR text, WORD* pValue);
 BOOL ParseOctalValue(const QString &text, WORD* pValue);
+ushort Translate_KOI8R(BYTE ch);
 
 
 //////////////////////////////////////////////////////////////////////
