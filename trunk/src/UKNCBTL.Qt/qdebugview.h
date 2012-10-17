@@ -16,6 +16,7 @@ public:
 
     void setCurrentProc(bool okProc);
     void updateData();
+    void updateWindowText();
 
 protected:
     void paintEvent(QPaintEvent *event);
