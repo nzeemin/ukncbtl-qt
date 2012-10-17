@@ -21,10 +21,18 @@ QDebugView::QDebugView(QWidget *parent) :
     this->setMaximumHeight(cyLine * 16 + cyLine / 2);
 }
 
+void QDebugView::updateWindowText()
+{
+    CProcessor* pDebugPU = m_okDebugProcessor ? g_pBoard->GetCPU() : g_pBoard->GetPPU();
+    QString buffer = QString(_T("Debug - %1")).arg(pDebugPU->GetName());
+    parentWidget()->setWindowTitle(buffer);
+}
+
 void QDebugView::setCurrentProc(bool okProc)
 {
     m_okDebugProcessor = okProc;
     this->updateData();
+    updateWindowText();
 }
 
 void QDebugView::updateData()

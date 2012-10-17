@@ -172,6 +172,7 @@ void MainWindow::restoreSettings()
     m_dockMemory->setVisible(Global_getSettings()->value("MainWindow/MemoryView", false).toBool());
 
     ui->actionSoundEnabled->setChecked(Settings_GetSound());
+    m_debug->updateWindowText();
 }
 
 void MainWindow::UpdateMenu()
