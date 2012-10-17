@@ -14,7 +14,7 @@ enum MemoryViewMode {
     MEMMODE_ROM  = 3,  // ROM
     MEMMODE_CPU  = 4,  // CPU memory
     MEMMODE_PPU  = 5,  // PPU memory
-    MEMMODE_LAST = 5,  // Last mode number
+    MEMMODE_LAST = 5   // Last mode number
 };
 
 
@@ -46,6 +46,26 @@ QMemoryView::QMemoryView()
 QMemoryView::~QMemoryView()
 {
     delete m_scrollbar;
+}
+
+LPCTSTR GetMemoryModeName(int mode)
+{
+    switch (mode) {
+        case MEMMODE_RAM0:  return _T("RAM0");
+        case MEMMODE_RAM1:  return _T("RAM1");
+        case MEMMODE_RAM2:  return _T("RAM2");
+        case MEMMODE_ROM:   return _T("ROM");
+        case MEMMODE_CPU:   return _T("CPU");
+        case MEMMODE_PPU:   return _T("PPU");
+        default:
+            return _T("UKWN");  // Unknown mode
+    }
+}
+
+void QMemoryView::updateWindowText()
+{
+    QString buffer = QString(_T("Memory - %1")).arg(GetMemoryModeName(m_Mode));
+    parentWidget()->setWindowTitle(buffer);
 }
 
 void QMemoryView::updateData()
@@ -174,6 +194,6 @@ void QMemoryView::keyPressEvent(QKeyEvent *event)
         else
             m_Mode++;
         this->repaint();
-        //MemoryView_UpdateWindowText();
+        updateWindowText();
     }
 }
