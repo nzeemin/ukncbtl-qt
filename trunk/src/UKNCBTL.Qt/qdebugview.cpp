@@ -82,10 +82,10 @@ void QDebugView::paintEvent(QPaintEvent * /*event*/)
     WORD* arrR = (m_okDebugProcessor) ? m_wDebugCpuR : m_wDebugPpuR;
     BOOL* arrRChanged = (m_okDebugProcessor) ? m_okDebugCpuRChanged : m_okDebugPpuRChanged;
 
-    LPCTSTR sProcName = pDebugPU->GetName();
-    painter.drawText(cxChar * 1, 2 * cyLine, sProcName);
+    //LPCTSTR sProcName = pDebugPU->GetName();
+    //painter.drawText(cxChar * 1, 2 * cyLine, sProcName);
 
-    drawProcessor(painter, pDebugPU, cxChar * 6, 1 * cyLine, arrR, arrRChanged);
+    drawProcessor(painter, pDebugPU, cxChar * 2, 1 * cyLine, arrR, arrRChanged);
 
     // Draw stack
     drawMemoryForRegister(painter, 6, pDebugPU, 35 * cxChar, 1 * cyLine);
@@ -101,7 +101,8 @@ void QDebugView::drawProcessor(QPainter &painter, const CProcessor *pProc, int x
     int cyLine = fontmetrics.height();
     QColor colorText = painter.pen().color();
 
-    painter.drawRect(x - cxChar, y - cyLine/2, 28 * cxChar, cyLine * 15);
+    painter.setPen(QColor(Qt::gray));
+    painter.drawRect(x - cxChar, y - cyLine/2, 33 * cxChar, cyLine * 15);
 
     // Registers
     for (int r = 0; r < 8; r++) {
@@ -112,7 +113,8 @@ void QDebugView::drawProcessor(QPainter &painter, const CProcessor *pProc, int x
 
         WORD value = arrR[r]; //pProc->GetReg(r);
         DrawOctalValue(painter, x + cxChar * 3, y + (1 + r) * cyLine, value);
-        DrawBinaryValue(painter, x + cxChar * 10, y + (1 + r) * cyLine, value);
+        DrawHexValue(painter, x + cxChar * 10, y + (1 + r) * cyLine, value);
+        DrawBinaryValue(painter, x + cxChar * 15, y + (1 + r) * cyLine, value);
     }
     painter.setPen(colorText);
 
@@ -120,15 +122,16 @@ void QDebugView::drawProcessor(QPainter &painter, const CProcessor *pProc, int x
     painter.drawText(x, y + 9 * cyLine, _T("PC'"));
     WORD cpc = pProc->GetCPC();
     DrawOctalValue(painter, x + cxChar * 3, y + 9 * cyLine, cpc);
-    DrawBinaryValue(painter, x + cxChar * 10, y + 9 * cyLine, cpc);
+    DrawBinaryValue(painter, x + cxChar * 15, y + 9 * cyLine, cpc);
 
     // PSW value
     painter.setPen(QColor(arrRChanged[8] ? Qt::red : colorText));
     painter.drawText(x, y + 11 * cyLine, _T("PS"));
     WORD psw = arrR[8]; // pProc->GetPSW();
     DrawOctalValue(painter, x + cxChar * 3, y + 11 * cyLine, psw);
-    painter.drawText(x + cxChar * 10, y + 10 * cyLine, _T("       HP  TNZVC"));
-    DrawBinaryValue(painter, x + cxChar * 10, y + 11 * cyLine, psw);
+    DrawHexValue(painter, x + cxChar * 10, y + 11 * cyLine, psw);
+    painter.drawText(x + cxChar * 15, y + 10 * cyLine, _T("       HP  TNZVC"));
+    DrawBinaryValue(painter, x + cxChar * 15, y + 11 * cyLine, psw);
 
     painter.setPen(colorText);
 
@@ -136,7 +139,7 @@ void QDebugView::drawProcessor(QPainter &painter, const CProcessor *pProc, int x
     painter.drawText(x, y + 12 * cyLine, _T("PS'"));
     WORD cpsw = pProc->GetCPSW();
     DrawOctalValue(painter, x + cxChar * 3, y + 12 * cyLine, cpsw);
-    DrawBinaryValue(painter, x + cxChar * 10, y + 12 * cyLine, cpsw);
+    DrawBinaryValue(painter, x + cxChar * 15, y + 12 * cyLine, cpsw);
 
     // Processor mode - HALT or USER
     BOOL okHaltMode = pProc->IsHaltMode();
