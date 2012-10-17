@@ -173,6 +173,7 @@ void MainWindow::restoreSettings()
 
     ui->actionSoundEnabled->setChecked(Settings_GetSound());
     m_debug->updateWindowText();
+    m_memory->updateWindowText();
 }
 
 void MainWindow::UpdateMenu()

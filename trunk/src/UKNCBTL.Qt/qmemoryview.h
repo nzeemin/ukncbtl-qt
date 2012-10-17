@@ -12,6 +12,7 @@ public:
     ~QMemoryView();
 
     void updateData();
+    void updateWindowText();
 
 protected:
     void paintEvent(QPaintEvent *);
