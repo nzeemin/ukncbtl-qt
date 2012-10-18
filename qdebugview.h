@@ -18,8 +18,12 @@ public:
     void updateData();
     void updateWindowText();
 
+public slots:
+    void switchCpuPpu();
+
 protected:
     void paintEvent(QPaintEvent *event);
+    void contextMenuEvent(QContextMenuEvent *event);
 
 private:
     BOOL m_okDebugProcessor;        // TRUE - CPU, FALSE - PPU

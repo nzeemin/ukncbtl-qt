@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include <QtGui>
+#include "main.h"
 #include "qdebugview.h"
 #include "Emulator.h"
 #include "emubase/Emubase.h"
@@ -62,6 +63,19 @@ void QDebugView::updateData()
     WORD pswPPU = pPPU->GetPSW();
     m_okDebugPpuRChanged[8] = (m_wDebugPpuR[8] != pswPPU);
     m_wDebugPpuR[8] = pswPPU;
+}
+
+void QDebugView::contextMenuEvent(QContextMenuEvent *event)
+{
+    QMenu menu(this);
+    menu.addAction(m_okDebugProcessor ? "Switch to PPU" : "Switch to CPU", this, SLOT(switchCpuPpu()));
+    menu.exec(event->globalPos());
+}
+
+void QDebugView::switchCpuPpu()
+{
+    Global_SetCurrentProc(! m_okDebugProcessor);
+    Global_UpdateAllViews();
 }
 
 void QDebugView::paintEvent(QPaintEvent * /*event*/)

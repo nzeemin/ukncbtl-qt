@@ -56,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionViewSizeUpscaled, SIGNAL(triggered()), this, SLOT(viewSizeUpscaled()));
     QObject::connect(ui->actionViewSizeUpscaled3, SIGNAL(triggered()), this, SLOT(viewSizeUpscaled3()));
     QObject::connect(ui->actionViewSizeUpscaled4, SIGNAL(triggered()), this, SLOT(viewSizeUpscaled4()));
-    connect(ui->actionSoundEnabled,SIGNAL(triggered()),this,SLOT(soundEnabled()));
+    QObject::connect(ui->actionSoundEnabled, SIGNAL(triggered()), this, SLOT(soundEnabled()));
 
     // Screen and keyboard
     m_screen = new QScreen();
@@ -163,6 +163,7 @@ void MainWindow::restoreSettings()
     ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
     ui->centralWidget->setMaximumWidth(m_screen->maximumWidth());
 
+    //NOTE: Restore from maximized state fails, see https://bugreports.qt-project.org/browse/QTBUG-15080
     restoreGeometry(Global_getSettings()->value("MainWindow/Geometry").toByteArray());
     restoreState(Global_getSettings()->value("MainWindow/WindowState").toByteArray());
 

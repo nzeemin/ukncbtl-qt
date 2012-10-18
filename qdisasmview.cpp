@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include <QtGui>
+#include "main.h"
 #include "qdisasmview.h"
 #include "Emulator.h"
 #include "emubase/Emubase.h"
@@ -28,6 +29,19 @@ void QDisasmView::updateData()
     CProcessor* pDisasmPU = (m_okDisasmProcessor) ? g_pBoard->GetCPU() : g_pBoard->GetPPU();
     ASSERT(pDisasmPU != NULL);
     m_wDisasmBaseAddr = pDisasmPU->GetPC();
+}
+
+void QDisasmView::contextMenuEvent(QContextMenuEvent *event)
+{
+    QMenu menu(this);
+    menu.addAction(m_okDisasmProcessor ? "Switch to PPU" : "Switch to CPU", this, SLOT(switchCpuPpu()));
+    menu.exec(event->globalPos());
+}
+
+void QDisasmView::switchCpuPpu()
+{
+    Global_SetCurrentProc(! m_okDisasmProcessor);
+    Global_UpdateAllViews();
 }
 
 void QDisasmView::paintEvent(QPaintEvent * /*event*/)
