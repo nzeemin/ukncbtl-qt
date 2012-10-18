@@ -15,8 +15,12 @@ public:
     void setCurrentProc(bool okProc);
     void updateData();
 
+public slots:
+    void switchCpuPpu();
+
 protected:
     void paintEvent(QPaintEvent *event);
+    void contextMenuEvent(QContextMenuEvent *event);
 
 private:
     bool m_okDisasmProcessor;  // TRUE - CPU, FALSE - PPU
