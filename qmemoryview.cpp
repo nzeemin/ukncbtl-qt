@@ -17,6 +17,10 @@ enum MemoryViewMode {
     MEMMODE_LAST = 5   // Last mode number
 };
 
+static const char * MemoryView_ModeNames[] = {
+    "RAM0", "RAM1", "RAM2", "ROM", "CPU", "PPU"
+};
+
 
 QMemoryView::QMemoryView()
 {
@@ -48,18 +52,11 @@ QMemoryView::~QMemoryView()
     delete m_scrollbar;
 }
 
-LPCTSTR GetMemoryModeName(int mode)
+const char * GetMemoryModeName(int mode)
 {
-    switch (mode) {
-        case MEMMODE_RAM0:  return _T("RAM0");
-        case MEMMODE_RAM1:  return _T("RAM1");
-        case MEMMODE_RAM2:  return _T("RAM2");
-        case MEMMODE_ROM:   return _T("ROM");
-        case MEMMODE_CPU:   return _T("CPU");
-        case MEMMODE_PPU:   return _T("PPU");
-        default:
-            return _T("UKWN");  // Unknown mode
-    }
+    if (mode < 0 || mode > MEMMODE_LAST)
+        return _T("UKWN");  // Unknown mode
+    return MemoryView_ModeNames[mode];
 }
 
 void QMemoryView::updateWindowText()
@@ -70,6 +67,37 @@ void QMemoryView::updateWindowText()
 
 void QMemoryView::updateData()
 {
+}
+
+void QMemoryView::contextMenuEvent(QContextMenuEvent *event)
+{
+    QMenu menu(this);
+    //menu.addAction("Go to Address...");
+    //menu.addSeparator();
+
+    for (int mode = 0; mode <= MEMMODE_LAST; mode++)
+    {
+        const char * modeName = MemoryView_ModeNames[mode];
+        QAction * action = menu.addAction(modeName, this, SLOT(changeMemoryMode()));
+        action->setCheckable(true);
+        action->setData(mode);
+        if (m_Mode == mode)
+            action->setChecked(true);
+    }
+
+    menu.exec(event->globalPos());
+}
+
+void QMemoryView::changeMemoryMode()
+{
+    QAction * action = qobject_cast<QAction*>(sender());
+    if (action == 0) return;
+    int mode = action->data().toInt();
+    if (mode < 0 || mode > MEMMODE_LAST) return;
+
+    m_Mode = mode;
+    repaint();
+    updateWindowText();
 }
 
 void QMemoryView::resizeEvent(QResizeEvent *)
