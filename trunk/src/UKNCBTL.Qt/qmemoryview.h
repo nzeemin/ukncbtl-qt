@@ -14,10 +14,14 @@ public:
     void updateData();
     void updateWindowText();
 
+public slots:
+    void changeMemoryMode();
+
 protected:
     void paintEvent(QPaintEvent *);
     void resizeEvent(QResizeEvent *);
     void keyPressEvent(QKeyEvent *);
+    void contextMenuEvent(QContextMenuEvent *);
 
 protected slots:
     void scrollValueChanged();
