@@ -16,6 +16,7 @@ public:
 
 public slots:
     void changeMemoryMode();
+    void gotoAddress();
 
 protected:
     void paintEvent(QPaintEvent *);

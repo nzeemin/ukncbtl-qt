@@ -24,7 +24,8 @@ SOURCES += main.cpp \
     qmemoryview.cpp \
     qsoundout.cpp \
     qscripting.cpp \
-    UnitTests.cpp
+    UnitTests.cpp \
+    qdialogs.cpp
 HEADERS += mainwindow.h \
     stdafx.h \
     util/WavPcmFile.h \
@@ -45,7 +46,8 @@ HEADERS += mainwindow.h \
     qmemoryview.h \
     qsoundout.h \
     qscripting.h \
-    UnitTests.h
+    UnitTests.h \
+    qdialogs.h
 FORMS += mainwindow.ui
 RESOURCES += QtUkncBtl.qrc
 QT += script
