@@ -2,9 +2,11 @@
 #include <QtGui>
 #include <QPainter>
 #include <QScrollBar>
+#include "main.h"
 #include "qmemoryview.h"
 #include "Emulator.h"
 #include "emubase/Emubase.h"
+#include "qdialogs.h"
 
 
 enum MemoryViewMode {
@@ -72,8 +74,8 @@ void QMemoryView::updateData()
 void QMemoryView::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu menu(this);
-    //menu.addAction("Go to Address...");
-    //menu.addSeparator();
+    menu.addAction("Go to Address...", this, SLOT(gotoAddress()));
+    menu.addSeparator();
 
     for (int mode = 0; mode <= MEMMODE_LAST; mode++)
     {
@@ -98,6 +100,18 @@ void QMemoryView::changeMemoryMode()
     m_Mode = mode;
     repaint();
     updateWindowText();
+}
+
+void QMemoryView::gotoAddress()
+{
+    WORD value = m_wBaseAddress;
+    QInputOctalDialog dialog(this, "Go To Address", "Address (octal):", &value);
+    if (dialog.exec() == QDialog::Rejected) return;
+
+    // Scroll to the address
+    m_wBaseAddress = value & ((WORD)~15);
+    repaint();
+    //TODO: Update scrollbar position
 }
 
 void QMemoryView::resizeEvent(QResizeEvent *)
