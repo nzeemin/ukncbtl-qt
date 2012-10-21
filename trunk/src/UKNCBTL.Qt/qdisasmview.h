@@ -21,13 +21,15 @@ public slots:
 protected:
     void paintEvent(QPaintEvent *event);
     void contextMenuEvent(QContextMenuEvent *event);
+    void focusInEvent(QFocusEvent *);
+    void focusOutEvent(QFocusEvent *);
 
 private:
     bool m_okDisasmProcessor;  // TRUE - CPU, FALSE - PPU
     unsigned short m_wDisasmBaseAddr;
     unsigned short m_wDisasmNextBaseAddr;
 
-    void DrawDisassemble(QPainter& painter, CProcessor* pProc, unsigned short base, unsigned short previous);
+    int DrawDisassemble(QPainter& painter, CProcessor* pProc, unsigned short base, unsigned short previous);
 };
 
 #endif // QDISASMVIEW_H

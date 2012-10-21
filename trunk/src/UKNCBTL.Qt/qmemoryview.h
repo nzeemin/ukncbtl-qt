@@ -17,12 +17,17 @@ public:
 public slots:
     void changeMemoryMode();
     void gotoAddress();
+    void scrollBy(uint16_t delta);
 
 protected:
     void paintEvent(QPaintEvent *);
     void resizeEvent(QResizeEvent *);
     void keyPressEvent(QKeyEvent *);
     void contextMenuEvent(QContextMenuEvent *);
+    void focusInEvent(QFocusEvent *);
+    void focusOutEvent(QFocusEvent *);
+
+    void updateScrollPos();
 
 protected slots:
     void scrollValueChanged();

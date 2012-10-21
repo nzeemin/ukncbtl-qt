@@ -46,7 +46,7 @@ QMemoryView::QMemoryView()
     m_scrollbar->setSingleStep(16);
     QObject::connect(m_scrollbar, SIGNAL(valueChanged(int)), this, SLOT(scrollValueChanged()));
 
-    setFocusPolicy(Qt::StrongFocus);
+    setFocusPolicy(Qt::ClickFocus);
 }
 
 QMemoryView::~QMemoryView()
@@ -54,7 +54,12 @@ QMemoryView::~QMemoryView()
     delete m_scrollbar;
 }
 
-const char * GetMemoryModeName(int mode)
+void QMemoryView::updateScrollPos()
+{
+    m_scrollbar->setValue(m_wBaseAddress);
+}
+
+static const char * GetMemoryModeName(int mode)
 {
     if (mode < 0 || mode > MEMMODE_LAST)
         return _T("UKWN");  // Unknown mode
@@ -69,6 +74,15 @@ void QMemoryView::updateWindowText()
 
 void QMemoryView::updateData()
 {
+}
+
+void QMemoryView::focusInEvent(QFocusEvent *)
+{
+    repaint();  // Need to draw focus rect
+}
+void QMemoryView::focusOutEvent(QFocusEvent *)
+{
+    repaint();  // Need to draw focus rect
 }
 
 void QMemoryView::contextMenuEvent(QContextMenuEvent *event)
@@ -102,6 +116,16 @@ void QMemoryView::changeMemoryMode()
     updateWindowText();
 }
 
+void QMemoryView::scrollBy(uint16_t delta)
+{
+    if (delta == 0) return;
+
+    m_wBaseAddress = (WORD)(m_wBaseAddress + delta);
+    m_wBaseAddress = m_wBaseAddress & ((WORD)~15);
+    repaint();
+    updateScrollPos();
+}
+
 void QMemoryView::gotoAddress()
 {
     WORD value = m_wBaseAddress;
@@ -111,7 +135,7 @@ void QMemoryView::gotoAddress()
     // Scroll to the address
     m_wBaseAddress = value & ((WORD)~15);
     repaint();
-    //TODO: Update scrollbar position
+    updateScrollPos();
 }
 
 void QMemoryView::resizeEvent(QResizeEvent *)
@@ -124,7 +148,7 @@ void QMemoryView::resizeEvent(QResizeEvent *)
 void QMemoryView::scrollValueChanged()
 {
     int value = m_scrollbar->value();
-    m_wBaseAddress = (unsigned short)value & ~15;
+    m_wBaseAddress = (unsigned short)value & ((WORD)~15);
     this->repaint();
 }
 
@@ -222,15 +246,26 @@ void QMemoryView::paintEvent(QPaintEvent * /*event*/)
 
         y += cyLine;
         if (y > this->height()) break;
+    }  // Draw lines
+
+    // Draw focus rect
+    if (hasFocus())
+    {
+        QStyleOptionFocusRect option;
+        option.initFrom(this);
+        option.state |= QStyle::State_KeyboardFocusChange;
+        option.backgroundColor = QColor(Qt::gray);
+        option.rect = QRect(0, cyLine + 1, 83 * cxChar, cyLine * m_nPageSize);
+        style()->drawPrimitive(QStyle::PE_FrameFocusRect, &option, &painter, this);
     }
 }
 
 void QMemoryView::keyPressEvent(QKeyEvent *event)
 {
-    if (event->isAutoRepeat()) return;
-
-    if (event->key() == Qt::Key_Space)
+    switch (event->key())
     {
+    case Qt::Key_Space:
+        if (event->isAutoRepeat()) return;
         event->accept();
         if (m_Mode == MEMMODE_LAST)
             m_Mode = 0;
@@ -238,5 +273,24 @@ void QMemoryView::keyPressEvent(QKeyEvent *event)
             m_Mode++;
         this->repaint();
         updateWindowText();
+        break;
+
+    case Qt::Key_Up:
+        event->accept();
+        scrollBy(-16);
+        break;
+    case Qt::Key_Down:
+        event->accept();
+        scrollBy(16);
+        break;
+
+    case Qt::Key_PageUp:
+        event->accept();
+        scrollBy(-m_nPageSize * 16);
+        break;
+    case Qt::Key_PageDown:
+        event->accept();
+        scrollBy(m_nPageSize * 16);
+        break;
     }
 }
