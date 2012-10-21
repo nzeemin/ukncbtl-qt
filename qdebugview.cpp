@@ -20,6 +20,8 @@ QDebugView::QDebugView(QWidget *parent) :
     int cyLine = fontmetrics.height();
     this->setMinimumSize(cxChar * 55, cyLine * 16 + cyLine / 2);
     this->setMaximumHeight(cyLine * 16 + cyLine / 2);
+
+    setFocusPolicy(Qt::ClickFocus);
 }
 
 void QDebugView::updateWindowText()
@@ -65,6 +67,15 @@ void QDebugView::updateData()
     m_wDebugPpuR[8] = pswPPU;
 }
 
+void QDebugView::focusInEvent(QFocusEvent *)
+{
+    repaint();  // Need to draw focus rect
+}
+void QDebugView::focusOutEvent(QFocusEvent *)
+{
+    repaint();  // Need to draw focus rect
+}
+
 void QDebugView::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu menu(this);
@@ -106,6 +117,17 @@ void QDebugView::paintEvent(QPaintEvent * /*event*/)
 
     CMemoryController* pDebugMemCtl = pDebugPU->GetMemoryController();
     drawPorts(painter, m_okDebugProcessor, pDebugMemCtl, g_pBoard, 57 * cxChar, 1 * cyLine);
+
+    // Draw focus rect
+    if (hasFocus())
+    {
+        QStyleOptionFocusRect option;
+        option.initFrom(this);
+        option.state |= QStyle::State_KeyboardFocusChange;
+        option.backgroundColor = QColor(Qt::gray);
+        option.rect = this->rect();
+        style()->drawPrimitive(QStyle::PE_FrameFocusRect, &option, &painter, this);
+    }
 }
 
 void QDebugView::drawProcessor(QPainter &painter, const CProcessor *pProc, int x, int y, WORD *arrR, BOOL *arrRChanged)

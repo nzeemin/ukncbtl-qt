@@ -24,6 +24,8 @@ public slots:
 protected:
     void paintEvent(QPaintEvent *event);
     void contextMenuEvent(QContextMenuEvent *event);
+    void focusInEvent(QFocusEvent *);
+    void focusOutEvent(QFocusEvent *);
 
 private:
     BOOL m_okDebugProcessor;        // TRUE - CPU, FALSE - PPU
