@@ -27,6 +27,7 @@ static const char * MemoryView_ModeNames[] = {
 QMemoryView::QMemoryView()
 {
     m_Mode = MEMMODE_ROM;
+    m_ByteMode = false;
     m_wBaseAddress = 0;
     m_cyLineMemory = 0;
     m_nPageSize = 0;
@@ -101,6 +102,9 @@ void QMemoryView::contextMenuEvent(QContextMenuEvent *event)
             action->setChecked(true);
     }
 
+    menu.addSeparator();
+    menu.addAction("Words / Bytes", this, SLOT(changeWordByteMode()));
+
     menu.exec(event->globalPos());
 }
 
@@ -114,6 +118,12 @@ void QMemoryView::changeMemoryMode()
     m_Mode = mode;
     repaint();
     updateWindowText();
+}
+
+void QMemoryView::changeWordByteMode()
+{
+    m_ByteMode = !m_ByteMode;
+    repaint();
 }
 
 void QMemoryView::scrollBy(uint16_t delta)
@@ -169,6 +179,7 @@ void QMemoryView::paintEvent(QPaintEvent * /*event*/)
 
     m_cyLineMemory = cyLine;
 
+    TCHAR buffer[7];
     const TCHAR* ADDRESS_LINE = _T(" address  0      2      4      6      10     12     14     16");
     painter.drawText(0, cyLine, ADDRESS_LINE);
 
@@ -221,7 +232,15 @@ void QMemoryView::paintEvent(QPaintEvent * /*event*/)
             if (okValid)
             {
                 painter.setPen(wChanged != 0 ? Qt::red : colorText);
-                DrawOctalValue(painter, x, y, word);
+                if (m_ByteMode)
+                {
+                    PrintOctalValue(buffer, (word & 0xff));
+                    painter.drawText(x, y, buffer + 3);
+                    PrintOctalValue(buffer, (word >> 8));
+                    painter.drawText(x + 3 * cxChar + cxChar / 2, y, buffer + 3);
+                }
+                else
+                    DrawOctalValue(painter, x, y, word);
             }
 
             // Prepare characters to draw at right
@@ -255,7 +274,7 @@ void QMemoryView::paintEvent(QPaintEvent * /*event*/)
         option.initFrom(this);
         option.state |= QStyle::State_KeyboardFocusChange;
         option.backgroundColor = QColor(Qt::gray);
-        option.rect = QRect(0, cyLine + 1, 83 * cxChar, cyLine * m_nPageSize);
+        option.rect = QRect(0, cyLine + 1, 85 * cxChar, cyLine * m_nPageSize);
         style()->drawPrimitive(QStyle::PE_FrameFocusRect, &option, &painter, this);
     }
 }
@@ -273,6 +292,11 @@ void QMemoryView::keyPressEvent(QKeyEvent *event)
             m_Mode++;
         this->repaint();
         updateWindowText();
+        break;
+
+    case Qt::Key_B:
+        event->accept();
+        changeWordByteMode();
         break;
 
     case Qt::Key_Up:
@@ -293,4 +317,14 @@ void QMemoryView::keyPressEvent(QKeyEvent *event)
         scrollBy(m_nPageSize * 16);
         break;
     }
+}
+
+void QMemoryView::wheelEvent(QWheelEvent * event)
+{
+    if (event->orientation() == Qt::Horizontal)
+        return;
+    event->accept();
+
+    int steps = -event->delta() / 60;
+    scrollBy(steps * 16);
 }
