@@ -5,6 +5,7 @@
 #include "Common.h"
 
 class QTextEdit;
+class QLabel;
 class QLineEdit;
 class CProcessor;
 
@@ -19,6 +20,7 @@ public:
     void printLine(const QString &message);
     void clear();
     void setCurrentProc(bool okProc);
+    void updatePrompt();
 
 public slots:
     void execConsoleCommand();
@@ -26,7 +28,9 @@ public slots:
 
 private:
     QTextEdit *m_log;
+    QLabel *m_prompt;
     QLineEdit *m_edit;
+
     bool m_okCurrentProc;
 
     CProcessor* getCurrentProcessor();
