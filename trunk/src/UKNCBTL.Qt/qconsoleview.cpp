@@ -47,6 +47,7 @@ QConsoleView::QConsoleView()
 QConsoleView::~QConsoleView()
 {
     delete m_log;
+    delete m_prompt;
     delete m_edit;
 }
 

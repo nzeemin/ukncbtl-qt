@@ -294,6 +294,10 @@ void QMemoryView::keyPressEvent(QKeyEvent *event)
         updateWindowText();
         break;
 
+    case Qt::Key_G:
+        event->accept();
+        gotoAddress();
+        break;
     case Qt::Key_B:
         event->accept();
         changeWordByteMode();
