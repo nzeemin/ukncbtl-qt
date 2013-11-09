@@ -8,9 +8,9 @@ See the GNU Lesser General Public License for more details.
     You should have received a copy of the GNU Lesser General Public License along with
 UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
 
-// Hard.cpp
-// Hard disk drive emulation
-// See defines in header file Emubase.h
+/// \file Hard.cpp
+/// \brief Hard disk drive emulation.
+/// \details See defines in header file Emubase.h
 
 #include "stdafx.h"
 #include <sys/stat.h>
@@ -140,7 +140,7 @@ BOOL CHardDrive::AttachImage(LPCTSTR sFileName)
     // Invert the buffer if needed
     if (m_okInverted)
         InvertBuffer(m_buffer);
-    
+
     // Calculate geometry
     m_numsectors = *(m_buffer + 0);
     m_numheads   = *(m_buffer + 1);
@@ -196,19 +196,19 @@ WORD CHardDrive::ReadPort(WORD port)
         data = 0xff00 | m_error;
         break;
     case IDE_PORT_SECTOR_COUNT:
-        data = 0xff00 | m_sectorcount;
+        data = 0xff00 | (WORD)m_sectorcount;
         break;
     case IDE_PORT_SECTOR_NUMBER:
-        data = 0xff00 | m_cursector;
+        data = 0xff00 | (WORD)m_cursector;
         break;
     case IDE_PORT_CYLINDER_LSB:
-        data = 0xff00 | (m_curcylinder & 0xff);
+        data = 0xff00 | (WORD)(m_curcylinder & 0xff);
         break;
     case IDE_PORT_CYLINDER_MSB:
-        data = 0xff00 | ((m_curcylinder >> 8) & 0xff);
+        data = 0xff00 | (WORD)((m_curcylinder >> 8) & 0xff);
         break;
     case IDE_PORT_HEAD_NUMBER:
-        data = 0xff00 | m_curheadreg;
+        data = 0xff00 | (WORD)m_curheadreg;
         break;
     case IDE_PORT_STATUS_COMMAND:
         data = 0xff00 | m_status;
@@ -308,56 +308,56 @@ void CHardDrive::HandleCommand(BYTE command)
     m_command = command;
     switch (command)
     {
-        case IDE_COMMAND_READ_MULTIPLE:
-        case IDE_COMMAND_READ_MULTIPLE1:
+    case IDE_COMMAND_READ_MULTIPLE:
+    case IDE_COMMAND_READ_MULTIPLE1:
 //#if !defined(PRODUCT)
 //            DebugPrintFormat(_T("HDD COMMAND %02x (READ MULT): C=%d, H=%d, SN=%d, SC=%d\r\n"),
 //                    command, m_curcylinder, m_curhead, m_cursector, m_sectorcount);
 //#endif
-            m_status |= IDE_STATUS_BUSY;
+        m_status |= IDE_STATUS_BUSY;
 
-            m_timeoutcount = TIME_PER_SECTOR * 3;  // Timeout while seek for track
-            m_timeoutevent = TIMEEVT_READ_SECTOR_DONE;
-            break;
+        m_timeoutcount = TIME_PER_SECTOR * 3;  // Timeout while seek for track
+        m_timeoutevent = TIMEEVT_READ_SECTOR_DONE;
+        break;
 
-        case IDE_COMMAND_SET_CONFIG:
+    case IDE_COMMAND_SET_CONFIG:
 //#if !defined(PRODUCT)
 //            DebugPrintFormat(_T("HDD COMMAND %02x (SET CONFIG): H=%d, SC=%d\r\n"),
 //                    command, m_curhead, m_sectorcount);
 //#endif
-            m_numsectors = m_sectorcount;
-            m_numheads = m_curhead + 1;
-            break;
+        m_numsectors = m_sectorcount;
+        m_numheads = m_curhead + 1;
+        break;
 
-        case IDE_COMMAND_WRITE_MULTIPLE:
-        case IDE_COMMAND_WRITE_MULTIPLE1:
+    case IDE_COMMAND_WRITE_MULTIPLE:
+    case IDE_COMMAND_WRITE_MULTIPLE1:
 //#if !defined(PRODUCT)
 //            DebugPrintFormat(_T("HDD COMMAND %02x (WRITE MULT): C=%d, H=%d, SN=%d, SC=%d\r\n"),
 //                    command, m_curcylinder, m_curhead, m_cursector, m_sectorcount);
 //#endif
-            m_bufferoffset = 0;
-            m_status |= IDE_STATUS_BUFFER_READY;
-            break;
+        m_bufferoffset = 0;
+        m_status |= IDE_STATUS_BUFFER_READY;
+        break;
 
-        case IDE_COMMAND_IDENTIFY:
+    case IDE_COMMAND_IDENTIFY:
 //#if !defined(PRODUCT)
 //            DebugPrintFormat(_T("HDD COMMAND %02x (IDENTIFY)\r\n"), command);
 //#endif
-            IdentifyDrive();  // Prepare the buffer
-            m_bufferoffset = 0;
-            m_sectorcount = 1;
-            m_status |= IDE_STATUS_BUFFER_READY | IDE_STATUS_SEEK_COMPLETE | IDE_STATUS_DRIVE_READY;
-            m_status &= ~IDE_STATUS_BUSY;
-            m_status &= ~IDE_STATUS_ERROR;
-            break;
+        IdentifyDrive();  // Prepare the buffer
+        m_bufferoffset = 0;
+        m_sectorcount = 1;
+        m_status |= IDE_STATUS_BUFFER_READY | IDE_STATUS_SEEK_COMPLETE | IDE_STATUS_DRIVE_READY;
+        m_status &= ~IDE_STATUS_BUSY;
+        m_status &= ~IDE_STATUS_ERROR;
+        break;
 
-        default:
+    default:
 //#if !defined(PRODUCT)
 //            DebugPrintFormat(_T("HDD COMMAND %02x (UNKNOWN): C=%d, H=%d, SN=%d, SC=%d\r\n"),
 //                    command, m_curcylinder, m_curhead, m_cursector, m_sectorcount);
 //            //DebugBreak();  // Implement this IDE command!
 //#endif
-            break;
+        break;
     }
 }
 
@@ -365,11 +365,11 @@ void CHardDrive::HandleCommand(BYTE command)
 // For use in CHardDrive::IdentifyDrive() method.
 static void swap_strncpy(BYTE* dst, const char* src, int words)
 {
-	int i;
-	for (i = 0; i < (int)strlen(src); i++)
-		dst[i ^ 1] = src[i];
-	for ( ; i < words * 2; i++)
-		dst[i ^ 1] = ' ';
+    int i;
+    for (i = 0; src[i] != 0; i++)
+        dst[i ^ 1] = src[i];
+    for ( ; i < words * 2; i++)
+        dst[i ^ 1] = ' ';
 }
 
 void CHardDrive::IdentifyDrive()

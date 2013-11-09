@@ -8,8 +8,7 @@ See the GNU Lesser General Public License for more details.
     You should have received a copy of the GNU Lesser General Public License along with
 UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
 
-// Processor.h
-// KM1801VM2 processor
+/// \file Processor.h  KM1801VM2 processor class
 
 #pragma once
 
@@ -21,68 +20,70 @@ class CMemoryController;
 
 //////////////////////////////////////////////////////////////////////
 
-
-class CProcessor  // KM1801VM2 processor
+/// \brief KM1801VM2 processor
+class CProcessor
 {
 
 public:  // Constructor / initialization
-                CProcessor(LPCTSTR name);
+    CProcessor(LPCTSTR name);
+    /// \brief Link the processor and memory controller
     void        AttachMemoryController(CMemoryController* ctl) { m_pMemoryController = ctl; }
     void        SetHALTPin(BOOL value);
     void        SetDCLOPin(BOOL value);
     void        SetACLOPin(BOOL value);
     void        MemoryError();
+    /// \brief Get the processor name, assigned in the constructor
     LPCTSTR     GetName() const { return m_name; }
 
 public:
-    static void Init();  // Initialize static tables
-    static void Done();  // Release memory used for static tables
+    static void Init();  ///< Initialize static tables
+    static void Done();  ///< Release memory used for static tables
 protected:  // Statics
     typedef void ( CProcessor::*ExecuteMethodRef )();
     static ExecuteMethodRef* m_pExecuteMethodMap;
     static void RegisterMethodRef(WORD start, WORD end, CProcessor::ExecuteMethodRef methodref);
 
 protected:  // Processor state
-    TCHAR       m_name[5];          // Processor name (DO NOT use it inside the processor code!!!)
-    WORD        m_internalTick;     // How many ticks waiting to the end of current instruction
-    WORD        m_psw;              // Processor Status Word (PSW)
-    WORD        m_R[8];             // Registers (R0..R5, R6=SP, R7=PC)
-    BOOL        m_okStopped;        // "Processor stopped" flag
-    WORD        m_savepc;           // CPC register
-    WORD        m_savepsw;          // CPSW register
-    BOOL        m_stepmode;         // Read TRUE if it's step mode
-    BOOL        m_buserror;         // Read TRUE if occured bus error for implementing double bus error if needed
-    BOOL        m_haltpin;          // HALT pin
-    BOOL        m_DCLOpin;          // DCLO pin
-    BOOL        m_ACLOpin;          // ACLO pin
-    BOOL        m_waitmode;         // WAIT
+    TCHAR       m_name[5];          ///< Processor name (DO NOT use it inside the processor code!!!)
+    WORD        m_internalTick;     ///< How many ticks waiting to the end of current instruction
+    WORD        m_psw;              ///< Processor Status Word (PSW)
+    WORD        m_R[8];             ///< Registers (R0..R5, R6=SP, R7=PC)
+    BOOL        m_okStopped;        ///< "Processor stopped" flag
+    WORD        m_savepc;           ///< CPC register
+    WORD        m_savepsw;          ///< CPSW register
+    BOOL        m_stepmode;         ///< Read TRUE if it's step mode
+    BOOL        m_buserror;         ///< Read TRUE if occured bus error for implementing double bus error if needed
+    BOOL        m_haltpin;          ///< HALT pin
+    BOOL        m_DCLOpin;          ///< DCLO pin
+    BOOL        m_ACLOpin;          ///< ACLO pin
+    BOOL        m_waitmode;         ///< WAIT
 
 protected:  // Current instruction processing
-    WORD        m_instruction;      // Curent instruction
-    int         m_regsrc;           // Source register number
-    int         m_methsrc;          // Source address mode
-    WORD        m_addrsrc;          // Source address
-    int         m_regdest;          // Destination register number
-    int         m_methdest;         // Destination address mode
-    WORD        m_addrdest;         // Destination address
+    WORD        m_instruction;      ///< Curent instruction
+    int         m_regsrc;           ///< Source register number
+    int         m_methsrc;          ///< Source address mode
+    WORD        m_addrsrc;          ///< Source address
+    int         m_regdest;          ///< Destination register number
+    int         m_methdest;         ///< Destination address mode
+    WORD        m_addrdest;         ///< Destination address
 protected:  // Interrupt processing
-    BOOL        m_STRTrq;           // Start interrupt pending
-    BOOL        m_RPLYrq;           // Hangup interrupt pending
-    BOOL        m_ILLGrq;           // Illegal instruction interrupt pending
-    BOOL        m_RSVDrq;           // Reserved instruction interrupt pending
-    BOOL        m_TBITrq;           // T-bit interrupt pending
-    BOOL        m_ACLOrq;           // Power down interrupt pending
-    BOOL        m_HALTrq;           // HALT command or HALT signal
-    BOOL        m_EVNTrq;           // Timer event interrupt pending
-    BOOL        m_FIS_rq;           // FIS command interrupt pending
-    BOOL        m_BPT_rq;           // BPT command interrupt pending
-    BOOL        m_IOT_rq;           // IOT command interrupt pending
-    BOOL        m_EMT_rq;           // EMT command interrupt pending
-    BOOL        m_TRAPrq;           // TRAP command interrupt pending
-    WORD        m_virq[16];         // VIRQ vector
-    BOOL        m_ACLOreset;        // Power fail interrupt request reset
-    BOOL        m_EVNTreset;        // EVNT interrupt request reset;
-    int         m_VIRQreset;        // VIRQ request reset for given device
+    BOOL        m_STRTrq;           ///< Start interrupt pending
+    BOOL        m_RPLYrq;           ///< Hangup interrupt pending
+    BOOL        m_ILLGrq;           ///< Illegal instruction interrupt pending
+    BOOL        m_RSVDrq;           ///< Reserved instruction interrupt pending
+    BOOL        m_TBITrq;           ///< T-bit interrupt pending
+    BOOL        m_ACLOrq;           ///< Power down interrupt pending
+    BOOL        m_HALTrq;           ///< HALT command or HALT signal
+    BOOL        m_EVNTrq;           ///< Timer event interrupt pending
+    BOOL        m_FIS_rq;           ///< FIS command interrupt pending
+    BOOL        m_BPT_rq;           ///< BPT command interrupt pending
+    BOOL        m_IOT_rq;           ///< IOT command interrupt pending
+    BOOL        m_EMT_rq;           ///< EMT command interrupt pending
+    BOOL        m_TRAPrq;           ///< TRAP command interrupt pending
+    WORD        m_virq[16];         ///< VIRQ vector
+    BOOL        m_ACLOreset;        ///< Power fail interrupt request reset
+    BOOL        m_EVNTreset;        ///< EVNT interrupt request reset;
+    int         m_VIRQreset;        ///< VIRQ request reset for given device
 protected:
     CMemoryController* m_pMemoryController;
 
@@ -90,9 +91,10 @@ public:
     CMemoryController* GetMemoryController() { return m_pMemoryController; }
 
 public:  // Register control
-    WORD        GetPSW() const { return m_psw; }
+    WORD        GetPSW() const { return m_psw; }  ///< Get the processor status word register value
     WORD        GetCPSW() const { return m_savepsw; }
-    BYTE        GetLPSW() const { return LOBYTE(m_psw); }
+    BYTE        GetLPSW() const { return LOBYTE(m_psw); }  ///< Get PSW lower byte
+    /// \brief Set the processor status word register value
     void        SetPSW(WORD word)
     {
         m_psw = word & 0777;
@@ -104,24 +106,25 @@ public:  // Register control
         m_psw = (m_psw & 0xFF00) | (WORD)byte;
         if ((m_psw & 0600) != 0600) m_savepsw = m_psw;
     }
-    WORD        GetReg(int regno) const { return m_R[regno]; }
+    WORD        GetReg(int regno) const { return m_R[regno]; }  ///< Get register value, regno=0..7
+    /// \brief Set register value
     void        SetReg(int regno, WORD word)
     {
         m_R[regno] = word;
-        if ((regno == 7) && ((m_psw & 0600)!=0600))	m_savepc = word;
+        if ((regno == 7) && ((m_psw & 0600) != 0600))	m_savepc = word;
     }
     BYTE        GetLReg(int regno) const { return LOBYTE(m_R[regno]); }
     void        SetLReg(int regno, BYTE byte)
     {
         m_R[regno] = (m_R[regno] & 0xFF00) | (WORD)byte;
-        if ((regno == 7) && ((m_psw & 0600)!=0600))	m_savepc = m_R[7];
+        if ((regno == 7) && ((m_psw & 0600) != 0600))	m_savepc = m_R[7];
     }
     WORD        GetSP() const { return m_R[6]; }
     void        SetSP(WORD word) { m_R[6] = word; }
     WORD        GetPC() const { return m_R[7]; }
     WORD        GetCPC() const { return m_savepc; }
     void        SetPC(WORD word)
-    { 
+    {
         m_R[7] = word;
         if ((m_psw & 0600) != 0600) m_savepc = word;
     }
@@ -140,30 +143,35 @@ public:  // PSW bits control
     WORD        GetHALT() const { return (m_psw & PSW_HALT) != 0; }
 
 public:  // Processor state
-    // "Processor stopped" flag
+    /// \brief "Processor stopped" flag
     BOOL        IsStopped() const { return m_okStopped; }
-    // HALT flag (TRUE - HALT mode, FALSE - USER mode)
+    /// \brief HALT flag (TRUE - HALT mode, FALSE - USER mode)
     BOOL        IsHaltMode() const
-    { 
-            return ((m_psw & 0400) != 0);
+    {
+        return ((m_psw & 0400) != 0);
     }
 public:  // Processor control
-    void        TickEVNT();  // EVNT signal
-    void        InterruptVIRQ(int que, WORD interrupt);  // External interrupt via VIRQ signal
+    void        TickEVNT();  ///< EVNT signal
+    void        InterruptVIRQ(int que, WORD interrupt);  ///< External interrupt via VIRQ signal
     WORD        GetVIRQ(int que);
-    void        Execute();   // Execute one instruction - for debugger only
+    /// \brief Execute one processor tick
+    void        Execute();
+    /// \brief Process pending interrupt requests
     BOOL        InterruptProcessing();
+    /// \brief Execute next command and process interrupts
     void        CommandExecution();
-    
+
 public:  // Saving/loading emulator status (pImage addresses up to 32 bytes)
     void        SaveToImage(BYTE* pImage) const;
     void        LoadFromImage(const BYTE* pImage);
 
 protected:  // Implementation
-    void        FetchInstruction();      // Read next instruction
-    void        TranslateInstruction();  // Execute the instruction
+    void        FetchInstruction();      ///< Read next instruction
+    void        TranslateInstruction();  ///< Execute the instruction
 protected:  // Implementation - memory access
+    /// \brief Read word from the bus for execution
     WORD        GetWordExec(WORD address) { return m_pMemoryController->GetWordExec(address, IsHaltMode()); }
+    /// \brief Read word from the bus
     WORD        GetWord(WORD address) { return m_pMemoryController->GetWord(address, IsHaltMode()); }
     void        SetWord(WORD address, WORD word) { m_pMemoryController->SetWord(address, IsHaltMode(), word); }
     BYTE        GetByte(WORD address) { return m_pMemoryController->GetByte(address, IsHaltMode()); }
@@ -188,7 +196,7 @@ protected:  // Implementation - instruction execution
     WORD        GetWordAddr (BYTE meth, BYTE reg);
     WORD        GetByteAddr (BYTE meth, BYTE reg);
 
-    void        ExecuteUNKNOWN ();  // Нет такой инструкции - просто вызывается TRAP 10
+    void        ExecuteUNKNOWN ();  ///< There is no such instruction -- just call TRAP 10
     void        ExecuteHALT ();
     void        ExecuteWAIT ();
     void        ExecuteRCPC	();
@@ -217,6 +225,7 @@ protected:  // Implementation - instruction execution
     void        ExecuteJMP ();
     void        ExecuteSWAB ();
     void        ExecuteCLR ();
+    void        ExecuteCLRB ();
     void        ExecuteCOM ();
     void        ExecuteINC ();
     void        ExecuteDEC ();
@@ -224,6 +233,7 @@ protected:  // Implementation - instruction execution
     void        ExecuteADC ();
     void        ExecuteSBC ();
     void        ExecuteTST ();
+    void        ExecuteTSTB ();
     void        ExecuteROR ();
     void        ExecuteROL ();
     void        ExecuteASR ();
@@ -232,7 +242,7 @@ protected:  // Implementation - instruction execution
     void        ExecuteSXT ();
     void        ExecuteMTPS ();
     void        ExecuteMFPS ();
-    
+
     // Branchs & interrupts
     void        ExecuteBR ();
     void        ExecuteBNE ();
@@ -264,7 +274,9 @@ protected:  // Implementation - instruction execution
 
     // Four fields
     void        ExecuteMOV ();
+    void        ExecuteMOVB ();
     void        ExecuteCMP ();
+    void        ExecuteCMPB ();
     void        ExecuteBIT ();
     void        ExecuteBIC ();
     void        ExecuteBIS ();
@@ -304,17 +316,17 @@ inline void CProcessor::SetHALT (BOOL bFlag)
 // PSW bits calculations - implementation
 inline BOOL CProcessor::CheckAddForOverflow (BYTE a, BYTE b)
 {
-#ifdef _M_IX86
+#if defined(_M_IX86) && !defined(_MANAGED)
     BOOL bOverflow = FALSE;
     _asm
     {
         pushf
         push cx
-        mov cl,byte ptr [a]
-        add cl,byte ptr [b]
+        mov cl, byte ptr [a]
+        add cl, byte ptr [b]
         jno end
-        mov dword ptr [bOverflow],1
-    end:
+        mov dword ptr [bOverflow], 1
+        end:
         pop cx
         popf
     }
@@ -328,17 +340,17 @@ inline BOOL CProcessor::CheckAddForOverflow (BYTE a, BYTE b)
 }
 inline BOOL CProcessor::CheckAddForOverflow (WORD a, WORD b)
 {
-#ifdef _M_IX86
+#if defined(_M_IX86) && !defined(_MANAGED)
     BOOL bOverflow = FALSE;
     _asm
     {
         pushf
         push cx
-        mov cx,word ptr [a]
-        add cx,word ptr [b]
+        mov cx, word ptr [a]
+        add cx, word ptr [b]
         jno end
-        mov dword ptr [bOverflow],1
-    end:
+        mov dword ptr [bOverflow], 1
+        end:
         pop cx
         popf
     }
@@ -353,17 +365,17 @@ inline BOOL CProcessor::CheckAddForOverflow (WORD a, WORD b)
 
 inline BOOL CProcessor::CheckSubForOverflow (BYTE a, BYTE b)
 {
-#ifdef _M_IX86
+#if defined(_M_IX86) && !defined(_MANAGED)
     BOOL bOverflow = FALSE;
     _asm
     {
         pushf
         push cx
-        mov cl,byte ptr [a]
-        sub cl,byte ptr [b]
+        mov cl, byte ptr [a]
+        sub cl, byte ptr [b]
         jno end
-        mov dword ptr [bOverflow],1
-    end:
+        mov dword ptr [bOverflow], 1
+        end:
         pop cx
         popf
     }
@@ -377,17 +389,17 @@ inline BOOL CProcessor::CheckSubForOverflow (BYTE a, BYTE b)
 }
 inline BOOL CProcessor::CheckSubForOverflow (WORD a, WORD b)
 {
-#ifdef _M_IX86
+#if defined(_M_IX86) && !defined(_MANAGED)
     BOOL bOverflow = FALSE;
     _asm
     {
         pushf
         push cx
-        mov cx,word ptr [a]
-        sub cx,word ptr [b]
+        mov cx, word ptr [a]
+        sub cx, word ptr [b]
         jno end
-        mov dword ptr [bOverflow],1
-    end:
+        mov dword ptr [bOverflow], 1
+        end:
         pop cx
         popf
     }

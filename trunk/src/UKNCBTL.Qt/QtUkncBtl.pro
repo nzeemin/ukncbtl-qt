@@ -33,7 +33,6 @@ HEADERS += mainwindow.h \
     emubase/Processor.h \
     emubase/Memory.h \
     emubase/Emubase.h \
-    emubase/Disasm.h \
     emubase/Defines.h \
     emubase/Board.h \
     Emulator.h \
