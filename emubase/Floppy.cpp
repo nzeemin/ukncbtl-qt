@@ -8,9 +8,9 @@ See the GNU Lesser General Public License for more details.
     You should have received a copy of the GNU Lesser General Public License along with
 UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
 
-// Floppy.cpp
-// Floppy controller and drives emulation
-// See defines in header file Emubase.h
+/// \file Floppy.cpp
+/// \brief Floppy controller and drives emulation
+/// \details See defines in header file Emubase.h
 
 #include "stdafx.h"
 #include <sys/stat.h>
@@ -56,8 +56,8 @@ CFloppyController::CFloppyController()
     m_writing = m_searchsync = m_writemarker = m_crccalculus = FALSE;
     m_writeflag = m_shiftflag = FALSE;
     m_trackchanged = FALSE;
-    m_status = FLOPPY_STATUS_TRACK0|FLOPPY_STATUS_WRITEPROTECT;
-    m_flags = FLOPPY_CMD_CORRECTION500|FLOPPY_CMD_SIDEUP|FLOPPY_CMD_DIR|FLOPPY_CMD_SKIPSYNC;
+    m_status = FLOPPY_STATUS_TRACK0 | FLOPPY_STATUS_WRITEPROTECT;
+    m_flags = FLOPPY_CMD_CORRECTION500 | FLOPPY_CMD_SIDEUP | FLOPPY_CMD_DIR | FLOPPY_CMD_SKIPSYNC;
 }
 
 CFloppyController::~CFloppyController()
@@ -76,8 +76,8 @@ void CFloppyController::Reset()
     m_writing = m_searchsync = m_writemarker = m_crccalculus = FALSE;
     m_writeflag = m_shiftflag = FALSE;
     m_trackchanged = FALSE;
-    m_status = (m_pDrive->okReadOnly) ? FLOPPY_STATUS_TRACK0|FLOPPY_STATUS_WRITEPROTECT : FLOPPY_STATUS_TRACK0;
-    m_flags = FLOPPY_CMD_CORRECTION500|FLOPPY_CMD_SIDEUP|FLOPPY_CMD_DIR|FLOPPY_CMD_SKIPSYNC;
+    m_status = (m_pDrive->okReadOnly) ? FLOPPY_STATUS_TRACK0 | FLOPPY_STATUS_WRITEPROTECT : FLOPPY_STATUS_TRACK0;
+    m_flags = FLOPPY_CMD_CORRECTION500 | FLOPPY_CMD_SIDEUP | FLOPPY_CMD_DIR | FLOPPY_CMD_SKIPSYNC;
 
     PrepareTrack();
 }
@@ -113,8 +113,8 @@ BOOL CFloppyController::AttachImage(int drive, LPCTSTR sFileName)
     m_writing = m_searchsync = m_writemarker = m_crccalculus = FALSE;
     m_writeflag = m_shiftflag = FALSE;
     m_trackchanged = FALSE;
-    m_status = (m_pDrive->okReadOnly) ? FLOPPY_STATUS_TRACK0|FLOPPY_STATUS_WRITEPROTECT : FLOPPY_STATUS_TRACK0;
-    m_flags = FLOPPY_CMD_CORRECTION500|FLOPPY_CMD_SIDEUP|FLOPPY_CMD_DIR|FLOPPY_CMD_SKIPSYNC;
+    m_status = (m_pDrive->okReadOnly) ? FLOPPY_STATUS_TRACK0 | FLOPPY_STATUS_WRITEPROTECT : FLOPPY_STATUS_TRACK0;
+    m_flags = FLOPPY_CMD_CORRECTION500 | FLOPPY_CMD_SIDEUP | FLOPPY_CMD_DIR | FLOPPY_CMD_SKIPSYNC;
 
     PrepareTrack();
 
@@ -190,7 +190,7 @@ void CFloppyController::SetCommand(WORD cmd)
     // Copy new flags to m_flags
     m_flags &= ~FLOPPY_CMD_MASKSTORED;
     m_flags |= cmd & FLOPPY_CMD_MASKSTORED;
-    
+
     // Проверяем, не сменилась ли сторона
     if (m_flags & FLOPPY_CMD_SIDEUP)  // Side selection: 0 - down, 1 - up
     {
@@ -198,7 +198,7 @@ void CFloppyController::SetCommand(WORD cmd)
     }
     else
     {
-        if (m_side == 1) { m_side = 0;  okPrepareTrack = TRUE; }	
+        if (m_side == 1) { m_side = 0;  okPrepareTrack = TRUE; }
     }
 
     if (cmd & FLOPPY_CMD_STEP)  // Move head for one track to center or from center
@@ -226,7 +226,7 @@ void CFloppyController::SetCommand(WORD cmd)
 //#endif
     }
 
-    if(cmd & FLOPPY_CMD_SEARCHSYNC)  // Search for marker
+    if (cmd & FLOPPY_CMD_SEARCHSYNC) // Search for marker
     {
 //#if !defined(PRODUCT)
 //        DebugLog(_T("Floppy SEARCHSYNC\r\n"));  //DEBUG
@@ -252,7 +252,7 @@ WORD CFloppyController::GetData(void)
 //#if !defined(PRODUCT)
 //    DebugLogFormat(_T("Floppy READ\t\t%04x\r\n"), m_datareg);  //DEBUG
 //#endif
-    
+
     m_status &= ~FLOPPY_STATUS_MOREDATA;
     m_writing = m_searchsync = FALSE;
     m_writeflag = m_shiftflag = FALSE;
@@ -472,7 +472,8 @@ void CFloppyController::FlushChanges()
         size_t dwBytesWritten = ::fwrite(&data, 1, 5120, m_pDrive->fpFile);
         //TODO: Проверка на ошибки записи
     }
-    else {
+    else
+    {
 //#if !defined(PRODUCT)
 //        DebugLog(_T("Floppy FLUSH FAILED\r\n"));  //DEBUG
 //#endif
@@ -508,9 +509,9 @@ static void EncodeTrackData(const BYTE* pSrc, BYTE* data, BYTE* marker, WORD tra
         marker[ptr / 2] = TRUE;  // ID marker; start CRC calculus
         data[ptr++] = 0xa1;  data[ptr++] = 0xa1;  data[ptr++] = 0xa1;
         data[ptr++] = 0xfe;
-        
+
         data[ptr++] = (BYTE) track;  data[ptr++] = (side != 0);
-        data[ptr++] = sect + 1;  data[ptr++] = 2; // Assume 512 bytes per sector;
+        data[ptr++] = (BYTE)sect + 1;  data[ptr++] = 2; // Assume 512 bytes per sector;
         // crc
         //TODO: Calculate CRC
         data[ptr++] = 0x12;  data[ptr++] = 0x34;  // CRC stub
@@ -521,7 +522,7 @@ static void EncodeTrackData(const BYTE* pSrc, BYTE* data, BYTE* marker, WORD tra
         for (count = 0; count < 12; count++) data[ptr++] = 0x00;
         // marker
         marker[ptr / 2] = TRUE;  // Data marker; start CRC calculus
-        data[ptr++] = 0xa1;  data[ptr++] = 0xa1;  data[ptr++]=0xa1;
+        data[ptr++] = 0xa1;  data[ptr++] = 0xa1;  data[ptr++] = 0xa1;
         data[ptr++] = 0xfb;
         // data
         for (count = 0; count < 512; count++)
@@ -558,7 +559,7 @@ static BOOL DecodeTrackData(const BYTE* pRaw, BYTE* pDest)
         if (pRaw[dataptr++] != 0xfe)
             return FALSE;  // Marker not found
 
-        BYTE sectcyl, secthd, sectsec, sectno;
+        BYTE sectcyl, secthd, sectsec, sectno = 0;
         if (dataptr < FLOPPY_RAWTRACKSIZE) sectcyl = pRaw[dataptr++];
         if (dataptr < FLOPPY_RAWTRACKSIZE) secthd  = pRaw[dataptr++];
         if (dataptr < FLOPPY_RAWTRACKSIZE) sectsec = pRaw[dataptr++];

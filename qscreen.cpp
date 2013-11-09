@@ -85,8 +85,8 @@ static void UpscaleScreen3(void* pImageBits)
             DWORD c2 = *psrc;  psrc--;
             DWORD c12 =
                 (((c1 & 0xff) + (c2 & 0xff)) >> 1) |
-                (((c1 & 0xff00) + (c2 & 0xff00)) >> 1) & 0xff00 |
-                (((c1 & 0xff0000) + (c2 & 0xff0000)) >> 1) & 0xff0000;
+                ((((c1 & 0xff00) + (c2 & 0xff00)) >> 1) & 0xff00) |
+                ((((c1 & 0xff0000) + (c2 & 0xff0000)) >> 1) & 0xff0000);
             *pdest = c1;  pdest--;
             *pdest = c12; pdest--;
             *pdest = c2;  pdest--;
