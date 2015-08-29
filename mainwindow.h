@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 
-class QScreen;
+class QEmulatorScreen;
 class QKeyboardView;
 class QConsoleView;
 class QDebugView;
@@ -80,7 +80,7 @@ protected:
 private:
     Ui::MainWindow *ui;
 
-    QScreen *m_screen;
+    QEmulatorScreen *m_screen;
     QKeyboardView *m_keyboard;
     QConsoleView *m_console;
     QDockWidget* m_dockConsole;

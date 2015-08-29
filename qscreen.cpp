@@ -125,7 +125,7 @@ static void UpscaleScreen4(void* pImageBits)
 //////////////////////////////////////////////////////////////////////
 
 
-QScreen::QScreen(QWidget *parent) :
+QEmulatorScreen::QEmulatorScreen(QWidget *parent) :
     QWidget(parent), m_image(0)
 {
     setFocusPolicy(Qt::StrongFocus);
@@ -137,17 +137,17 @@ QScreen::QScreen(QWidget *parent) :
     createDisplay();
 }
 
-QScreen::~QScreen()
+QEmulatorScreen::~QEmulatorScreen()
 {
     delete m_image;
 }
 
-void QScreen::setMode(ScreenViewMode mode)
+void QEmulatorScreen::setMode(ScreenViewMode mode)
 {
     m_mode = mode;
 }
 
-void QScreen::setSizeMode(ScreenSizeMode mode)
+void QEmulatorScreen::setSizeMode(ScreenSizeMode mode)
 {
     if (m_sizeMode == mode) return;
 
@@ -156,12 +156,12 @@ void QScreen::setSizeMode(ScreenSizeMode mode)
     createDisplay();
 }
 
-void QScreen::saveScreenshot(QString strFileName)
+void QEmulatorScreen::saveScreenshot(QString strFileName)
 {
     m_image->save(strFileName, _T("PNG"), -1);
 }
 
-void QScreen::createDisplay()
+void QEmulatorScreen::createDisplay()
 {
     if (m_image != 0)
     {
@@ -192,7 +192,7 @@ void QScreen::createDisplay()
     setMaximumSize(cxScreenWidth + 100, cyScreenHeight + 20);
 }
 
-void QScreen::paintEvent(QPaintEvent * /*event*/)
+void QEmulatorScreen::paintEvent(QPaintEvent * /*event*/)
 {
     const DWORD* colors;
     switch (m_mode)
@@ -217,7 +217,7 @@ void QScreen::paintEvent(QPaintEvent * /*event*/)
     painter.drawImage(0, 0, *m_image);
 }
 
-void QScreen::keyPressEvent(QKeyEvent *event)
+void QEmulatorScreen::keyPressEvent(QKeyEvent *event)
 {
     if (! g_okEmulatorRunning) return;
     if (event->isAutoRepeat()) return;
@@ -229,7 +229,7 @@ void QScreen::keyPressEvent(QKeyEvent *event)
     event->accept();
 }
 
-void QScreen::keyReleaseEvent(QKeyEvent *event)
+void QEmulatorScreen::keyReleaseEvent(QKeyEvent *event)
 {
     unsigned char ukncscan = TranslateQtKeyToUkncKey(event->key());
     if (ukncscan == 0) return;
@@ -278,7 +278,7 @@ const unsigned char arrQtkey2UkncscanRus[256] = {  // ÐÓÑ
 };
 
 
-unsigned char QScreen::TranslateQtKeyToUkncKey(int qtkey)
+unsigned char QEmulatorScreen::TranslateQtKeyToUkncKey(int qtkey)
 {
     switch (qtkey)
     {

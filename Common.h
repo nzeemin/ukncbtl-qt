@@ -47,8 +47,8 @@ typedef const wchar_t * LPCTSTR;
 typedef const char * LPCTSTR;
 #endif
 
-typedef qint32 LONG;
-typedef quint32 DWORD;
+typedef long int LONG;
+typedef long unsigned int DWORD;
 typedef quint16 WORD;
 typedef quint8 BYTE;
 

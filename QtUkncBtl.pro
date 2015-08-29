@@ -49,5 +49,7 @@ HEADERS += mainwindow.h \
     qdialogs.h
 FORMS += mainwindow.ui
 RESOURCES += QtUkncBtl.qrc
+QT += widgets
 QT += script
-CONFIG += qtestlib 
+QT += testlib 
+DEFINES -= UNICODE

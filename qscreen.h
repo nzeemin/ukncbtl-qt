@@ -1,5 +1,5 @@
-#ifndef QSCREEN_H
-#define QSCREEN_H
+#ifndef QEMULATORSCREEN_H
+#define QEMULATORSCREEN_H
 
 #include <QWidget>
 
@@ -17,12 +17,12 @@ enum ScreenSizeMode {
     UpscaledScreen4 = 5
 };
 
-class QScreen : public QWidget
+class QEmulatorScreen : public QWidget
 {
     Q_OBJECT
 public:
-    QScreen(QWidget *parent = 0);
-    ~QScreen();
+    QEmulatorScreen(QWidget *parent = 0);
+    ~QEmulatorScreen();
 
 public:
     void saveScreenshot(QString strFileName);
@@ -46,4 +46,4 @@ private:
     unsigned char TranslateQtKeyToUkncKey(int qtkey);
 };
 
-#endif // QSCREEN_H
+#endif // QEMULATORSCREEN_H

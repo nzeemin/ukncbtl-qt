@@ -11,8 +11,8 @@ QSoundOut::QSoundOut(QObject *parent) :
     m_dev=NULL;
 
     QAudioFormat fmt;
-    fmt.setFrequency(SAMPLERATE);
-    fmt.setChannels(CHANNELS);
+    fmt.setSampleRate(SAMPLERATE);
+    fmt.setChannelCount(CHANNELS);
     fmt.setSampleSize(SAMPLESIZE);
     fmt.setByteOrder(QAudioFormat::LittleEndian);
     fmt.setCodec("audio/pcm");

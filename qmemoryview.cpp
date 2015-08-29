@@ -1,7 +1,10 @@
 #include "stdafx.h"
 #include <QtGui>
+#include <QMenu>
 #include <QPainter>
 #include <QScrollBar>
+#include <QStyle>
+#include <QStyleOptionFocusRect>
 #include "main.h"
 #include "qmemoryview.h"
 #include "Emulator.h"
@@ -126,7 +129,7 @@ void QMemoryView::changeWordByteMode()
     repaint();
 }
 
-void QMemoryView::scrollBy(uint16_t delta)
+void QMemoryView::scrollBy(quint16 delta)
 {
     if (delta == 0) return;
 

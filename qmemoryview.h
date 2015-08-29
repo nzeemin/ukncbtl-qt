@@ -18,7 +18,7 @@ public slots:
     void changeMemoryMode();
     void changeWordByteMode();
     void gotoAddress();
-    void scrollBy(uint16_t delta);
+    void scrollBy(quint16 delta);
 
 protected:
     void paintEvent(QPaintEvent *);

@@ -1,0 +1,7 @@
+/debug
+/release
+/Makefile.*
+/Makefile
+/object_script.*
+/*.user
+/ui_mainwindow.h
