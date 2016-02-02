@@ -18,7 +18,7 @@ UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
 //////////////////////////////////////////////////////////////////////
 // Bus devices
 
-static const WORD ProcessorTimerAddressRanges[] =
+static const uint16_t ProcessorTimerAddressRanges[] =
 {
     0177710, 6,  // 177710-177715
     0, 0
@@ -27,10 +27,10 @@ class CBusDeviceProcessorTimer : public CBusDevice
 {
 public:
     virtual LPCTSTR GetName() const { return _T("Processor timer"); }
-    virtual const WORD* GetAddressRanges() const { return ProcessorTimerAddressRanges; }
+    virtual const uint16_t* GetAddressRanges() const { return ProcessorTimerAddressRanges; }
 };
 
-static const WORD CpuChannelsAddressRanges[] =
+static const uint16_t CpuChannelsAddressRanges[] =
 {
     0176660, 16,
     0177560, 8,
@@ -40,10 +40,10 @@ class CBusDeviceCpuChannels : public CBusDevice
 {
 public:
     virtual LPCTSTR GetName() const { return _T("CPU-PPU channels"); }
-    virtual const WORD* GetAddressRanges() const { return CpuChannelsAddressRanges; }
+    virtual const uint16_t* GetAddressRanges() const { return CpuChannelsAddressRanges; }
 };
 
-static const WORD PpuChannelsAddressRanges[] =
+static const uint16_t PpuChannelsAddressRanges[] =
 {
     0177060, 16,
     0177100, 4,
@@ -53,10 +53,10 @@ class CBusDevicePpuChannels : public CBusDevice
 {
 public:
     virtual LPCTSTR GetName() const { return _T("CPU-PPU channels"); }
-    virtual const WORD* GetAddressRanges() const { return PpuChannelsAddressRanges; }
+    virtual const uint16_t* GetAddressRanges() const { return PpuChannelsAddressRanges; }
 };
 
-static const WORD NetworkAdapterAddressRanges[] =
+static const uint16_t NetworkAdapterAddressRanges[] =
 {
     0176560, 8,
     0, 0
@@ -65,10 +65,10 @@ class CBusDeviceNetworkAdapter : public CBusDevice
 {
 public:
     virtual LPCTSTR GetName() const { return _T("Network adapter"); }
-    virtual const WORD* GetAddressRanges() const { return NetworkAdapterAddressRanges; }
+    virtual const uint16_t* GetAddressRanges() const { return NetworkAdapterAddressRanges; }
 };
 
-static const WORD SerialPortAddressRanges[] =
+static const uint16_t SerialPortAddressRanges[] =
 {
     0176570, 8,
     0, 0
@@ -77,10 +77,10 @@ class CBusDeviceSerialPort : public CBusDevice
 {
 public:
     virtual LPCTSTR GetName() const { return _T("Serial port"); }
-    virtual const WORD* GetAddressRanges() const { return SerialPortAddressRanges; }
+    virtual const uint16_t* GetAddressRanges() const { return SerialPortAddressRanges; }
 };
 
-static const WORD CpuMemoryAccessAddressRanges[] =
+static const uint16_t CpuMemoryAccessAddressRanges[] =
 {
     0176640, 8,
     0176564, 4,  // Регистры пультового терминала
@@ -90,10 +90,10 @@ class CBusDeviceCpuMemoryAccess : public CBusDevice
 {
 public:
     virtual LPCTSTR GetName() const { return _T("Memory access"); }
-    virtual const WORD* GetAddressRanges() const { return CpuMemoryAccessAddressRanges; }
+    virtual const uint16_t* GetAddressRanges() const { return CpuMemoryAccessAddressRanges; }
 };
 
-static const WORD PpuMemoryAccessAddressRanges[] =
+static const uint16_t PpuMemoryAccessAddressRanges[] =
 {
     0177010, 16,
     0177054, 2,
@@ -103,10 +103,10 @@ class CBusDevicePpuMemoryAccess : public CBusDevice
 {
 public:
     virtual LPCTSTR GetName() const { return _T("Memory access"); }
-    virtual const WORD* GetAddressRanges() const { return PpuMemoryAccessAddressRanges; }
+    virtual const uint16_t* GetAddressRanges() const { return PpuMemoryAccessAddressRanges; }
 };
 
-static const WORD ProgrammablePortAddressRanges[] =
+static const uint16_t ProgrammablePortAddressRanges[] =
 {
     0177100, 4,  // i8255 ports
     0, 0
@@ -115,10 +115,10 @@ class CBusDeviceProgrammablePort : public CBusDevice
 {
 public:
     virtual LPCTSTR GetName() const { return _T("Programmable port"); }
-    virtual const WORD* GetAddressRanges() const { return ProgrammablePortAddressRanges; }
+    virtual const uint16_t* GetAddressRanges() const { return ProgrammablePortAddressRanges; }
 };
 
-static const WORD KeyboardAddressRanges[] =
+static const uint16_t KeyboardAddressRanges[] =
 {
     0177700, 6,
     0, 0
@@ -127,10 +127,10 @@ class CBusDeviceKeyboard : public CBusDevice
 {
 public:
     virtual LPCTSTR GetName() const { return _T("Keyboard"); }
-    virtual const WORD* GetAddressRanges() const { return KeyboardAddressRanges; }
+    virtual const uint16_t* GetAddressRanges() const { return KeyboardAddressRanges; }
 };
 
-static const WORD FloppyControllerAddressRanges[] =
+static const uint16_t FloppyControllerAddressRanges[] =
 {
     0177130, 4,
     0, 0
@@ -139,10 +139,10 @@ class CBusDeviceFloppyController : public CBusDevice
 {
 public:
     virtual LPCTSTR GetName() const { return _T("Floppy controller"); }
-    virtual const WORD* GetAddressRanges() const { return FloppyControllerAddressRanges; }
+    virtual const uint16_t* GetAddressRanges() const { return FloppyControllerAddressRanges; }
 };
 
-static const WORD HardDriveAddressRanges[] =
+static const uint16_t HardDriveAddressRanges[] =
 {
     0110000, 010000,
     0, 0
@@ -151,7 +151,7 @@ class CBusDeviceHardDrive : public CBusDevice
 {
 public:
     virtual LPCTSTR GetName() const { return _T("Hard drive"); }
-    virtual const WORD* GetAddressRanges() const { return HardDriveAddressRanges; }
+    virtual const uint16_t* GetAddressRanges() const { return HardDriveAddressRanges; }
 };
 
 
@@ -192,10 +192,10 @@ CMotherboard::CMotherboard ()
     m_pSecondMemCtl->Attach(this, m_pPPU);
 
     // Allocate memory for RAM and ROM
-    m_pRAM[0] = (BYTE*) malloc(65536);  memset(m_pRAM[0], 0, 65536);
-    m_pRAM[1] = (BYTE*) malloc(65536);  memset(m_pRAM[1], 0, 65536);
-    m_pRAM[2] = (BYTE*) malloc(65536);  memset(m_pRAM[2], 0, 65536);
-    m_pROM    = (BYTE*) malloc(32768);  memset(m_pROM, 0, 32768);
+    m_pRAM[0] = (uint8_t*) malloc(65536);  memset(m_pRAM[0], 0, 65536);
+    m_pRAM[1] = (uint8_t*) malloc(65536);  memset(m_pRAM[1], 0, 65536);
+    m_pRAM[2] = (uint8_t*) malloc(65536);  memset(m_pRAM[2], 0, 65536);
+    m_pROM    = (uint8_t*) malloc(32768);  memset(m_pROM, 0, 32768);
     m_pROMCart[0] = NULL;
     m_pROMCart[1] = NULL;
     m_pHardDrives[0] = NULL;
@@ -263,8 +263,8 @@ CMotherboard::~CMotherboard ()
 
 void CMotherboard::Reset ()
 {
-    m_pPPU->SetDCLOPin(TRUE);
-    m_pPPU->SetACLOPin(TRUE);
+    m_pPPU->SetDCLOPin(true);
+    m_pPPU->SetACLOPin(true);
 
     ResetFloppy();
 
@@ -291,28 +291,28 @@ void CMotherboard::Reset ()
     //ChanResetByPPU();
 
     // We always start with PPU
-    m_pPPU->SetDCLOPin(FALSE);
-    m_pPPU->SetACLOPin(FALSE);
+    m_pPPU->SetDCLOPin(false);
+    m_pPPU->SetACLOPin(false);
 }
 
-void CMotherboard::LoadROM(const BYTE* pBuffer)  // Load 32 KB ROM image from the buffer
+void CMotherboard::LoadROM(const uint8_t* pBuffer)  // Load 32 KB ROM image from the buffer
 {
     memcpy(m_pROM, pBuffer, 32768);
 }
 
-void CMotherboard::LoadROMCartridge(int cartno, const BYTE* pBuffer)  // Load 24 KB ROM cartridge image
+void CMotherboard::LoadROMCartridge(int cartno, const uint8_t* pBuffer)  // Load 24 KB ROM cartridge image
 {
     ASSERT(cartno == 1 || cartno == 2);  // Only two cartridges, #1 and #2
     ASSERT(pBuffer != NULL);
 
     int cartindex = cartno - 1;
     if (m_pROMCart[cartindex] == NULL)
-        m_pROMCart[cartindex] = (BYTE*) malloc(24 * 1024);
+        m_pROMCart[cartindex] = (uint8_t*) malloc(24 * 1024);
 
     memcpy(m_pROMCart[cartindex], pBuffer, 24 * 1024);
 }
 
-void CMotherboard::LoadRAM(int plan, const BYTE* pBuffer)  // Load 32 KB RAM image from the buffer
+void CMotherboard::LoadRAM(int plan, const uint8_t* pBuffer)  // Load 32 KB RAM image from the buffer
 {
     ASSERT(plan >= 0 && plan <= 2);
     memcpy(m_pRAM[plan], pBuffer, 32768);
@@ -320,31 +320,31 @@ void CMotherboard::LoadRAM(int plan, const BYTE* pBuffer)  // Load 32 KB RAM ima
 
 void CMotherboard::SetNetStation(int station)
 {
-    CFirstMemoryController* pMemCtl = (CFirstMemoryController*) m_pFirstMemCtl;
+    CFirstMemoryController* pMemCtl = static_cast<CFirstMemoryController*>(m_pFirstMemCtl);
     pMemCtl->m_NetStation = station;
 }
 
 
 // Floppy ////////////////////////////////////////////////////////////
 
-BOOL CMotherboard::IsFloppyImageAttached(int slot) const
+bool CMotherboard::IsFloppyImageAttached(int slot) const
 {
     ASSERT(slot >= 0 && slot < 4);
     return m_pFloppyCtl->IsAttached(slot);
 }
 
-BOOL CMotherboard::IsFloppyReadOnly(int slot) const
+bool CMotherboard::IsFloppyReadOnly(int slot) const
 {
     ASSERT(slot >= 0 && slot < 4);
     return m_pFloppyCtl->IsReadOnly(slot);
 }
 
-BOOL CMotherboard::IsFloppyEngineOn() const
+bool CMotherboard::IsFloppyEngineOn() const
 {
     return m_pFloppyCtl->IsEngineOn();
 }
 
-BOOL CMotherboard::AttachFloppyImage(int slot, LPCTSTR sFileName)
+bool CMotherboard::AttachFloppyImage(int slot, LPCTSTR sFileName)
 {
     ASSERT(slot >= 0 && slot < 4);
     return m_pFloppyCtl->AttachImage(slot, sFileName);
@@ -359,7 +359,7 @@ void CMotherboard::DetachFloppyImage(int slot)
 
 // ROM cartridge /////////////////////////////////////////////////////
 
-BOOL CMotherboard::IsROMCartridgeLoaded(int cartno) const
+bool CMotherboard::IsROMCartridgeLoaded(int cartno) const
 {
     ASSERT(cartno == 1 || cartno == 2);  // Only two cartridges, #1 and #2
     int cartindex = cartno - 1;
@@ -380,26 +380,26 @@ void CMotherboard::UnloadROMCartridge(int cartno)
 
 // Hard Drives ///////////////////////////////////////////////////////
 
-BOOL CMotherboard::IsHardImageAttached(int slot) const
+bool CMotherboard::IsHardImageAttached(int slot) const
 {
     ASSERT(slot >= 1 && slot <= 2);
     return (m_pHardDrives[slot - 1] != NULL);
 }
 
-BOOL CMotherboard::IsHardImageReadOnly(int slot) const
+bool CMotherboard::IsHardImageReadOnly(int slot) const
 {
     ASSERT(slot >= 1 && slot <= 2);
     CHardDrive* pHardDrive = m_pHardDrives[slot - 1];
-    if (pHardDrive == NULL) return FALSE;
+    if (pHardDrive == NULL) return false;
     return pHardDrive->IsReadOnly();
 }
 
-BOOL CMotherboard::AttachHardImage(int slot, LPCTSTR sFileName)
+bool CMotherboard::AttachHardImage(int slot, LPCTSTR sFileName)
 {
     ASSERT(slot >= 1 && slot <= 2);
 
     m_pHardDrives[slot - 1] = new CHardDrive();
-    BOOL success = m_pHardDrives[slot - 1]->AttachImage(sFileName);
+    bool success = m_pHardDrives[slot - 1]->AttachImage(sFileName);
     if (success)
     {
         m_pHardDrives[slot - 1]->Reset();
@@ -416,21 +416,21 @@ void CMotherboard::DetachHardImage(int slot)
     m_pHardDrives[slot - 1] = NULL;
 }
 
-WORD CMotherboard::GetHardPortWord(int slot, WORD port)
+uint16_t CMotherboard::GetHardPortWord(int slot, uint16_t port)
 {
     ASSERT(slot >= 1 && slot <= 2);
 
     if (m_pHardDrives[slot - 1] == NULL) return 0;
-    port = (WORD) (~(port >> 1) & 7) | 0x1f0;
-    WORD data = m_pHardDrives[slot - 1]->ReadPort(port);
+    port = (uint16_t) (~(port >> 1) & 7) | 0x1f0;
+    uint16_t data = m_pHardDrives[slot - 1]->ReadPort(port);
     return ~data;  // QBUS inverts the bits
 }
-void CMotherboard::SetHardPortWord(int slot, WORD port, WORD data)
+void CMotherboard::SetHardPortWord(int slot, uint16_t port, uint16_t data)
 {
     ASSERT(slot >= 1 && slot <= 2);
 
     if (m_pHardDrives[slot - 1] == NULL) return;
-    port = (WORD) (~(port >> 1) & 7) | 0x1f0;
+    port = (uint16_t) (~(port >> 1) & 7) | 0x1f0;
     data = ~data;  // QBUS inverts the bits
     m_pHardDrives[slot - 1]->WritePort(port, data);
 }
@@ -440,46 +440,46 @@ void CMotherboard::SetHardPortWord(int slot, WORD port, WORD data)
 
 //NOTE: GetRAMWord() and GetRAMByte() are inline, see Processor.h
 
-void CMotherboard::SetRAMWord(int plan, WORD offset, WORD word)
+void CMotherboard::SetRAMWord(int plan, uint16_t offset, uint16_t word)
 {
     ASSERT(plan >= 0 && plan <= 2);
-    *((WORD*)(m_pRAM[plan] + (offset & 0xFFFE))) = word;
+    *((uint16_t*)(m_pRAM[plan] + (offset & 0xFFFE))) = word;
 }
-void CMotherboard::SetRAMByte(int plan, WORD offset, BYTE byte)
+void CMotherboard::SetRAMByte(int plan, uint16_t offset, uint8_t byte)
 {
     ASSERT(plan >= 0 && plan <= 2);
     m_pRAM[plan][offset] = byte;
 }
 
-WORD CMotherboard::GetROMWord(WORD offset) const
+uint16_t CMotherboard::GetROMWord(uint16_t offset) const
 {
     ASSERT(offset < 32768);
-    return *((WORD*)(m_pROM + (offset & 0xFFFE)));
+    return *((uint16_t*)(m_pROM + (offset & 0xFFFE)));
 }
-BYTE CMotherboard::GetROMByte(WORD offset) const
+uint8_t CMotherboard::GetROMByte(uint16_t offset) const
 {
     ASSERT(offset < 32768);
     return m_pROM[offset];
 }
 
-WORD CMotherboard::GetROMCartWord(int cartno, WORD offset) const
+uint16_t CMotherboard::GetROMCartWord(int cartno, uint16_t offset) const
 {
     ASSERT(cartno == 1 || cartno == 2);
     ASSERT(offset < 24 * 1024 - 1);
     int cartindex = cartno - 1;
     if (m_pROMCart[cartindex] == NULL)
         return 0177777;
-    WORD* p = (WORD*) (m_pROMCart[cartindex] + (offset & 0xFFFE));
+    uint16_t* p = (uint16_t*) (m_pROMCart[cartindex] + (offset & 0xFFFE));
     return *p;
 }
-BYTE CMotherboard::GetROMCartByte(int cartno, WORD offset) const
+uint8_t CMotherboard::GetROMCartByte(int cartno, uint16_t offset) const
 {
     ASSERT(cartno == 1 || cartno == 2);
     ASSERT(offset < 24 * 1024);
     int cartindex = cartno - 1;
     if (m_pROMCart[cartindex] == NULL)
         return 0377;
-    BYTE* p = m_pROMCart[cartindex] + offset;
+    uint8_t* p = m_pROMCart[cartindex] + offset;
     return *p;
 }
 
@@ -577,35 +577,35 @@ void CMotherboard::TimerTick() // Timer Tick, 2uS -- dividers are within timer r
         m_timer = m_timerreload & 07777; // Reload it
     }
 }
-WORD CMotherboard::GetTimerValue()  // Returns current timer value
+uint16_t CMotherboard::GetTimerValue()  // Returns current timer value
 {
     if ((m_timerflags & 0240) == 0)
         return m_timer;
 
     m_timerflags &= ~0240;  // Clear flags
-    WORD res = m_timer;
+    uint16_t res = m_timer;
     m_timer = m_timerreload & 07777; // Reload it
     return res;
 }
-WORD CMotherboard::GetTimerReload()  // Returns timer reload value
+uint16_t CMotherboard::GetTimerReload()  // Returns timer reload value
 {
     return m_timerreload;
 }
-WORD CMotherboard::GetTimerState() // Returns timer state
+uint16_t CMotherboard::GetTimerState() // Returns timer state
 {
-    WORD res = m_timerflags;
+    uint16_t res = m_timerflags;
     m_timerflags &= ~010;  // Clear overflow
     return res;
 }
 
-void CMotherboard::SetTimerReload(WORD val)	 // Sets timer reload value
+void CMotherboard::SetTimerReload(uint16_t val)	 // Sets timer reload value
 {
     m_timerreload = val & 07777;
     if ((m_timerflags & 1) == 0)
         m_timer = m_timerreload;
 }
 
-void CMotherboard::SetTimerState(WORD val) // Sets timer state
+void CMotherboard::SetTimerState(uint16_t val) // Sets timer state
 {
     // 753   200 40 10
     if ((val & 1) && ((m_timerflags & 1) == 0))
@@ -662,9 +662,11 @@ void CMotherboard::DebugTicks()
 * 48 тиков обмена с COM-портом - каждый 416 тик
 * 8?? тиков обмена с NET-портом - каждый 64 тик ???
 */
-#define SYSTEMFRAME_EXECUTE_CPU     { if (m_pCPU->GetPC() == m_CPUbp) return FALSE;  m_pCPU->Execute(); }
-#define SYSTEMFRAME_EXECUTE_PPU     { if (m_pPPU->GetPC() == m_PPUbp) return FALSE;  m_pPPU->Execute(); }
-BOOL CMotherboard::SystemFrame()
+#define SYSTEMFRAME_EXECUTE_CPU     { m_pCPU->Execute(); }
+#define SYSTEMFRAME_EXECUTE_PPU     { m_pPPU->Execute(); }
+#define SYSTEMFRAME_EXECUTE_BP_CPU  { if (m_pCPU->GetPC() == m_CPUbp) return false;  m_pCPU->Execute(); }
+#define SYSTEMFRAME_EXECUTE_BP_PPU  { if (m_pPPU->GetPC() == m_PPUbp) return false;  m_pPPU->Execute(); }
+bool CMotherboard::SystemFrame()
 {
     int frameticks = 0;  // 20000 ticks
     const int audioticks = 20286 / (SAMPLERATE / 25);
@@ -688,49 +690,69 @@ BOOL CMotherboard::SystemFrame()
             Tick50();  // 1/50 timer event
 
         // CPU - 16 times, PPU - 12.5 times
-        /*  0 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;  SYSTEMFRAME_EXECUTE_CPU;
-        /*  1 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;
-        /*  2 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;
-        /*  3 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;  SYSTEMFRAME_EXECUTE_CPU;
-        /*  4 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;
-        /*  5 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;
-        /*  6 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;  SYSTEMFRAME_EXECUTE_CPU;
-        /*  7 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;
-        /*  8 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;
-        /*  9 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;  SYSTEMFRAME_EXECUTE_CPU;
-        /* 10 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;
-        /* 11 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;
-        if ((frameticks & 1) == 0)  // (frameticks % 2 == 0) PPU extra ticks
-            SYSTEMFRAME_EXECUTE_PPU;
+        if (m_CPUbp == 0177777 && m_PPUbp == 0177777)  // No breakpoints, no need to check
+        {
+            /*  0 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;  SYSTEMFRAME_EXECUTE_CPU;
+            /*  1 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;
+            /*  2 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;
+            /*  3 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;  SYSTEMFRAME_EXECUTE_CPU;
+            /*  4 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;
+            /*  5 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;
+            /*  6 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;  SYSTEMFRAME_EXECUTE_CPU;
+            /*  7 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;
+            /*  8 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;
+            /*  9 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;  SYSTEMFRAME_EXECUTE_CPU;
+            /* 10 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;
+            /* 11 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;
+            if ((frameticks & 1) == 0)  // (frameticks % 2 == 0) PPU extra ticks
+                SYSTEMFRAME_EXECUTE_PPU;
+        }
+        else  // Have breakpoint, need to check
+        {
+            /*  0 */  SYSTEMFRAME_EXECUTE_BP_CPU;  SYSTEMFRAME_EXECUTE_BP_PPU;  SYSTEMFRAME_EXECUTE_BP_CPU;
+            /*  1 */  SYSTEMFRAME_EXECUTE_BP_CPU;  SYSTEMFRAME_EXECUTE_BP_PPU;
+            /*  2 */  SYSTEMFRAME_EXECUTE_BP_CPU;  SYSTEMFRAME_EXECUTE_BP_PPU;
+            /*  3 */  SYSTEMFRAME_EXECUTE_BP_CPU;  SYSTEMFRAME_EXECUTE_BP_PPU;  SYSTEMFRAME_EXECUTE_BP_CPU;
+            /*  4 */  SYSTEMFRAME_EXECUTE_BP_CPU;  SYSTEMFRAME_EXECUTE_BP_PPU;
+            /*  5 */  SYSTEMFRAME_EXECUTE_BP_CPU;  SYSTEMFRAME_EXECUTE_BP_PPU;
+            /*  6 */  SYSTEMFRAME_EXECUTE_BP_CPU;  SYSTEMFRAME_EXECUTE_BP_PPU;  SYSTEMFRAME_EXECUTE_BP_CPU;
+            /*  7 */  SYSTEMFRAME_EXECUTE_BP_CPU;  SYSTEMFRAME_EXECUTE_BP_PPU;
+            /*  8 */  SYSTEMFRAME_EXECUTE_BP_CPU;  SYSTEMFRAME_EXECUTE_BP_PPU;
+            /*  9 */  SYSTEMFRAME_EXECUTE_BP_CPU;  SYSTEMFRAME_EXECUTE_BP_PPU;  SYSTEMFRAME_EXECUTE_BP_CPU;
+            /* 10 */  SYSTEMFRAME_EXECUTE_BP_CPU;  SYSTEMFRAME_EXECUTE_BP_PPU;
+            /* 11 */  SYSTEMFRAME_EXECUTE_BP_CPU;  SYSTEMFRAME_EXECUTE_BP_PPU;
+            if ((frameticks & 1) == 0)  // (frameticks % 2 == 0) PPU extra ticks
+                SYSTEMFRAME_EXECUTE_BP_PPU;
+        }
 
         if ((frameticks & 31) == 0)  // (frameticks % 32 == 0)
         {
             m_pFloppyCtl->Periodic();  // Each 32nd tick -- FDD tick
 
             // Keyboard processing
-            CSecondMemoryController* pMemCtl = (CSecondMemoryController*) m_pSecondMemCtl;
+            CSecondMemoryController* pMemCtl = static_cast<CSecondMemoryController*>(m_pSecondMemCtl);
             if ((pMemCtl->m_Port177700 & 0200) == 0)
             {
-                BYTE row_Y = m_scanned_key & 0xF;
-                BYTE col_X = (m_scanned_key & 0x70) >> 4;
-                BYTE bit_X = 1 << col_X;
+                uint8_t row_Y = m_scanned_key & 0xF;
+                uint8_t col_X = (m_scanned_key & 0x70) >> 4;
+                uint8_t bit_X = 1 << col_X;
                 pMemCtl->m_Port177702 = m_scanned_key;
                 if ((m_scanned_key & 0200) == 0)
                 {
-                    if ((m_kbd_matrix[row_Y].processed == FALSE) && ((m_kbd_matrix[row_Y].row_Y & bit_X) != 0))
+                    if ((m_kbd_matrix[row_Y].processed == false) && ((m_kbd_matrix[row_Y].row_Y & bit_X) != 0))
                     {
                         pMemCtl->m_Port177700 |= 0200;
-                        m_kbd_matrix[row_Y].processed = TRUE;
+                        m_kbd_matrix[row_Y].processed = true;
                         if (pMemCtl->m_Port177700 & 0100)
                             m_pPPU->InterruptVIRQ(3, 0300);
                     }
                 }
                 else
                 {
-                    if ((m_kbd_matrix[row_Y].processed == TRUE) && (m_kbd_matrix[row_Y].row_Y == 0))
+                    if ((m_kbd_matrix[row_Y].processed == true) && (m_kbd_matrix[row_Y].row_Y == 0))
                     {
                         pMemCtl->m_Port177700 |= 0200;
-                        m_kbd_matrix[row_Y].processed = FALSE;
+                        m_kbd_matrix[row_Y].processed = false;
                         if (pMemCtl->m_Port177700 & 0100)
                             m_pPPU->InterruptVIRQ(3, 0300);
                         pMemCtl->m_Port177702 = m_scanned_key & 0x8F;
@@ -757,8 +779,8 @@ BOOL CMotherboard::SystemFrame()
 
                 if (m_TapeReadCallback != NULL)  // Tape reading
                 {
-                    BOOL tapeBit = (*m_TapeReadCallback)(1);
-                    CSecondMemoryController* pMemCtl = (CSecondMemoryController*) m_pSecondMemCtl;
+                    bool tapeBit = (*m_TapeReadCallback)(1);
+                    CSecondMemoryController* pMemCtl = static_cast<CSecondMemoryController*>(m_pSecondMemCtl);
                     if (pMemCtl->TapeInput(tapeBit))
                     {
                         m_timerflags |= 040;  // Set bit 5 of timer state: external event ready to read
@@ -766,7 +788,7 @@ BOOL CMotherboard::SystemFrame()
                 }
                 else if (m_TapeWriteCallback != NULL)  // Tape writing
                 {
-                    CSecondMemoryController* pMemCtl = (CSecondMemoryController*) m_pSecondMemCtl;
+                    CSecondMemoryController* pMemCtl = static_cast<CSecondMemoryController*>(m_pSecondMemCtl);
                     unsigned int value = pMemCtl->TapeOutput() ? 0xffffffff : 0;
                     (*m_TapeWriteCallback)(value, 1);
                 }
@@ -775,10 +797,10 @@ BOOL CMotherboard::SystemFrame()
 
         if (m_SerialInCallback != NULL && frameticks % 416 == 0)
         {
-            CFirstMemoryController* pMemCtl = (CFirstMemoryController*) m_pFirstMemCtl;
+            CFirstMemoryController* pMemCtl = static_cast<CFirstMemoryController*>(m_pFirstMemCtl);
             if ((pMemCtl->m_Port176574 & 004) == 0)  // Not loopback?
             {
-                BYTE b;
+                uint8_t b;
                 if (m_SerialInCallback(&b))
                 {
                     if (pMemCtl->SerialInput(b) && (pMemCtl->m_Port176570 & 0100))
@@ -788,17 +810,17 @@ BOOL CMotherboard::SystemFrame()
         }
         if (m_SerialOutCallback != NULL && frameticks % serialOutTicks == 0)
         {
-            CFirstMemoryController* pMemCtl = (CFirstMemoryController*) m_pFirstMemCtl;
+            CFirstMemoryController* pMemCtl = static_cast<CFirstMemoryController*>(m_pFirstMemCtl);
             if (serialTxCount > 0)
             {
                 serialTxCount--;
                 if (serialTxCount == 0)  // Translation countdown finished - the byte translated
                 {
                     if ((pMemCtl->m_Port176574 & 004) == 0)  // Not loopback?
-                        (*m_SerialOutCallback)((BYTE)(pMemCtl->m_Port176576 & 0xff));
+                        (*m_SerialOutCallback)((uint8_t)(pMemCtl->m_Port176576 & 0xff));
                     else  // Loopback
                     {
-                        if (pMemCtl->SerialInput((BYTE)(pMemCtl->m_Port176576 & 0xff)) && (pMemCtl->m_Port176570 & 0100))
+                        if (pMemCtl->SerialInput((uint8_t)(pMemCtl->m_Port176576 & 0xff)) && (pMemCtl->m_Port176570 & 0100))
                             m_pCPU->InterruptVIRQ(7, 0370);
                     }
                     pMemCtl->m_Port176574 |= 0200;  // Set Ready flag
@@ -814,10 +836,10 @@ BOOL CMotherboard::SystemFrame()
 
         if (m_NetworkInCallback != NULL && frameticks % 64 == 0)
         {
-            CFirstMemoryController* pMemCtl = (CFirstMemoryController*) m_pFirstMemCtl;
+            CFirstMemoryController* pMemCtl = static_cast<CFirstMemoryController*>(m_pFirstMemCtl);
             if ((pMemCtl->m_Port176564 & 004) == 0)  // Not loopback?
             {
-                BYTE b;
+                uint8_t b;
                 if (m_NetworkInCallback(&b))
                 {
                     if (pMemCtl->NetworkInput(b) && (pMemCtl->m_Port176560 & 0100))
@@ -830,17 +852,17 @@ BOOL CMotherboard::SystemFrame()
         }
         if (m_NetworkOutCallback != NULL && frameticks % networkOutTicks == 0)
         {
-            CFirstMemoryController* pMemCtl = (CFirstMemoryController*) m_pFirstMemCtl;
+            CFirstMemoryController* pMemCtl = static_cast<CFirstMemoryController*>(m_pFirstMemCtl);
             if (networkTxCount > 0)
             {
                 networkTxCount--;
                 if (networkTxCount == 0)  // Translation countdown finished - the byte translated
                 {
                     if ((pMemCtl->m_Port176564 & 004) == 0)  // Not loopback?
-                        (*m_NetworkOutCallback)((BYTE)(pMemCtl->m_Port176566 & 0xff));
+                        (*m_NetworkOutCallback)((uint8_t)(pMemCtl->m_Port176566 & 0xff));
                     else  // Loopback
                     {
-                        if (pMemCtl->NetworkInput((BYTE)(pMemCtl->m_Port176566 & 0xff)) && (pMemCtl->m_Port176560 & 0100))
+                        if (pMemCtl->NetworkInput((uint8_t)(pMemCtl->m_Port176566 & 0xff)) && (pMemCtl->m_Port176560 & 0100))
                             m_pCPU->InterruptVIRQ(9, 0360);
                     }
                     pMemCtl->m_Port176564 |= 0200;  // Set Ready flag
@@ -859,7 +881,7 @@ BOOL CMotherboard::SystemFrame()
 
         if (m_ParallelOutCallback != NULL)
         {
-            CSecondMemoryController* pMemCtl = (CSecondMemoryController*) m_pSecondMemCtl;
+            CSecondMemoryController* pMemCtl = static_cast<CSecondMemoryController*>(m_pSecondMemCtl);
             if ((pMemCtl->m_Port177102 & 0x80) == 0x80 && (pMemCtl->m_Port177101 & 0x80) == 0x80)
             {
                 // Strobe set, Printer Ack set => reset Printer Ack
@@ -879,15 +901,15 @@ BOOL CMotherboard::SystemFrame()
     }
     while (frameticks < 20000);
 
-    return TRUE;
+    return true;
 }
 
 // Key pressed or released
-void CMotherboard::KeyboardEvent(BYTE scancode, BOOL okPressed)
+void CMotherboard::KeyboardEvent(uint8_t scancode, bool okPressed)
 {
-    BYTE row_Y = scancode & 0xF;
-    BYTE col_X = (scancode & 0x70) >> 4;
-    BYTE bit_X = 1 << col_X;
+    uint8_t row_Y = scancode & 0xF;
+    uint8_t col_X = (scancode & 0x70) >> 4;
+    uint8_t bit_X = 1 << col_X;
     if (okPressed)
         m_kbd_matrix[row_Y].row_Y |= bit_X;
     else
@@ -915,49 +937,49 @@ void CMotherboard::KeyboardEvent(BYTE scancode, BOOL okPressed)
 //TODO: Floppy drive state
 //TODO: Hard drive state
 
-void CMotherboard::SaveToImage(BYTE* pImage)
+void CMotherboard::SaveToImage(uint8_t* pImage)
 {
     // Board data                                       // Offset Size
-    WORD* pwImage = (WORD*) (pImage + 32);              //   32    --
+    uint16_t* pwImage = (uint16_t*) (pImage + 32);      //   32    --
     *pwImage++ = m_timer;                               //   32     2
     *pwImage++ = m_timerreload;                         //   34     2
     *pwImage++ = m_timerflags;                          //   36     2
     *pwImage++ = m_timerdivider;                        //   38     2
-    DWORD* pdwImage = (DWORD*)pwImage;                  //   40    --
+    uint32_t* pdwImage = (uint32_t*)pwImage;            //   40    --
     memcpy(pdwImage, m_chancputx, 3 * 4); pdwImage += 3;//   40    12
     memcpy(pdwImage, m_chancpurx, 2 * 4); pdwImage += 2;//   52     8
     memcpy(pdwImage, m_chanpputx, 2 * 4); pdwImage += 2;//   60     8
     memcpy(pdwImage, m_chanppurx, 3 * 4); pdwImage += 3;//   68    12
-    BYTE* pbImage = (BYTE*) pdwImage;                   //   80    --
+    uint8_t* pbImage = (uint8_t*) pdwImage;             //   80    --
     *pbImage++ = m_chan0disabled;                       //   80     1
     *pbImage++ = m_irq_cpureset;                        //   81     1
     *pbImage++ = 0;                                     //   82     1  // not used
     *pbImage++ = m_scanned_key;                         //   83     1
-    memcpy(pbImage, m_kbd_matrix, 2 * 16); pbImage += 32; //   84    32
-    pwImage = (WORD*) pbImage;                          //  116    --
+    memcpy(pbImage, m_kbd_matrix, 2 * 16); pbImage += 32;//  84    32
+    pwImage = (uint16_t*) pbImage;                      //  116    --
     *pwImage++ = m_multiply;                            //  116     2
     memcpy(pwImage, freq_per, 12); pwImage += 6;        //  118    12
     memcpy(pwImage, freq_out, 12); pwImage += 6;        //  130    12
-    memcpy(pwImage, freq_enable, 12); pwImage += 6;     //  142    12
+    memcpy(pwImage, freq_enable, 12); /*pwImage += 6;*/ //  142    12
 
     // CPU status
-    BYTE* pImageCPU = pImage + 160;
+    uint8_t* pImageCPU = pImage + 160;
     m_pCPU->SaveToImage(pImageCPU);
     // PPU status
-    BYTE* pImagePPU = pImageCPU + 64;
+    uint8_t* pImagePPU = pImageCPU + 64;
     m_pPPU->SaveToImage(pImagePPU);
     // CPU memory/IO controller status
-    BYTE* pImageCpuMem = pImagePPU + 64;
+    uint8_t* pImageCpuMem = pImagePPU + 64;
     m_pFirstMemCtl->SaveToImage(pImageCpuMem);
     // PPU memory/IO controller status
-    BYTE* pImagePpuMem = pImageCpuMem + 64;
+    uint8_t* pImagePpuMem = pImageCpuMem + 64;
     m_pSecondMemCtl->SaveToImage(pImagePpuMem);
 
     // ROM
-    BYTE* pImageRom = pImage + UKNCIMAGE_HEADER_SIZE;
+    uint8_t* pImageRom = pImage + UKNCIMAGE_HEADER_SIZE;
     memcpy(pImageRom, m_pROM, 32 * 1024);
     // RAM planes 0, 1, 2
-    BYTE* pImageRam = pImageRom + 32 * 1024;
+    uint8_t* pImageRam = pImageRom + 32 * 1024;
     memcpy(pImageRam, m_pRAM[0], 64 * 1024);
     pImageRam += 64 * 1024;
     memcpy(pImageRam, m_pRAM[1], 64 * 1024);
@@ -966,49 +988,49 @@ void CMotherboard::SaveToImage(BYTE* pImage)
     pImageRam += 64 * 1024;
     ASSERT((pImageRam - pImage) == UKNCIMAGE_SIZE);
 }
-void CMotherboard::LoadFromImage(const BYTE* pImage)
+void CMotherboard::LoadFromImage(const uint8_t* pImage)
 {
     // Board data                                       // Offset Size
-    const WORD* pwImage = (const WORD*) (pImage + 32);  //   32    --
+    const uint16_t* pwImage = (const uint16_t*) (pImage + 32);//   32    --
     m_timer = *pwImage++;                               //   32     2
     m_timerreload = *pwImage++;                         //   34     2
     m_timerflags = *pwImage++;                          //   36     2
     m_timerdivider = *pwImage++;                        //   38     2
-    DWORD* pdwImage = (DWORD*)pwImage;                  //   40    --
+    uint32_t* pdwImage = (uint32_t*)pwImage;            //   40    --
     memcpy(m_chancputx, pdwImage, 3 * 4); pdwImage += 3;//   40    12
     memcpy(m_chancpurx, pdwImage, 2 * 4); pdwImage += 2;//   52     8
     memcpy(m_chanpputx, pdwImage, 2 * 4); pdwImage += 2;//   60     8
     memcpy(m_chanppurx, pdwImage, 3 * 4); pdwImage += 3;//   68    12
-    const BYTE* pbImage = (const BYTE*) pdwImage;       //   80    --
+    const uint8_t* pbImage = (const uint8_t*) pdwImage; //   80    --
     m_chan0disabled = *pbImage++;                       //   80     1
     m_irq_cpureset = *pbImage++;                        //   81     1
     pbImage++;                                          //   82     1  // not used
     m_scanned_key = *pbImage++;                         //   83     1
-    memcpy(m_kbd_matrix, pbImage, 2 * 16); pbImage += 32; //   84    32
-    pwImage = (const WORD*) pbImage;                    //  116    --
+    memcpy(m_kbd_matrix, pbImage, 2 * 16); pbImage += 32;//  84    32
+    pwImage = (const uint16_t*) pbImage;                //  116    --
     m_multiply = *pwImage++;                            //  116     2
     memcpy(freq_per, pwImage, 12); pwImage += 6;        //  118    12
     memcpy(freq_out, pwImage, 12); pwImage += 6;        //  130    12
     memcpy(freq_enable, pwImage, 12); pwImage += 6;     //  142    12
 
     // CPU status
-    const BYTE* pImageCPU = pImage + 160;               //  160    32
+    const uint8_t* pImageCPU = pImage + 160;            //  160    32
     m_pCPU->LoadFromImage(pImageCPU);
     // PPU status
-    const BYTE* pImagePPU = pImageCPU + 64;             //  224    32
+    const uint8_t* pImagePPU = pImageCPU + 64;          //  224    32
     m_pPPU->LoadFromImage(pImagePPU);
     // CPU memory/IO controller status
-    const BYTE* pImageCpuMem = pImagePPU + 64;          //  288    64
+    const uint8_t* pImageCpuMem = pImagePPU + 64;       //  288    64
     m_pFirstMemCtl->LoadFromImage(pImageCpuMem);
     // PPU memory/IO controller status
-    const BYTE* pImagePpuMem = pImageCpuMem + 64;       //  352    64
+    const uint8_t* pImagePpuMem = pImageCpuMem + 64;    //  352    64
     m_pSecondMemCtl->LoadFromImage(pImagePpuMem);
 
     // ROM
-    const BYTE* pImageRom = pImage + UKNCIMAGE_HEADER_SIZE; // 512
+    const uint8_t* pImageRom = pImage + UKNCIMAGE_HEADER_SIZE; // 512
     memcpy(m_pROM, pImageRom, 32 * 1024);
     // RAM planes 0, 1, 2
-    const BYTE* pImageRam = pImageRom + 32 * 1024;
+    const uint8_t* pImageRam = pImageRom + 32 * 1024;
     memcpy(m_pRAM[0], pImageRam, 64 * 1024);
     pImageRam += 64 * 1024;
     memcpy(m_pRAM[1], pImageRam, 64 * 1024);
@@ -1018,9 +1040,9 @@ void CMotherboard::LoadFromImage(const BYTE* pImage)
     ASSERT((pImageRam - pImage) == UKNCIMAGE_SIZE);
 }
 
-void CMotherboard::ChanWriteByCPU(BYTE chan, BYTE data)
+void CMotherboard::ChanWriteByCPU(uint8_t chan, uint8_t data)
 {
-    BYTE oldp_ready = m_chanppurx[chan].ready;
+    uint8_t oldp_ready = m_chanppurx[chan].ready;
     chan &= 3;
     ASSERT(chan < 3);
 
@@ -1038,9 +1060,9 @@ void CMotherboard::ChanWriteByCPU(BYTE chan, BYTE data)
         m_pPPU->InterruptVIRQ(5 + chan * 2, 0320 + (010 * chan));
     }
 }
-void CMotherboard::ChanWriteByPPU(BYTE chan, BYTE data)
+void CMotherboard::ChanWriteByPPU(uint8_t chan, uint8_t data)
 {
-    BYTE oldc_ready = m_chancpurx[chan].ready;
+    uint8_t oldc_ready = m_chancpurx[chan].ready;
     chan &= 3;
     ASSERT(chan < 2);
 
@@ -1058,9 +1080,9 @@ void CMotherboard::ChanWriteByPPU(BYTE chan, BYTE data)
         m_pCPU->InterruptVIRQ(chan ? 3 : 1, chan ? 0460 : 060);
     }
 }
-BYTE CMotherboard::ChanReadByCPU(BYTE chan)
+uint8_t CMotherboard::ChanReadByCPU(uint8_t chan)
 {
-    BYTE res, oldp_ready = m_chanpputx[chan].ready;
+    uint8_t res, oldp_ready = m_chanpputx[chan].ready;
 
     chan &= 3;
     ASSERT(chan < 2);
@@ -1080,9 +1102,9 @@ BYTE CMotherboard::ChanReadByCPU(BYTE chan)
     }
     return res;
 }
-BYTE CMotherboard::ChanReadByPPU(BYTE chan)
+uint8_t CMotherboard::ChanReadByPPU(uint8_t chan)
 {
-    BYTE res, oldc_ready = m_chancputx[chan].ready;
+    uint8_t res, oldc_ready = m_chancputx[chan].ready;
 
     chan &= 3;
     ASSERT(chan < 3);
@@ -1115,7 +1137,7 @@ BYTE CMotherboard::ChanReadByPPU(BYTE chan)
     return res;
 }
 
-BYTE CMotherboard::ChanRxStateGetCPU(BYTE chan)
+uint8_t CMotherboard::ChanRxStateGetCPU(uint8_t chan)
 {
     chan &= 3;
     ASSERT(chan < 2);
@@ -1123,16 +1145,16 @@ BYTE CMotherboard::ChanRxStateGetCPU(BYTE chan)
     return (m_chancpurx[chan].ready << 7) | (m_chancpurx[chan].irq << 6);
 }
 
-BYTE CMotherboard::ChanTxStateGetCPU(BYTE chan)
+uint8_t CMotherboard::ChanTxStateGetCPU(uint8_t chan)
 {
     chan &= 3;
     ASSERT(chan < 3);
     return (m_chancputx[chan].ready << 7) | (m_chancputx[chan].irq << 6);
 }
 
-BYTE CMotherboard::ChanRxStateGetPPU()
+uint8_t CMotherboard::ChanRxStateGetPPU()
 {
-    BYTE res;
+    uint8_t res;
 
     res = (m_irq_cpureset << 6) | (m_chanppurx[2].ready << 5) | (m_chanppurx[1].ready << 4) | (m_chanppurx[0].ready << 3) |
           (m_chanppurx[2].irq << 2)   | (m_chanppurx[1].irq << 1)   | (m_chanppurx[0].irq);
@@ -1140,18 +1162,18 @@ BYTE CMotherboard::ChanRxStateGetPPU()
 
     return res;
 }
-BYTE CMotherboard::ChanTxStateGetPPU()
+uint8_t CMotherboard::ChanTxStateGetPPU()
 {
-    BYTE res;
+    uint8_t res;
     res = (m_chanpputx[1].ready << 4) | (m_chanpputx[0].ready << 3) | (m_chan0disabled << 2) |
           (m_chanpputx[1].irq << 1)   | (m_chanpputx[0].irq);
 
 
     return res;
 }
-void CMotherboard::ChanRxStateSetCPU(BYTE chan, BYTE state)
+void CMotherboard::ChanRxStateSetCPU(uint8_t chan, uint8_t state)
 {
-    BYTE oldc_irq = m_chancpurx[chan].irq;
+    uint8_t oldc_irq = m_chancpurx[chan].irq;
     chan &= 3;
     ASSERT(chan < 2);
 
@@ -1169,9 +1191,9 @@ void CMotherboard::ChanRxStateSetCPU(BYTE chan, BYTE state)
         m_pCPU->InterruptVIRQ(chan ? 3 : 1, chan ? 0460 : 060);
     }
 }
-void CMotherboard::ChanTxStateSetCPU(BYTE chan, BYTE state)
+void CMotherboard::ChanTxStateSetCPU(uint8_t chan, uint8_t state)
 {
-    BYTE oldc_irq = m_chancputx[chan].irq;
+    uint8_t oldc_irq = m_chancputx[chan].irq;
     chan &= 3;
     ASSERT(chan < 3);
 
@@ -1202,11 +1224,11 @@ void CMotherboard::ChanTxStateSetCPU(BYTE chan, BYTE state)
     }
 }
 
-void CMotherboard::ChanRxStateSetPPU(BYTE state)
+void CMotherboard::ChanRxStateSetPPU(uint8_t state)
 {
-    BYTE oldp_irq0 = m_chanppurx[0].irq;
-    BYTE oldp_irq1 = m_chanppurx[1].irq;
-    BYTE oldp_irq2 = m_chanppurx[2].irq;
+    uint8_t oldp_irq0 = m_chanppurx[0].irq;
+    uint8_t oldp_irq1 = m_chanppurx[1].irq;
+    uint8_t oldp_irq2 = m_chanppurx[2].irq;
 
     m_chanppurx[0].irq = state & 1;
     m_chanppurx[1].irq = (state >> 1) & 1;
@@ -1246,10 +1268,10 @@ void CMotherboard::ChanRxStateSetPPU(BYTE state)
     }
 
 }
-void CMotherboard::ChanTxStateSetPPU(BYTE state)
+void CMotherboard::ChanTxStateSetPPU(uint8_t state)
 {
-    BYTE oldp_irq0 = m_chanpputx[0].irq;
-    BYTE oldp_irq1 = m_chanpputx[1].irq;
+    uint8_t oldp_irq0 = m_chanpputx[0].irq;
+    uint8_t oldp_irq1 = m_chanpputx[1].irq;
 
     m_chanpputx[0].irq = state & 1;
     m_chanpputx[1].irq = (state >> 1) & 1;
@@ -1385,7 +1407,7 @@ void CMotherboard::ChanResetByPPU()
     m_pPPU->InterruptVIRQ(4, 0);
 }
 
-//void CMotherboard::FloppyDebug(BYTE val)
+//void CMotherboard::FloppyDebug(uint8_t val)
 //{
 ////#if !defined(PRODUCT)
 ////    TCHAR buffer[512];
@@ -1422,8 +1444,8 @@ void CMotherboard::ChanResetByPPU()
 //		case FLOPPY_FSM_WAITFORTERM1:
 //			if(val==0xff)
 //			{ //done
-//				WORD par;
-//				BYTE trk,sector,side;
+//				uint16_t par;
+//				uint8_t trk,sector,side;
 //
 //				par=m_pFirstMemCtl->GetWord(m_floppyaddr,0);
 //
@@ -1461,19 +1483,19 @@ void CMotherboard::ChanResetByPPU()
 //}
 
 
-WORD CMotherboard::GetFloppyState()
+uint16_t CMotherboard::GetFloppyState()
 {
     return m_pFloppyCtl->GetState();
 }
-WORD CMotherboard::GetFloppyData()
+uint16_t CMotherboard::GetFloppyData()
 {
     return m_pFloppyCtl->GetData();
 }
-void CMotherboard::SetFloppyState(WORD val)
+void CMotherboard::SetFloppyState(uint16_t val)
 {
     m_pFloppyCtl->SetCommand(val);
 }
-void CMotherboard::SetFloppyData(WORD val)
+void CMotherboard::SetFloppyData(uint16_t val)
 {
     m_pFloppyCtl->WriteData(val);
 }
@@ -1481,12 +1503,12 @@ void CMotherboard::SetFloppyData(WORD val)
 
 //////////////////////////////////////////////////////////////////////
 
-WORD CMotherboard::GetKeyboardRegister(void)
+uint16_t CMotherboard::GetKeyboardRegister(void)
 {
-    WORD w7214 = GetRAMWord(0, 07214);
-    BYTE b22556 = GetRAMByte(0, 022556);
+    uint16_t w7214 = GetRAMWord(0, 07214);
+    uint8_t b22556 = GetRAMByte(0, 022556);
 
-    WORD res = 0;
+    uint16_t res = 0;
     switch (w7214)
     {
     case 010534: //fix
@@ -1542,7 +1564,7 @@ void CMotherboard::DoSound(void)
     }
 }
 
-void CMotherboard::SetSound(WORD val)
+void CMotherboard::SetSound(uint16_t val)
 {
     if (val & (1 << 7))
         freq_enable[5] = 1;
@@ -1636,7 +1658,7 @@ void CMotherboard::SetSerialCallbacks(SERIALINCALLBACK incallback, SERIALOUTCALL
 
 void CMotherboard::SetParallelOutCallback(PARALLELOUTCALLBACK outcallback)
 {
-    CSecondMemoryController* pMemCtl = (CSecondMemoryController*) m_pSecondMemCtl;
+    CSecondMemoryController* pMemCtl = static_cast<CSecondMemoryController*>(m_pSecondMemCtl);
     if (outcallback == NULL)  // Reset callback
     {
         pMemCtl->m_Port177101 &= ~2;  // Reset OnLine flag

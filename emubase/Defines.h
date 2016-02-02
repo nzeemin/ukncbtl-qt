@@ -15,7 +15,7 @@ UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
 
 //////////////////////////////////////////////////////////////////////
 
-inline int GetDigit (WORD word, int pos)
+inline int GetDigit (uint16_t word, int pos)
 {
     //return (word >>= pos * 3) % 8;
     return (word >>= ((pos << 1) + pos)) & 7;
@@ -174,7 +174,7 @@ inline int GetDigit (WORD word, int pos)
 #define PI_FDIV         0075030
 
 // Commands -- special commands, HALT mode only
-#define PI_GO           0000012  // Return to USER mode;  PC := CPC; PSW := CPS
+#define PI_START        0000012  // Return to USER mode;  PC := CPC; PSW := CPS
 #define PI_STEP         0000016
 #define PI_RSEL         0000020  // R0 := SEL  - Read SEL register
 #define PI_MFUS         0000021  // R0 := (R5)+

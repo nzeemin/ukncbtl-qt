@@ -33,10 +33,10 @@ struct WAVPCMFILE
     int nBitsPerSample;
     int nSampleFrequency;
     int nBlockAlign;
-    DWORD dwDataOffset;
-    DWORD dwDataSize;
-    DWORD dwCurrentPosition;
-    BOOL okWriting;
+    quint32 dwDataOffset;
+    quint32 dwDataSize;
+    quint32 dwCurrentPosition;
+    bool okWriting;
 };
 
 int WavPcmFile_GetFrequency(HWAVPCMFILE wavpcmfile)
@@ -49,7 +49,7 @@ int WavPcmFile_GetFrequency(HWAVPCMFILE wavpcmfile)
     return pWavPcm->nSampleFrequency;
 }
 
-DWORD WavPcmFile_GetLength(HWAVPCMFILE wavpcmfile)
+quint32 WavPcmFile_GetLength(HWAVPCMFILE wavpcmfile)
 {
     if (wavpcmfile == INVALID_HANDLE_VALUE)
         return 0;
@@ -59,7 +59,7 @@ DWORD WavPcmFile_GetLength(HWAVPCMFILE wavpcmfile)
     return pWavPcm->dwDataSize / pWavPcm->nBlockAlign;
 }
 
-DWORD WavPcmFile_GetPosition(HWAVPCMFILE wavpcmfile)
+quint32 WavPcmFile_GetPosition(HWAVPCMFILE wavpcmfile)
 {
     if (wavpcmfile == INVALID_HANDLE_VALUE)
         return 0;
@@ -69,14 +69,14 @@ DWORD WavPcmFile_GetPosition(HWAVPCMFILE wavpcmfile)
     return pWavPcm->dwCurrentPosition;
 }
 
-void WavPcmFile_SetPosition(HWAVPCMFILE wavpcmfile, DWORD position)
+void WavPcmFile_SetPosition(HWAVPCMFILE wavpcmfile, quint32 position)
 {
     if (wavpcmfile == INVALID_HANDLE_VALUE)
         return;
 
     WAVPCMFILE* pWavPcm = (WAVPCMFILE*) wavpcmfile;
 
-    DWORD offsetInData = position * pWavPcm->nBlockAlign;
+    quint32 offsetInData = position * pWavPcm->nBlockAlign;
     ::fseek(pWavPcm->fpFile, pWavPcm->dwDataOffset + offsetInData, SEEK_SET);
 
     pWavPcm->dwCurrentPosition = position;
@@ -93,21 +93,21 @@ HWAVPCMFILE WavPcmFile_Create(LPCTSTR filename, int sampleRate)
         return (HWAVPCMFILE) INVALID_HANDLE_VALUE;  // Failed to create file
 
     // Prepare and write file header
-    BYTE consolidated_header[12 + 8 + 16 + 8];
+    quint8 consolidated_header[12 + 8 + 16 + 8];
     ::memset(consolidated_header, 0, sizeof(consolidated_header));
-    DWORD bytesWritten;
+    quint32 bytesWritten;
 
     memcpy(&consolidated_header[0], magic1, 4);  // RIFF
     memcpy(&consolidated_header[8], magic2, 4);  // WAVE
     
     memcpy(&consolidated_header[12], format_tag_id, 4);  // fmt
-    *((DWORD*)(consolidated_header + 16)) = 16;  // Size of "fmt" chunk
-    *((WORD*)(consolidated_header + 20)) = WAV_FORMAT_PCM;  // AudioFormat = PCM
-    *((WORD*)(consolidated_header + 22)) = channels;  // NumChannels = mono
-    *((DWORD*)(consolidated_header + 24)) = sampleRate;  // SampleRate
-    *((DWORD*)(consolidated_header + 28)) = sampleRate * channels * bitsPerSample / 8;  // ByteRate
-    *((WORD*)(consolidated_header + 32)) = blockAlign;
-    *((WORD*)(consolidated_header + 34)) = bitsPerSample;
+    *((quint32*)(consolidated_header + 16)) = 16;  // Size of "fmt" chunk
+    *((quint16*)(consolidated_header + 20)) = WAV_FORMAT_PCM;  // AudioFormat = PCM
+    *((quint16*)(consolidated_header + 22)) = channels;  // NumChannels = mono
+    *((quint32*)(consolidated_header + 24)) = sampleRate;  // SampleRate
+    *((quint32*)(consolidated_header + 28)) = sampleRate * channels * bitsPerSample / 8;  // ByteRate
+    *((quint16*)(consolidated_header + 32)) = blockAlign;
+    *((quint16*)(consolidated_header + 34)) = bitsPerSample;
 
     memcpy(&consolidated_header[36], data_tag_id, 4);  // data
 
@@ -127,7 +127,7 @@ HWAVPCMFILE WavPcmFile_Create(LPCTSTR filename, int sampleRate)
     pWavPcm->nBlockAlign = blockAlign;
     pWavPcm->dwDataOffset = sizeof(consolidated_header);
     pWavPcm->dwDataSize = 0;
-    pWavPcm->okWriting = TRUE;
+    pWavPcm->okWriting = true;
 
     WavPcmFile_SetPosition((HWAVPCMFILE) pWavPcm, 0);
 
@@ -140,13 +140,13 @@ HWAVPCMFILE WavPcmFile_Open(LPCTSTR filename)
     if (fpFileOpen == NULL)
         return (HWAVPCMFILE) INVALID_HANDLE_VALUE;  // Failed to open file
 
-    DWORD offset = 0;
-    DWORD bytesRead;
+    quint32 offset = 0;
+    quint32 bytesRead;
     ::fseek(fpFileOpen, 0, SEEK_END);
-    DWORD fileSize = ::ftell(fpFileOpen);
+    quint32 fileSize = ::ftell(fpFileOpen);
     ::fseek(fpFileOpen, 0, SEEK_SET);
 
-    BYTE fileHeader[12];
+    quint8 fileHeader[12];
     bytesRead = ::fread(fileHeader, 1, sizeof(fileHeader), fpFileOpen);
     if (bytesRead != sizeof(fileHeader) ||
         memcmp(&fileHeader[0], magic1, 4) != 0 ||
@@ -157,15 +157,15 @@ HWAVPCMFILE WavPcmFile_Open(LPCTSTR filename)
     }
     offset += bytesRead;
 
-    DWORD statedSize = *((DWORD*)(fileHeader + 4)) + 8;
+    quint32 statedSize = *((quint32*)(fileHeader + 4)) + 8;
     if (statedSize > fileSize)
         statedSize = fileSize;
 
-    BYTE tagHeader[8];
-    WORD formatTag[8];
-    BOOL formatSpecified = FALSE;
+    quint8 tagHeader[8];
+    quint16 formatTag[8];
+    bool formatSpecified = false;
     int formatType, channels = 1, bitsPerSample, blockAlign;
-    DWORD sampleFrequency, bytesPerSecond, dataOffset, dataSize = 0;
+    quint32 sampleFrequency, bytesPerSecond, dataOffset, dataSize = 0;
     while (offset < statedSize)
     {
         bytesRead = ::fread(tagHeader, 1, sizeof(tagHeader), fpFileOpen);
@@ -176,7 +176,7 @@ HWAVPCMFILE WavPcmFile_Open(LPCTSTR filename)
         }
         offset += bytesRead;
 
-        DWORD tagSize = *(DWORD*)(tagHeader + 4);
+        quint32 tagSize = *(quint32*)(tagHeader + 4);
         if (!memcmp(tagHeader, format_tag_id, 4))
         {
             if (formatSpecified || tagSize < sizeof(formatTag))
@@ -184,7 +184,7 @@ HWAVPCMFILE WavPcmFile_Open(LPCTSTR filename)
                 ::fclose(fpFileOpen);
                 return (HWAVPCMFILE) INVALID_HANDLE_VALUE;  // Wrong tag header
             }
-            formatSpecified = TRUE;
+            formatSpecified = true;
 
             bytesRead = ::fread(formatTag, 1, sizeof(formatTag), fpFileOpen);
             if (bytesRead != sizeof(formatTag))
@@ -239,7 +239,7 @@ HWAVPCMFILE WavPcmFile_Open(LPCTSTR filename)
     pWavPcm->nBlockAlign = blockAlign;
     pWavPcm->dwDataOffset = dataOffset;
     pWavPcm->dwDataSize = dataSize;
-    pWavPcm->okWriting = FALSE;
+    pWavPcm->okWriting = false;
 
     WavPcmFile_SetPosition((HWAVPCMFILE) pWavPcm, 0);
 
@@ -255,10 +255,10 @@ void WavPcmFile_Close(HWAVPCMFILE wavpcmfile)
 
     if (pWavPcm->okWriting)
     {
-        DWORD bytesWritten;
+        quint32 bytesWritten;
         // Write data chunk size
         ::fseek(pWavPcm->fpFile, 4, SEEK_SET);
-        DWORD chunkSize = 36 + pWavPcm->dwDataSize;
+        quint32 chunkSize = 36 + pWavPcm->dwDataSize;
         bytesWritten = ::fwrite(&chunkSize, 1, 4, pWavPcm->fpFile);
         // Write data subchunk size
         ::fseek(pWavPcm->fpFile, 40, SEEK_SET);
@@ -270,27 +270,27 @@ void WavPcmFile_Close(HWAVPCMFILE wavpcmfile)
     ::free(pWavPcm);
 }
 
-BOOL WavPcmFile_WriteOne(HWAVPCMFILE wavpcmfile, unsigned int value)
+bool WavPcmFile_WriteOne(HWAVPCMFILE wavpcmfile, unsigned int value)
 {
     if (wavpcmfile == INVALID_HANDLE_VALUE)
-        return FALSE;
+        return false;
 
     WAVPCMFILE* pWavPcm = (WAVPCMFILE*) wavpcmfile;
     if (!pWavPcm->okWriting)
-        return FALSE;
+        return false;
     ASSERT(pWavPcm->nBitsPerSample == 8);
     ASSERT(pWavPcm->nChannels == 1);
 
-    BYTE data = (value >> 24) & 0xff;
+    quint8 data = (value >> 24) & 0xff;
 
     size_t bytesWritten = ::fwrite(&data, 1, 1, pWavPcm->fpFile);
     if (bytesWritten != 1)
-        return FALSE;
+        return false;
 
     pWavPcm->dwCurrentPosition++;
     pWavPcm->dwDataSize += pWavPcm->nBlockAlign;
 
-    return TRUE;
+    return true;
 }
 
 unsigned int WavPcmFile_ReadOne(HWAVPCMFILE wavpcmfile)
@@ -303,9 +303,9 @@ unsigned int WavPcmFile_ReadOne(HWAVPCMFILE wavpcmfile)
         return 0;
 
     // Read one sample
-    DWORD bytesToRead = pWavPcm->nBlockAlign;
-    DWORD bytesRead;
-    BYTE data[16];
+    quint32 bytesToRead = pWavPcm->nBlockAlign;
+    quint32 bytesRead;
+    quint8 data[16];
     bytesRead = ::fread(data, 1, bytesToRead, pWavPcm->fpFile);
     if (bytesRead != bytesToRead)
         return 0;
@@ -321,11 +321,11 @@ unsigned int WavPcmFile_ReadOne(HWAVPCMFILE wavpcmfile)
         value = value << 24;
         break;
     case 16:
-        value = *((WORD*)data);
+        value = *((quint16*)data);
         value = value << 16;
         break;
     case 32:
-        value = *((DWORD*)data);
+        value = *((quint32*)data);
         break;
     }
 

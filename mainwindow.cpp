@@ -434,7 +434,7 @@ void MainWindow::emulatorReset()
 void MainWindow::soundEnabled()
 {
     bool sound = ui->actionSoundEnabled->isChecked();
-    Emulator_SetSound(sound ? TRUE : FALSE);
+    Emulator_SetSound(sound ? true : false);
     Settings_SetSound(sound);
 }
 
@@ -543,7 +543,7 @@ void MainWindow::emulatorHardDrive(int slot)
     else
     {
         // Check if cartridge (HDD ROM image) already selected
-        BOOL okCartLoaded = g_pBoard->IsROMCartridgeLoaded(slot);
+        bool okCartLoaded = g_pBoard->IsROMCartridgeLoaded(slot);
         if (!okCartLoaded)
         {
             AlertWarning(_T("Please select HDD ROM image as cartridge first."));
@@ -590,7 +590,7 @@ void MainWindow::detachHardDrive(int slot)
 
 void MainWindow::debugConsoleView()
 {
-    BOOL okShow = !m_dockConsole->isVisible();
+    bool okShow = !m_dockConsole->isVisible();
     m_dockConsole->setVisible(okShow);
     m_dockDebug->setVisible(okShow);
     m_dockDisasm->setVisible(okShow);

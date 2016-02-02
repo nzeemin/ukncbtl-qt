@@ -12,7 +12,7 @@ void UnitTests_ExecuteAll()
 
 void TestCommon::testParseOctalValue()
 {
-    WORD value;
+    quint16 value;
 
     QVERIFY(ParseOctalValue(_T("0"), &value));
     QVERIFY(value == 0);

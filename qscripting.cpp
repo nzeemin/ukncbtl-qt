@@ -62,11 +62,11 @@ float QEmulator::getUptime()
 
 void QEmulator::setCPUBreakpoint(quint16 address)
 {
-    Emulator_SetCPUBreakpoint((WORD)address);
+    Emulator_SetCPUBreakpoint((quint16)address);
 }
 void QEmulator::setPPUBreakpoint(quint16 address)
 {
-    Emulator_SetPPUBreakpoint((WORD)address);
+    Emulator_SetPPUBreakpoint((quint16)address);
 }
 bool QEmulator::isBreakpoint()
 {
@@ -113,21 +113,21 @@ void QEmulator::detachHard(int slot)
 
 void QEmulator::keyScan(uchar ukncscan, int timeout)
 {
-    g_pBoard->KeyboardEvent(ukncscan, TRUE);
+    g_pBoard->KeyboardEvent(ukncscan, true);
     run(timeout);
-    g_pBoard->KeyboardEvent(ukncscan, FALSE);
+    g_pBoard->KeyboardEvent(ukncscan, false);
     run(3);
 }
 
 void QEmulator::keyScanShift(uchar ukncscan, int timeout)
 {
-    g_pBoard->KeyboardEvent(0105, TRUE);
+    g_pBoard->KeyboardEvent(0105, true);
     run(2);
-    g_pBoard->KeyboardEvent(ukncscan, TRUE);
+    g_pBoard->KeyboardEvent(ukncscan, true);
     run(timeout);
-    g_pBoard->KeyboardEvent(ukncscan, FALSE);
+    g_pBoard->KeyboardEvent(ukncscan, false);
     run(2);
-    g_pBoard->KeyboardEvent(0105, FALSE);
+    g_pBoard->KeyboardEvent(0105, false);
     run(3);
 }
 
@@ -241,14 +241,14 @@ void QEmulatorProcessor::setPSW(ushort value)
 
 ushort QEmulatorProcessor::readWord(ushort addr)
 {
-    BOOL okValid;
-    return m_processor->GetMemoryController()->GetWordView(addr, m_processor->IsHaltMode(), FALSE, &okValid);
+    bool okValid;
+    return m_processor->GetMemoryController()->GetWordView(addr, m_processor->IsHaltMode(), false, &okValid);
 }
 
 uchar QEmulatorProcessor::readByte(ushort addr)
 {
-    BOOL okValid;
-    ushort word = m_processor->GetMemoryController()->GetWordView(addr, m_processor->IsHaltMode(), FALSE, &okValid);
+    bool okValid;
+    ushort word = m_processor->GetMemoryController()->GetWordView(addr, m_processor->IsHaltMode(), false, &okValid);
     if (!okValid)
         return 0;
     return (addr & 1) ? word & 0xff : (word >> 8) & 0xff;
@@ -257,12 +257,12 @@ uchar QEmulatorProcessor::readByte(ushort addr)
 QScriptValue QEmulatorProcessor::disassemble(ushort addr)
 {
     CMemoryController* pMemCtl = m_processor->GetMemoryController();
-    WORD buffer[4];
-    WORD current = addr;
+    quint16 buffer[4];
+    quint16 current = addr;
     for (int i = 0; i < 4; i++)
     {
-        BOOL okValid;
-        buffer[i] = pMemCtl->GetWordView(current, m_processor->IsHaltMode(), FALSE, &okValid);
+        bool okValid;
+        buffer[i] = pMemCtl->GetWordView(current, m_processor->IsHaltMode(), false, &okValid);
         current += 2;
     }
 

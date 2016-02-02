@@ -116,7 +116,7 @@ void QDisasmView::parseSubtitles(QTextStream &stream)
             // Parse address
             int addrlen = 1;
             while (addrlen < lineLength && line.at(addrlen).isDigit()) addrlen++;
-            WORD address;
+            quint16 address;
             if (!ParseOctalValue(line.left(addrlen), &address))
                 continue;
 
@@ -178,7 +178,7 @@ void QDisasmView::paintEvent(QPaintEvent * /*event*/)
     ASSERT(pDisasmPU != NULL);
 
     // Draw disasseble for the current processor
-    WORD prevPC = (m_okDisasmProcessor) ? g_wEmulatorPrevCpuPC : g_wEmulatorPrevPpuPC;
+    quint16 prevPC = (m_okDisasmProcessor) ? g_wEmulatorPrevCpuPC : g_wEmulatorPrevPpuPC;
     int yFocus = DrawDisassemble(painter, pDisasmPU, m_wDisasmBaseAddr, prevPC);
 
     // Draw focus rect
@@ -222,25 +222,25 @@ int QDisasmView::DrawDisassemble(QPainter &painter, CProcessor *pProc, unsigned 
     QColor colorText = painter.pen().color();
 
     CMemoryController* pMemCtl = pProc->GetMemoryController();
-    WORD proccurrent = pProc->GetPC();
-    WORD current = base;
+    quint16 proccurrent = pProc->GetPC();
+    quint16 current = base;
 
     // Читаем из памяти процессора в буфер
     const int nWindowSize = 30; //this->height() / cyLine;
-    WORD memory[nWindowSize + 2];
+    quint16 memory[nWindowSize + 2];
     for (int idx = 0; idx < nWindowSize; idx++) {
-        int addrtype;
+        bool valid;
         memory[idx] = pMemCtl->GetWordView(
-                current + idx * 2 - 10, pProc->IsHaltMode(), TRUE, &addrtype);
+                current + idx * 2 - 10, pProc->IsHaltMode(), TRUE, &valid);
     }
 
-    WORD address = current - 10;
-    WORD disasmfrom = current;
+    quint16 address = current - 10;
+    quint16 disasmfrom = current;
     if ((previous >= address) && previous < current)
         disasmfrom = previous;
 
     int length = 0;
-    WORD wNextBaseAddr = 0;
+    quint16 wNextBaseAddr = 0;
     int y = cyLine;
     for (int index = 0; index < nWindowSize; index++)  // Рисуем строки
     {
@@ -259,7 +259,7 @@ int QDisasmView::DrawDisassemble(QPainter &painter, CProcessor *pProc, unsigned 
 
         DrawOctalValue(painter, 5 * cxChar, y, address);  // Address
         // Value at the address
-        WORD value = memory[index];
+        quint16 value = memory[index];
         painter.setPen(Qt::gray);
         DrawOctalValue(painter, 13 * cxChar, y, value);
         painter.setPen(colorText);
@@ -272,7 +272,7 @@ int QDisasmView::DrawDisassemble(QPainter &painter, CProcessor *pProc, unsigned 
         }
         if (address == proccurrent)
         {
-            BOOL okPCchanged = proccurrent != previous;
+            bool okPCchanged = proccurrent != previous;
             if (okPCchanged) painter.setPen(Qt::red);
             painter.drawText(1 * cxChar, y, _T("PC"));
             painter.setPen(colorText);
@@ -284,7 +284,7 @@ int QDisasmView::DrawDisassemble(QPainter &painter, CProcessor *pProc, unsigned 
             painter.drawText(1 * cxChar, y, _T("  >"));
         }
 
-        BOOL okData = FALSE;
+        bool okData = FALSE;
         if (!m_SubtitleItems.isEmpty())  // Show subtitle
         {
             const DisasmSubtitleItem* pSubItem = findSubtitle(address, SUBTYPE_COMMENT | SUBTYPE_DATA);

@@ -8,16 +8,16 @@
 // Colors
 
 // Table for color conversion yrgb (4 bits) -> DWORD (32 bits)
-const DWORD ScreenView_StandardRGBColors[16] = {
+const quint32 ScreenView_StandardRGBColors[16] = {
     0x000000, 0x000080, 0x008000, 0x008080, 0x800000, 0x800080, 0x808000, 0x808080,
     0x000000, 0x0000FF, 0x00FF00, 0x00FFFF, 0xFF0000, 0xFF00FF, 0xFFFF00, 0xFFFFFF,
 };
-const DWORD ScreenView_StandardGRBColors[16] = {
+const quint32 ScreenView_StandardGRBColors[16] = {
     0x000000, 0x000080, 0x800000, 0x800080, 0x008000, 0x008080, 0x808000, 0x808080,
     0x000000, 0x0000FF, 0xFF0000, 0xFF00FF, 0x00FF00, 0x00FFFF, 0xFFFF00, 0xFFFFFF,
 };
 // Table for color conversion, gray (black and white) display
-const DWORD ScreenView_GrayColors[16] = {
+const quint32 ScreenView_GrayColors[16] = {
     0x000000, 0x242424, 0x484848, 0x6C6C6C, 0x909090, 0xB4B4B4, 0xD8D8D8, 0xFFFFFF,
     0x000000, 0x242424, 0x484848, 0x6C6C6C, 0x909090, 0xB4B4B4, 0xD8D8D8, 0xFFFFFF,
 };
@@ -32,24 +32,24 @@ static void UpscaleScreen(void* pImageBits)
     int ukncline = 287;
     for (int line = 431; line > 0; line--)
     {
-        DWORD* pdest = ((DWORD*)pImageBits) + line * UKNC_SCREEN_WIDTH;
+        quint32* pdest = ((quint32*)pImageBits) + line * UKNC_SCREEN_WIDTH;
         if (line % 3 == 1)
         {
-            BYTE* psrc1 = ((BYTE*)pImageBits) + ukncline * UKNC_SCREEN_WIDTH * 4;
-            BYTE* psrc2 = ((BYTE*)pImageBits) + (ukncline + 1) * UKNC_SCREEN_WIDTH * 4;
-            BYTE* pdst1 = (BYTE*)pdest;
+            quint8* psrc1 = ((quint8*)pImageBits) + ukncline * UKNC_SCREEN_WIDTH * 4;
+            quint8* psrc2 = ((quint8*)pImageBits) + (ukncline + 1) * UKNC_SCREEN_WIDTH * 4;
+            quint8* pdst1 = (quint8*)pdest;
             for (int i = 0; i < UKNC_SCREEN_WIDTH * 4; i++)
             {
                 if (i % 4 == 3)
                     *pdst1 = 0;
                 else
-                    *pdst1 = (BYTE)((((WORD)*psrc1) + ((WORD)*psrc2)) / 2);
+                    *pdst1 = (quint8)((((quint16)*psrc1) + ((quint16)*psrc2)) / 2);
                 psrc1++;  psrc2++;  pdst1++;
             }
         }
         else
         {
-            DWORD* psrc = ((DWORD*)pImageBits) + ukncline * UKNC_SCREEN_WIDTH;
+            quint32* psrc = ((quint32*)pImageBits) + ukncline * UKNC_SCREEN_WIDTH;
             memcpy(pdest, psrc, UKNC_SCREEN_WIDTH * 4);
             ukncline--;
         }
@@ -61,8 +61,8 @@ static void UpscaleScreen2(void* pImageBits)
 {
     for (int ukncline = 287; ukncline >= 0; ukncline--)
     {
-        DWORD* psrc = ((DWORD*)pImageBits) + ukncline * UKNC_SCREEN_WIDTH;
-        DWORD* pdest = ((DWORD*)pImageBits) + (ukncline * 2) * UKNC_SCREEN_WIDTH;
+        quint32* psrc = ((quint32*)pImageBits) + ukncline * UKNC_SCREEN_WIDTH;
+        quint32* pdest = ((quint32*)pImageBits) + (ukncline * 2) * UKNC_SCREEN_WIDTH;
         memcpy(pdest, psrc, UKNC_SCREEN_WIDTH * 4);
 
         pdest += UKNC_SCREEN_WIDTH;
@@ -75,15 +75,15 @@ static void UpscaleScreen3(void* pImageBits)
 {
     for (int ukncline = 287; ukncline >= 0; ukncline--)
     {
-        DWORD* psrc = ((DWORD*)pImageBits) + ukncline * UKNC_SCREEN_WIDTH;
+        quint32* psrc = ((quint32*)pImageBits) + ukncline * UKNC_SCREEN_WIDTH;
         psrc += UKNC_SCREEN_WIDTH - 1;
-        DWORD* pdest = ((DWORD*)pImageBits) + (ukncline * 2) * 960;
+        quint32* pdest = ((quint32*)pImageBits) + (ukncline * 2) * 960;
         pdest += 960 - 1;
         for (int i = 0; i < UKNC_SCREEN_WIDTH / 2; i++)
         {
-            DWORD c1 = *psrc;  psrc--;
-            DWORD c2 = *psrc;  psrc--;
-            DWORD c12 =
+            quint32 c1 = *psrc;  psrc--;
+            quint32 c2 = *psrc;  psrc--;
+            quint32 c12 =
                 (((c1 & 0xff) + (c2 & 0xff)) >> 1) |
                 ((((c1 & 0xff00) + (c2 & 0xff00)) >> 1) & 0xff00) |
                 ((((c1 & 0xff0000) + (c2 & 0xff0000)) >> 1) & 0xff0000);
@@ -102,15 +102,15 @@ static void UpscaleScreen4(void* pImageBits)
 {
     for (int ukncline = 287; ukncline >= 0; ukncline--)
     {
-        DWORD* psrc = ((DWORD*)pImageBits) + ukncline * UKNC_SCREEN_WIDTH;
-        DWORD* pdest = ((DWORD*)pImageBits) + (ukncline * 3) * 1280;
+        quint32* psrc = ((quint32*)pImageBits) + ukncline * UKNC_SCREEN_WIDTH;
+        quint32* pdest = ((quint32*)pImageBits) + (ukncline * 3) * 1280;
         psrc += UKNC_SCREEN_WIDTH - 1;
         pdest += 1280 - 1;
-        DWORD* pdest2 = pdest + 1280;
-        DWORD* pdest3 = pdest2 + 1280;
+        quint32* pdest2 = pdest + 1280;
+        quint32* pdest3 = pdest2 + 1280;
         for (int i = 0; i < UKNC_SCREEN_WIDTH; i++)
         {
-            DWORD color = *psrc;  psrc--;
+            quint32 color = *psrc;  psrc--;
             *pdest = color;  pdest--;
             *pdest = color;  pdest--;
             *pdest2 = color;  pdest2--;
@@ -194,7 +194,7 @@ void QEmulatorScreen::createDisplay()
 
 void QEmulatorScreen::paintEvent(QPaintEvent * /*event*/)
 {
-    const DWORD* colors;
+    const quint32* colors;
     switch (m_mode)
     {
         case RGBScreen:   colors = ScreenView_StandardRGBColors; break;

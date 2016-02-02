@@ -36,9 +36,9 @@ private:
     CProcessor* getCurrentProcessor();
     void printConsolePrompt();
     void printHelp();
-    int printDisassemble(CProcessor* pProc, WORD address, BOOL okOneInstr, BOOL okShort);
-    void printRegister(LPCTSTR strName, WORD value);
-    void printMemoryDump(CProcessor* pProc, WORD address, int lines);
+    int printDisassemble(CProcessor* pProc, quint16 address, bool okOneInstr, bool okShort);
+    void printRegister(LPCTSTR strName, quint16 value);
+    void printMemoryDump(CProcessor* pProc, quint16 address, int lines);
 };
 
 #endif // QCONSOLEVIEW_H

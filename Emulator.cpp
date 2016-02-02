@@ -16,29 +16,29 @@
 CMotherboard* g_pBoard = NULL;
 QSoundOut * g_sound = NULL;
 
-BOOL g_okEmulatorInitialized = FALSE;
-BOOL g_okEmulatorRunning = FALSE;
+bool g_okEmulatorInitialized = false;
+bool g_okEmulatorRunning = false;
 
-WORD m_wEmulatorCPUBreakpoint = 0177777;
-WORD m_wEmulatorPPUBreakpoint = 0177777;
+quint16 m_wEmulatorCPUBreakpoint = 0177777;
+quint16 m_wEmulatorPPUBreakpoint = 0177777;
 
-BOOL m_okEmulatorSound = FALSE;
+bool m_okEmulatorSound = false;
 
 long m_nFrameCount = 0;
 QTime m_emulatorTime;
 int m_nTickCount = 0;
-DWORD m_dwEmulatorUptime = 0;  // UKNC uptime, seconds, from turn on or reset, increments every 25 frames
+quint32 m_dwEmulatorUptime = 0;  // UKNC uptime, seconds, from turn on or reset, increments every 25 frames
 long m_nUptimeFrameCount = 0;
 
-BYTE* g_pEmulatorRam[3];  // RAM values - for change tracking
-BYTE* g_pEmulatorChangedRam[3];  // RAM change flags
-WORD g_wEmulatorCpuPC = 0177777;      // Current PC value
-WORD g_wEmulatorPrevCpuPC = 0177777;  // Previous PC value
-WORD g_wEmulatorPpuPC = 0177777;      // Current PC value
-WORD g_wEmulatorPrevPpuPC = 0177777;  // Previous PC value
+quint8* g_pEmulatorRam[3];  // RAM values - for change tracking
+quint8* g_pEmulatorChangedRam[3];  // RAM change flags
+quint16 g_wEmulatorCpuPC = 0177777;      // Current PC value
+quint16 g_wEmulatorPrevCpuPC = 0177777;  // Previous PC value
+quint16 g_wEmulatorPpuPC = 0177777;      // Current PC value
+quint16 g_wEmulatorPrevPpuPC = 0177777;  // Previous PC value
 
 const int KEYEVENT_QUEUE_SIZE = 32;
-WORD m_EmulatorKeyQueue[KEYEVENT_QUEUE_SIZE];
+quint16 m_EmulatorKeyQueue[KEYEVENT_QUEUE_SIZE];
 int m_EmulatorKeyQueueTop = 0;
 int m_EmulatorKeyQueueBottom = 0;
 int m_EmulatorKeyQueueCount = 0;
@@ -49,7 +49,7 @@ void CALLBACK Emulator_FeedDAC(unsigned short l, unsigned short r);
 
 //////////////////////////////////////////////////////////////////////
 
-BOOL Emulator_Init()
+bool Emulator_Init()
 {
     ASSERT(g_pBoard == NULL);
 
@@ -57,7 +57,7 @@ BOOL Emulator_Init()
 
     g_pBoard = new CMotherboard();
 
-    BYTE buffer[32768];
+    quint8 buffer[32768];
 
     // Load ROM file
     memset(buffer, 0, 32768);
@@ -87,12 +87,12 @@ BOOL Emulator_Init()
     // Allocate memory for old RAM values
     for (int i = 0; i < 3; i++)
     {
-        g_pEmulatorRam[i] = (BYTE*) ::malloc(65536);  memset(g_pEmulatorRam[i], 0, 65536);
-        g_pEmulatorChangedRam[i] = (BYTE*) ::malloc(65536);  memset(g_pEmulatorChangedRam[i], 0, 65536);
+        g_pEmulatorRam[i] = (quint8*) ::malloc(65536);  memset(g_pEmulatorRam[i], 0, 65536);
+        g_pEmulatorChangedRam[i] = (quint8*) ::malloc(65536);  memset(g_pEmulatorChangedRam[i], 0, 65536);
     }
 
-    g_okEmulatorInitialized = TRUE;
-    return TRUE;
+    g_okEmulatorInitialized = true;
+    return true;
 }
 
 void Emulator_Done()
@@ -118,12 +118,12 @@ void Emulator_Done()
         ::free(g_pEmulatorChangedRam[i]);
     }
 
-    g_okEmulatorInitialized = FALSE;
+    g_okEmulatorInitialized = false;
 }
 
 void Emulator_Start()
 {
-    g_okEmulatorRunning = TRUE;
+    g_okEmulatorRunning = true;
 
     m_nFrameCount = 0;
     m_emulatorTime.restart();
@@ -131,7 +131,7 @@ void Emulator_Start()
 }
 void Emulator_Stop()
 {
-    g_okEmulatorRunning = FALSE;
+    g_okEmulatorRunning = false;
     m_wEmulatorCPUBreakpoint = 0177777;
     m_wEmulatorPPUBreakpoint = 0177777;
 
@@ -154,23 +154,23 @@ void Emulator_Reset()
     Global_UpdateAllViews();
 }
 
-void Emulator_SetCPUBreakpoint(WORD address)
+void Emulator_SetCPUBreakpoint(quint16 address)
 {
     m_wEmulatorCPUBreakpoint = address;
 }
-void Emulator_SetPPUBreakpoint(WORD address)
+void Emulator_SetPPUBreakpoint(quint16 address)
 {
     m_wEmulatorPPUBreakpoint = address;
 }
-BOOL Emulator_IsBreakpoint()
+bool Emulator_IsBreakpoint()
 {
-    WORD wCPUAddr = g_pBoard->GetCPU()->GetPC();
+    quint16 wCPUAddr = g_pBoard->GetCPU()->GetPC();
     if (wCPUAddr == m_wEmulatorCPUBreakpoint)
-        return TRUE;
-    WORD wPPUAddr = g_pBoard->GetPPU()->GetPC();
+        return true;
+    quint16 wPPUAddr = g_pBoard->GetPPU()->GetPC();
     if (wPPUAddr == m_wEmulatorPPUBreakpoint)
-        return TRUE;
-    return FALSE;
+        return true;
+    return false;
 }
 
 int Emulator_SystemFrame()
@@ -227,13 +227,13 @@ void Emulator_OnUpdate()
     // Update memory change flags
     for (int plane = 0; plane < 3; plane++)
     {
-        BYTE* pOld = g_pEmulatorRam[plane];
-        BYTE* pChanged = g_pEmulatorChangedRam[plane];
-        WORD addr = 0;
+        quint8* pOld = g_pEmulatorRam[plane];
+        quint8* pChanged = g_pEmulatorChangedRam[plane];
+        quint16 addr = 0;
         do
         {
-            BYTE newvalue = g_pBoard->GetRAMByte(plane, addr);
-            BYTE oldvalue = *pOld;
+            quint8 newvalue = g_pBoard->GetRAMByte(plane, addr);
+            quint8 oldvalue = *pOld;
             *pChanged = (newvalue != oldvalue) ? 255 : 0;
             *pOld = newvalue;
             addr++;
@@ -245,14 +245,14 @@ void Emulator_OnUpdate()
 
 // Get RAM change flag
 //   addrtype - address mode - see ADDRTYPE_XXX constants
-WORD Emulator_GetChangeRamStatus(int addrtype, WORD address)
+quint16 Emulator_GetChangeRamStatus(int addrtype, quint16 address)
 {
     switch (addrtype)
     {
     case ADDRTYPE_RAM0:
     case ADDRTYPE_RAM1:
     case ADDRTYPE_RAM2:
-        return *((WORD*)(g_pEmulatorChangedRam[addrtype] + address));
+        return *((quint16*)(g_pEmulatorChangedRam[addrtype] + address));
     case ADDRTYPE_RAM12:
         if (address < 0170000)
             return MAKEWORD(
@@ -276,9 +276,9 @@ void Emulator_LoadROMCartridge(int slot, LPCTSTR sFilePath)
     }
 
     // Allocate memory
-    BYTE* pImage = (BYTE*) ::malloc(24 * 1024);
+    quint8* pImage = (quint8*) ::malloc(24 * 1024);
 
-    DWORD dwBytesRead = ::fread(pImage, 1, 24 * 1024, fpFile);
+    quint32 dwBytesRead = ::fread(pImage, 1, 24 * 1024, fpFile);
     if (dwBytesRead != 24 * 1024)
     {
         AlertWarning(_T("Failed to load ROM cartridge image."));
@@ -292,29 +292,29 @@ void Emulator_LoadROMCartridge(int slot, LPCTSTR sFilePath)
     ::fclose(fpFile);
 }
 
-void Emulator_PrepareScreenRGB32(void* pImageBits, const DWORD* colors)
+void Emulator_PrepareScreenRGB32(void* pImageBits, const quint32* colors)
 {
     if (pImageBits == NULL) return;
     if (!g_okEmulatorInitialized) return;
 
     // Tag parsing loop
-    BYTE cursorYRGB;
-    BOOL okCursorType;
-    BYTE cursorPos = 128;
-    BOOL cursorOn = FALSE;
-    BYTE cursorAddress;      // Address of graphical cursor
-    WORD address = 0000270;  // Tag sequence start address
-    BOOL okTagSize = FALSE;  // Tag size: TRUE - 4-word, FALSE - 2-word (first tag is always 2-word)
-    BOOL okTagType = FALSE;  // Type of 4-word tag: TRUE - set palette, FALSE - set params
+    quint8 cursorYRGB;
+    bool okCursorType;
+    quint8 cursorPos = 128;
+    bool cursorOn = false;
+    quint8 cursorAddress;      // Address of graphical cursor
+    quint16 address = 0000270;  // Tag sequence start address
+    bool okTagSize = false;  // Tag size: true - 4-word, false - 2-word (first tag is always 2-word)
+    bool okTagType = false;  // Type of 4-word tag: true - set palette, false - set params
     int scale = 1;           // Horizontal scale: 1, 2, 4, or 8
-    DWORD palette = 0;       // Palette
-    BYTE pbpgpr = 7;         // 3-bit Y-value modifier
+    quint32 palette = 0;       // Palette
+    quint8 pbpgpr = 7;         // 3-bit Y-value modifier
     for (int yy = 0; yy < 307; yy++) {
 
         if (okTagSize) {  // 4-word tag
-            WORD tag1 = g_pBoard->GetRAMWord(0, address);
+            quint16 tag1 = g_pBoard->GetRAMWord(0, address);
             address += 2;
-            WORD tag2 = g_pBoard->GetRAMWord(0, address);
+            quint16 tag2 = g_pBoard->GetRAMWord(0, address);
             address += 2;
 
             if (okTagType)  // 4-word palette tag
@@ -327,7 +327,7 @@ void Emulator_PrepareScreenRGB32(void* pImageBits, const DWORD* colors)
                 //TODO: use Y-value modifier
                 pbpgpr = tag2 & 7;  // Y-value modifier
                 cursorYRGB = tag1 & 15;  // Cursor color
-                okCursorType = ((tag1 & 16) != 0);  // TRUE - graphical cursor, FALSE - symbolic cursor
+                okCursorType = ((tag1 & 16) != 0);  // true - graphical cursor, false - symbolic cursor
                 ASSERT(okCursorType==0);  //DEBUG
                 cursorPos = ((tag1 >> 8) >> scale) & 0x7f;  // Cursor position in the line
                 //TODO: Use cursorAddress
@@ -337,11 +337,11 @@ void Emulator_PrepareScreenRGB32(void* pImageBits, const DWORD* colors)
             }
         }
 
-        WORD addressBits = g_pBoard->GetRAMWord(0, address);  // The word before the last word - is address of bits from all three memory planes
+        quint16 addressBits = g_pBoard->GetRAMWord(0, address);  // The word before the last word - is address of bits from all three memory planes
         address += 2;
 
         // Calculate size, type and address of the next tag
-        WORD tagB = g_pBoard->GetRAMWord(0, address);  // Last word of the tag - is address and type of the next tag
+        quint16 tagB = g_pBoard->GetRAMWord(0, address);  // Last word of the tag - is address and type of the next tag
         okTagSize = (tagB & 2) != 0;  // Bit 1 shows size of the next tag
         if (okTagSize)
         {
@@ -365,25 +365,25 @@ void Emulator_PrepareScreenRGB32(void* pImageBits, const DWORD* colors)
 
             int x = 0;
             int y = yy - 19;
-            DWORD* pBits = ((DWORD*)pImageBits) + y * 640;
+            quint32* pBits = ((quint32*)pImageBits) + y * 640;
             for (int pos = 0; ; pos++)
             {
                 // Get bit from planes 0,1,2
-                BYTE src0 = g_pBoard->GetRAMByte(0, addressBits);
-                BYTE src1 = g_pBoard->GetRAMByte(1, addressBits);
-                BYTE src2 = g_pBoard->GetRAMByte(2, addressBits);
+                quint8 src0 = g_pBoard->GetRAMByte(0, addressBits);
+                quint8 src1 = g_pBoard->GetRAMByte(1, addressBits);
+                quint8 src2 = g_pBoard->GetRAMByte(2, addressBits);
                 // Loop through the bits of the byte
                 for (int bit = 0; bit < 8; bit++)
                 {
                     // Make 3-bit value from the bits
-                    BYTE value012 = (src0 & 1) | (src1 & 1) * 2 | (src2 & 1) * 4;
+                    quint8 value012 = (src0 & 1) | (src1 & 1) * 2 | (src2 & 1) * 4;
                     // Map value to palette; result is 4-bit value YRGB
-                    BYTE valueYRGB;
+                    quint8 valueYRGB;
                     if (cursorOn && (pos == cursorPos) && (!okCursorType || (okCursorType && bit == cursorAddress)))
                         valueYRGB = cursorYRGB;
                     else
-                        valueYRGB = (BYTE) (palette >> (value012 * 4)) & 15;
-                    DWORD valueRGB = colors[valueYRGB];
+                        valueYRGB = (quint8) (palette >> (value012 * 4)) & 15;
+                    quint32 valueRGB = colors[valueYRGB];
 
                     // Put value to m_bits; repeat using scale value
                     for (int s = 0; s < scale; s++)
@@ -404,11 +404,11 @@ void Emulator_PrepareScreenRGB32(void* pImageBits, const DWORD* colors)
     }
 }
 
-void Emulator_KeyEvent(BYTE keyscan, BOOL pressed)
+void Emulator_KeyEvent(quint8 keyscan, bool pressed)
 {
     if (m_EmulatorKeyQueueCount == KEYEVENT_QUEUE_SIZE) return;  // Full queue
 
-    WORD keyevent = MAKEWORD(keyscan, pressed ? 128 : 0);
+    quint16 keyevent = MAKEWORD(keyscan, pressed ? 128 : 0);
 
     m_EmulatorKeyQueue[m_EmulatorKeyQueueTop] = keyevent;
     m_EmulatorKeyQueueTop++;
@@ -417,11 +417,11 @@ void Emulator_KeyEvent(BYTE keyscan, BOOL pressed)
     m_EmulatorKeyQueueCount++;
 }
 
-WORD Emulator_GetKeyEventFromQueue()
+quint16 Emulator_GetKeyEventFromQueue()
 {
     if (m_EmulatorKeyQueueCount == 0) return 0;  // Empty queue
 
-    WORD keyevent = m_EmulatorKeyQueue[m_EmulatorKeyQueueBottom];
+    quint16 keyevent = m_EmulatorKeyQueue[m_EmulatorKeyQueueBottom];
     m_EmulatorKeyQueueBottom++;
     if (m_EmulatorKeyQueueBottom >= KEYEVENT_QUEUE_SIZE)
         m_EmulatorKeyQueueBottom = 0;
@@ -433,11 +433,11 @@ WORD Emulator_GetKeyEventFromQueue()
 void Emulator_ProcessKeyEvent()
 {
     // Process next event in the keyboard queue
-    WORD keyevent = Emulator_GetKeyEventFromQueue();
+    quint16 keyevent = Emulator_GetKeyEventFromQueue();
     if (keyevent != 0)
     {
-        BOOL pressed = ((keyevent & 0x8000) != 0);
-        BYTE ukncscan = LOBYTE(keyevent);
+        bool pressed = ((keyevent & 0x8000) != 0);
+        quint8 ukncscan = LOBYTE(keyevent);
         g_pBoard->KeyboardEvent(ukncscan, pressed);
     }
 }
@@ -451,7 +451,7 @@ void CALLBACK Emulator_FeedDAC(unsigned short l, unsigned short r)
     }
 }
 
-void Emulator_SetSound(BOOL enable)
+void Emulator_SetSound(bool enable)
 {
     m_okEmulatorSound = enable;
     if (g_pBoard != 0)
@@ -477,17 +477,17 @@ void Emulator_SaveImage(const QString& sFilePath)
     }
 
     // Allocate memory
-    BYTE* pImage = (BYTE*) ::malloc(UKNCIMAGE_SIZE);
+    quint8* pImage = (quint8*) ::malloc(UKNCIMAGE_SIZE);
     memset(pImage, 0, UKNCIMAGE_SIZE);
     // Prepare header
-    DWORD* pHeader = (DWORD*) pImage;
+    quint32* pHeader = (quint32*) pImage;
     *pHeader++ = UKNCIMAGE_HEADER1;
     *pHeader++ = UKNCIMAGE_HEADER2;
     *pHeader++ = UKNCIMAGE_VERSION;
     *pHeader++ = UKNCIMAGE_SIZE;
     // Store emulator state to the image
     g_pBoard->SaveToImage(pImage);
-    *(DWORD*)(pImage + 16) = m_dwEmulatorUptime;
+    *(quint32*)(pImage + 16) = m_dwEmulatorUptime;
 
     // Save image to the file
     qint64 bytesWritten = file.write((const char *)pImage, UKNCIMAGE_SIZE);
@@ -514,14 +514,14 @@ void Emulator_LoadImage(const QString &sFilePath)
     Emulator_Stop();
 
     // Read header
-    DWORD bufHeader[UKNCIMAGE_HEADER_SIZE / sizeof(DWORD)];
+    quint32 bufHeader[UKNCIMAGE_HEADER_SIZE / sizeof(quint32)];
     qint64 bytesRead = file.read((char*)bufHeader, UKNCIMAGE_HEADER_SIZE);
     //TODO: Check if bytesRead != UKNCIMAGE_HEADER_SIZE
 
     //TODO: Check version and size
 
     // Allocate memory
-    BYTE* pImage = (BYTE*) ::malloc(UKNCIMAGE_SIZE);
+    quint8* pImage = (quint8*) ::malloc(UKNCIMAGE_SIZE);
 
     // Read image
     file.seek(0);
@@ -536,7 +536,7 @@ void Emulator_LoadImage(const QString &sFilePath)
         // Restore emulator state from the image
         g_pBoard->LoadFromImage(pImage);
 
-        m_dwEmulatorUptime = *(DWORD*)(pImage + 16);
+        m_dwEmulatorUptime = *(quint32*)(pImage + 16);
     }
 
     // Free memory, close file
