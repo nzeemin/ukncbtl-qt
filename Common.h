@@ -57,11 +57,7 @@ typedef long int LONG;
 #define HIBYTE(w)           ((quint8)((((quint32)(w)) >> 8) & 0xff))
 
 #ifdef __GNUC__
- #ifdef __APPLE__
-  #define CALLBACK
- #else
-  #define CALLBACK __attribute__((stdcall))
- #endif
+ #define CALLBACK
 #else
  #define CALLBACK __stdcall
 #endif

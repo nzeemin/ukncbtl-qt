@@ -269,7 +269,7 @@ void Emulator_LoadROMCartridge(int slot, LPCTSTR sFilePath)
 {
     // Open file
     FILE* fpFile = ::_tfopen(sFilePath, _T("rb"));
-    if (fpFile == INVALID_HANDLE_VALUE)
+    if (fpFile == NULL)
     {
         AlertWarning(_T("Failed to load ROM cartridge image."));
         return;

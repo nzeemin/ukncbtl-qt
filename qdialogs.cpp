@@ -3,7 +3,7 @@
 #include <QMessageBox>
 
 QInputOctalDialog::QInputOctalDialog(QWidget *parent, const QString & title, const QString & prompt, quint16 * value)
-    : QDialog::QDialog(parent)
+    : QDialog(parent, 0)
 {
     m_result = value;
 
