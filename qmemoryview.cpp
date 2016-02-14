@@ -200,8 +200,8 @@ void QMemoryView::paintEvent(QPaintEvent * /*event*/)
         for (int j = 0; j < 8; j++) {  // Draw words as octal value
             // Get word from memory
             quint16 word = 0;
-            bool okValid = TRUE;
-            bool okHalt = FALSE;
+            bool okValid = true;
+            bool okHalt = false;
             quint16 wChanged = 0;
             switch (m_Mode) {
                 case MEMMODE_RAM0:
@@ -212,18 +212,18 @@ void QMemoryView::paintEvent(QPaintEvent * /*event*/)
                     break;
                 case MEMMODE_ROM:  // ROM - only 32 Kbytes
                     if (address < 0100000)
-                        okValid = FALSE;
+                        okValid = false;
                     else
                         word = g_pBoard->GetROMWord(address - 0100000);
                     break;
                 case MEMMODE_CPU:
                     okHalt = g_pBoard->GetCPU()->IsHaltMode();
-                    word = g_pBoard->GetCPUMemoryController()->GetWordView(address, okHalt, FALSE, &okValid);
+                    word = g_pBoard->GetCPUMemoryController()->GetWordView(address, okHalt, false, &okValid);
                     wChanged = Emulator_GetChangeRamStatus(ADDRTYPE_RAM12, address);
                     break;
                 case MEMMODE_PPU:
                     okHalt = g_pBoard->GetPPU()->IsHaltMode();
-                    word = g_pBoard->GetPPUMemoryController()->GetWordView(address, okHalt, FALSE, &okValid);
+                    word = g_pBoard->GetPPUMemoryController()->GetWordView(address, okHalt, false, &okValid);
                     if (address < 0100000)
                         wChanged = Emulator_GetChangeRamStatus(ADDRTYPE_RAM0, address);
                     else

@@ -12,7 +12,7 @@
 
 QDisasmView::QDisasmView()
 {
-    m_okDisasmProcessor = FALSE;
+    m_okDisasmProcessor = false;
     m_wDisasmBaseAddr = 0;
     m_wDisasmNextBaseAddr = 0;
 
@@ -231,7 +231,7 @@ int QDisasmView::DrawDisassemble(QPainter &painter, CProcessor *pProc, unsigned 
     for (int idx = 0; idx < nWindowSize; idx++) {
         bool valid;
         memory[idx] = pMemCtl->GetWordView(
-                current + idx * 2 - 10, pProc->IsHaltMode(), TRUE, &valid);
+                current + idx * 2 - 10, pProc->IsHaltMode(), true, &valid);
     }
 
     quint16 address = current - 10;
@@ -284,12 +284,12 @@ int QDisasmView::DrawDisassemble(QPainter &painter, CProcessor *pProc, unsigned 
             painter.drawText(1 * cxChar, y, _T("  >"));
         }
 
-        bool okData = FALSE;
+        bool okData = false;
         if (!m_SubtitleItems.isEmpty())  // Show subtitle
         {
             const DisasmSubtitleItem* pSubItem = findSubtitle(address, SUBTYPE_COMMENT | SUBTYPE_DATA);
             if (pSubItem != NULL && (pSubItem->type & SUBTYPE_DATA) != 0)
-                okData = TRUE;
+                okData = true;
             if (pSubItem != NULL && (pSubItem->type & SUBTYPE_COMMENT) != 0 && !pSubItem->comment.isEmpty())
             {
                 painter.setPen(QColor(COLOR_SUBTITLE));

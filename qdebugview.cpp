@@ -14,7 +14,7 @@
 QDebugView::QDebugView(QWidget *parent) :
         QWidget(parent)
 {
-    m_okDebugProcessor = FALSE;
+    m_okDebugProcessor = false;
 
     QFont font = Common_GetMonospacedFont();
     QFontMetrics fontmetrics(font);

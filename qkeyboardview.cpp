@@ -146,7 +146,7 @@ void QKeyboardView::mousePressEvent(QMouseEvent *event)
     unsigned char keyscan = GetKeyByPoint(event->x(), event->y());
     if (keyscan == 0) return;
 
-    Emulator_KeyEvent(keyscan, TRUE);
+    Emulator_KeyEvent(keyscan, true);
 }
 
 void QKeyboardView::mouseReleaseEvent(QMouseEvent *event)
@@ -154,7 +154,7 @@ void QKeyboardView::mouseReleaseEvent(QMouseEvent *event)
     unsigned char keyscan = GetKeyByPoint(event->x(), event->y());
     if (keyscan == 0) return;
 
-    Emulator_KeyEvent(keyscan, FALSE);
+    Emulator_KeyEvent(keyscan, false);
 }
 
 unsigned char QKeyboardView::GetKeyByPoint(int x, int y)

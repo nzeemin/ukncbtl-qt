@@ -225,7 +225,7 @@ void QEmulatorScreen::keyPressEvent(QKeyEvent *event)
     unsigned char ukncscan = TranslateQtKeyToUkncKey(event->key());
     if (ukncscan == 0) return;
 
-    Emulator_KeyEvent(ukncscan, TRUE);
+    Emulator_KeyEvent(ukncscan, true);
     event->accept();
 }
 
@@ -234,7 +234,7 @@ void QEmulatorScreen::keyReleaseEvent(QKeyEvent *event)
     unsigned char ukncscan = TranslateQtKeyToUkncKey(event->key());
     if (ukncscan == 0) return;
 
-    Emulator_KeyEvent(ukncscan, FALSE);
+    Emulator_KeyEvent(ukncscan, false);
     event->accept();
 }
 
