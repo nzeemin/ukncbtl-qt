@@ -437,7 +437,7 @@ void Emulator_ProcessKeyEvent()
     if (keyevent != 0)
     {
         bool pressed = ((keyevent & 0x8000) != 0);
-        quint8 ukncscan = LOBYTE(keyevent);
+        quint8 ukncscan = (quint8)(keyevent & 0xff);
         g_pBoard->KeyboardEvent(ukncscan, pressed);
     }
 }
