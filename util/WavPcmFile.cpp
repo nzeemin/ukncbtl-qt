@@ -95,7 +95,7 @@ HWAVPCMFILE WavPcmFile_Create(LPCTSTR filename, int sampleRate)
     // Prepare and write file header
     quint8 consolidated_header[12 + 8 + 16 + 8];
     ::memset(consolidated_header, 0, sizeof(consolidated_header));
-    quint32 bytesWritten;
+    size_t bytesWritten;
 
     memcpy(&consolidated_header[0], magic1, 4);  // RIFF
     memcpy(&consolidated_header[8], magic2, 4);  // WAVE
@@ -119,7 +119,13 @@ HWAVPCMFILE WavPcmFile_Create(LPCTSTR filename, int sampleRate)
         return (HWAVPCMFILE) INVALID_HANDLE_VALUE;  // Failed to write consolidated header
     }
 
-    WAVPCMFILE* pWavPcm = (WAVPCMFILE*) ::malloc(sizeof(WAVPCMFILE));  memset(pWavPcm, 0, sizeof(WAVPCMFILE));
+    WAVPCMFILE* pWavPcm = (WAVPCMFILE*) ::malloc(sizeof(WAVPCMFILE));
+    if (pWavPcm == NULL)
+    {
+        ::fclose(fpFileNew);
+        return (HWAVPCMFILE) INVALID_HANDLE_VALUE;  // Failed to allocate memory
+    }
+    memset(pWavPcm, 0, sizeof(WAVPCMFILE));
     pWavPcm->fpFile = fpFileNew;
     pWavPcm->nChannels = channels;
     pWavPcm->nSampleFrequency = sampleRate;
@@ -141,7 +147,7 @@ HWAVPCMFILE WavPcmFile_Open(LPCTSTR filename)
         return (HWAVPCMFILE) INVALID_HANDLE_VALUE;  // Failed to open file
 
     quint32 offset = 0;
-    quint32 bytesRead;
+    size_t bytesRead;
     ::fseek(fpFileOpen, 0, SEEK_END);
     quint32 fileSize = ::ftell(fpFileOpen);
     ::fseek(fpFileOpen, 0, SEEK_SET);
@@ -155,7 +161,7 @@ HWAVPCMFILE WavPcmFile_Open(LPCTSTR filename)
         ::fclose(fpFileOpen);
         return (HWAVPCMFILE) INVALID_HANDLE_VALUE;  // Failed to read file header OR invalid 'RIFF' tag OR invalid 'WAVE' tag
     }
-    offset += bytesRead;
+    offset += (quint32)bytesRead;
 
     quint32 statedSize = *((quint32*)(fileHeader + 4)) + 8;
     if (statedSize > fileSize)
@@ -174,7 +180,7 @@ HWAVPCMFILE WavPcmFile_Open(LPCTSTR filename)
             ::fclose(fpFileOpen);
             return (HWAVPCMFILE) INVALID_HANDLE_VALUE;  // Failed to read tag header
         }
-        offset += bytesRead;
+        offset += (quint32)bytesRead;
 
         quint32 tagSize = *(quint32*)(tagHeader + 4);
         if (!memcmp(tagHeader, format_tag_id, 4))
@@ -231,7 +237,13 @@ HWAVPCMFILE WavPcmFile_Open(LPCTSTR filename)
         ::fseek(fpFileOpen, offset, SEEK_SET);
     }
 
-    WAVPCMFILE* pWavPcm = (WAVPCMFILE*) ::malloc(sizeof(WAVPCMFILE));  ::memset(pWavPcm, 0, sizeof(WAVPCMFILE));
+    WAVPCMFILE* pWavPcm = (WAVPCMFILE*) ::malloc(sizeof(WAVPCMFILE));
+    if (pWavPcm == NULL)
+    {
+        ::fclose(fpFileOpen);
+        return (HWAVPCMFILE) INVALID_HANDLE_VALUE;  // Failed to allocate memory
+    }
+    ::memset(pWavPcm, 0, sizeof(WAVPCMFILE));
     pWavPcm->fpFile = fpFileOpen;
     pWavPcm->nChannels = channels;
     pWavPcm->nSampleFrequency = sampleFrequency;
@@ -255,7 +267,7 @@ void WavPcmFile_Close(HWAVPCMFILE wavpcmfile)
 
     if (pWavPcm->okWriting)
     {
-        quint32 bytesWritten;
+        size_t bytesWritten;
         // Write data chunk size
         ::fseek(pWavPcm->fpFile, 4, SEEK_SET);
         quint32 chunkSize = 36 + pWavPcm->dwDataSize;
@@ -304,7 +316,7 @@ unsigned int WavPcmFile_ReadOne(HWAVPCMFILE wavpcmfile)
 
     // Read one sample
     quint32 bytesToRead = pWavPcm->nBlockAlign;
-    quint32 bytesRead;
+    size_t bytesRead;
     quint8 data[16];
     bytesRead = ::fread(data, 1, bytesToRead, pWavPcm->fpFile);
     if (bytesRead != bytesToRead)

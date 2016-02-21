@@ -278,7 +278,7 @@ void Emulator_LoadROMCartridge(int slot, LPCTSTR sFilePath)
     // Allocate memory
     quint8* pImage = (quint8*) ::malloc(24 * 1024);
 
-    quint32 dwBytesRead = ::fread(pImage, 1, 24 * 1024, fpFile);
+    size_t dwBytesRead = ::fread(pImage, 1, 24 * 1024, fpFile);
     if (dwBytesRead != 24 * 1024)
     {
         AlertWarning(_T("Failed to load ROM cartridge image."));
