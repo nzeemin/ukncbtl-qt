@@ -185,7 +185,7 @@ public:  // System control
     void        LoadROM(const uint8_t* pBuffer);  ///< Load 32 KB ROM image from the biffer
     void        LoadROMCartridge(int cartno, const uint8_t* pBuffer);  ///< Load 24 KB ROM cartridge image
     void        LoadRAM(int plan, const uint8_t* pBuffer);  ///< Load 32 KB RAM image from the biffer
-    void        SetNetStation(int station);  // Network station number
+    void        SetNetStation(uint16_t station);  // Network station number
     void        Tick8000();  ///< Tick 8.00 MHz
     void        Tick6250();  ///< Tick 6.25 MHz
     void        Tick50();    ///< Tick 50 Hz - goes to CPU/PPU EVNT line
@@ -325,6 +325,16 @@ inline uint8_t CMotherboard::GetRAMByte(int plan, uint16_t offset) const
 {
     ASSERT(plan >= 0 && plan <= 2);
     return m_pRAM[plan][offset];
+}
+inline void CMotherboard::SetRAMWord(int plan, uint16_t offset, uint16_t word)
+{
+    ASSERT(plan >= 0 && plan <= 2);
+    *((uint16_t*)(m_pRAM[plan] + (offset & 0xFFFE))) = word;
+}
+inline void CMotherboard::SetRAMByte(int plan, uint16_t offset, uint8_t byte)
+{
+    ASSERT(plan >= 0 && plan <= 2);
+    m_pRAM[plan][offset] = byte;
 }
 
 
