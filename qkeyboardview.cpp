@@ -5,7 +5,7 @@
 
 
 // Keyboard key mapping to bitmap
-const unsigned short m_arrKeyboardKeys[] = {
+const quint16 m_arrKeyboardKeys[] = {
 /*   x1,y1    w,h    UKNCscan  */
      18,15,  42,27,    0010,  // K1
      62,15,  42,27,    0011,  // K2
@@ -143,7 +143,7 @@ void QKeyboardView::paintEvent(QPaintEvent *)
 
 void QKeyboardView::mousePressEvent(QMouseEvent *event)
 {
-    unsigned char keyscan = GetKeyByPoint(event->x(), event->y());
+    quint8 keyscan = GetKeyByPoint(event->x(), event->y());
     if (keyscan == 0) return;
 
     Emulator_KeyEvent(keyscan, true);
@@ -157,7 +157,7 @@ void QKeyboardView::mouseReleaseEvent(QMouseEvent *event)
     Emulator_KeyEvent(keyscan, false);
 }
 
-unsigned char QKeyboardView::GetKeyByPoint(int x, int y)
+quint8 QKeyboardView::GetKeyByPoint(int x, int y)
 {
     for (int i = 0; i < m_nKeyboardKeysCount; i++)
     {
@@ -169,7 +169,7 @@ unsigned char QKeyboardView::GetKeyByPoint(int x, int y)
 
         if (x >= rcKey.left() && x < rcKey.right() && y >= rcKey.top() && y < rcKey.bottom())
         {
-            return (unsigned char) m_arrKeyboardKeys[i * 5 + 4];
+            return (quint8) m_arrKeyboardKeys[i * 5 + 4];
         }
     }
 

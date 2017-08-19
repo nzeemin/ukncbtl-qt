@@ -19,7 +19,7 @@ private:
     int m_nImageLeft;
 
 private:
-    unsigned char GetKeyByPoint(int x, int y);
+    quint8 GetKeyByPoint(int x, int y);
 };
 
 #endif // QKEYBOARDVIEW_H
