@@ -203,9 +203,9 @@ void QDebugView::drawMemoryForRegister(QPainter &painter, int reg, CProcessor *p
     quint16 memory[16];
     CMemoryController* pMemCtl = pProc->GetMemoryController();
     for (int idx = 0; idx < 16; idx++) {
-        bool valid;
+        int addrtype;
         memory[idx] = pMemCtl->GetWordView(
-                current + idx * 2 - 16, pProc->IsHaltMode(), okExec, &valid);
+                current + idx * 2 - 16, pProc->IsHaltMode(), okExec, &addrtype);
     }
 
     quint16 address = current - 16;

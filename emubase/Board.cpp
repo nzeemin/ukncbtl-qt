@@ -168,6 +168,7 @@ CMotherboard::CMotherboard ()
     memset(m_chanpputx, 0, sizeof(m_chanpputx));
     memset(m_chanppurx, 0, sizeof(m_chanppurx));
 
+    m_dwTrace = TRACE_NONE;
     m_TapeReadCallback = NULL;
     m_TapeWriteCallback = NULL;
     m_nTapeSampleRate = 0;
@@ -259,6 +260,13 @@ CMotherboard::~CMotherboard ()
     if (m_pROMCart[1] != NULL) free(m_pROMCart[1]);
     if (m_pHardDrives[0] != NULL) delete m_pHardDrives[0];
     if (m_pHardDrives[1] != NULL) delete m_pHardDrives[1];
+}
+
+void CMotherboard::SetTrace(uint32_t dwTrace)
+{
+    m_dwTrace = dwTrace;
+    if (m_pFloppyCtl != NULL)
+        m_pFloppyCtl->SetTrace(dwTrace & TRACE_FLOPPY);
 }
 
 void CMotherboard::Reset ()
@@ -651,8 +659,8 @@ void CMotherboard::DebugTicks()
 */
 #define SYSTEMFRAME_EXECUTE_CPU     { m_pCPU->Execute(); }
 #define SYSTEMFRAME_EXECUTE_PPU     { m_pPPU->Execute(); }
-#define SYSTEMFRAME_EXECUTE_BP_CPU  { if (m_pCPU->GetPC() == m_CPUbp) return false;  m_pCPU->Execute(); }
-#define SYSTEMFRAME_EXECUTE_BP_PPU  { if (m_pPPU->GetPC() == m_PPUbp) return false;  m_pPPU->Execute(); }
+#define SYSTEMFRAME_EXECUTE_BP_CPU  { m_pCPU->Execute();  if (m_pCPU->GetPC() == m_CPUbp) return false; }
+#define SYSTEMFRAME_EXECUTE_BP_PPU  { m_pPPU->Execute();  if (m_pPPU->GetPC() == m_PPUbp) return false; }
 bool CMotherboard::SystemFrame()
 {
     int frameticks = 0;  // 20000 ticks
@@ -1532,7 +1540,6 @@ void CMotherboard::DoSound(void)
     freq_out[3] = (m_timer >> 8) & 1; //250
     freq_out[4] = (m_timer >> 10) & 1; //60
 
-    global = 0;
     global = !(freq_out[0] & freq_enable[0]) & ! (freq_out[1] & freq_enable[1]) & !(freq_out[2] & freq_enable[2]) & !(freq_out[3] & freq_enable[3]) & !(freq_out[4] & freq_enable[4]);
     if (freq_enable[5] == 0)
         global = 0;

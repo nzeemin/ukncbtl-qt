@@ -127,9 +127,9 @@ int QConsoleView::printDisassemble(CProcessor* pProc, quint16 address, bool okOn
 
     const int nWindowSize = 30;
     quint16 memory[nWindowSize + 2];
-    bool valid;
+    int addrType;
     for (int i = 0; i < nWindowSize + 2; i++)
-        memory[i] = pMemCtl->GetWordView(address + i*2, okHaltMode, true, &valid);
+        memory[i] = pMemCtl->GetWordView(address + i*2, okHaltMode, true, &addrType);
 
     TCHAR bufaddr[7];
     TCHAR bufvalue[7];

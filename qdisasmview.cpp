@@ -229,9 +229,9 @@ int QDisasmView::DrawDisassemble(QPainter &painter, CProcessor *pProc, unsigned 
     const int nWindowSize = 30; //this->height() / cyLine;
     quint16 memory[nWindowSize + 2];
     for (int idx = 0; idx < nWindowSize; idx++) {
-        bool valid;
+        int addrtype;
         memory[idx] = pMemCtl->GetWordView(
-                current + idx * 2 - 10, pProc->IsHaltMode(), true, &valid);
+                current + idx * 2 - 10, pProc->IsHaltMode(), true, &addrtype);
     }
 
     quint16 address = current - 10;

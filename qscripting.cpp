@@ -241,15 +241,15 @@ void QEmulatorProcessor::setPSW(ushort value)
 
 ushort QEmulatorProcessor::readWord(ushort addr)
 {
-    bool okValid;
-    return m_processor->GetMemoryController()->GetWordView(addr, m_processor->IsHaltMode(), false, &okValid);
+    int addrtype;
+    return m_processor->GetMemoryController()->GetWordView(addr, m_processor->IsHaltMode(), false, &addrtype);
 }
 
 uchar QEmulatorProcessor::readByte(ushort addr)
 {
-    bool okValid;
-    ushort word = m_processor->GetMemoryController()->GetWordView(addr, m_processor->IsHaltMode(), false, &okValid);
-    if (!okValid)
+    int addrtype;
+    ushort word = m_processor->GetMemoryController()->GetWordView(addr, m_processor->IsHaltMode(), false, &addrtype);
+    if ((addrtype == ADDRTYPE_IO) || (addrtype == ADDRTYPE_DENY))
         return 0;
     return (addr & 1) ? word & 0xff : (word >> 8) & 0xff;
 }
@@ -261,8 +261,8 @@ QScriptValue QEmulatorProcessor::disassemble(ushort addr)
     quint16 current = addr;
     for (int i = 0; i < 4; i++)
     {
-        bool okValid;
-        buffer[i] = pMemCtl->GetWordView(current, m_processor->IsHaltMode(), false, &okValid);
+        int addrtype;
+        buffer[i] = pMemCtl->GetWordView(current, m_processor->IsHaltMode(), false, &addrtype);
         current += 2;
     }
 

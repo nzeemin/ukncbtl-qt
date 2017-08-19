@@ -200,7 +200,8 @@ void QMemoryView::paintEvent(QPaintEvent * /*event*/)
         for (int j = 0; j < 8; j++) {  // Draw words as octal value
             // Get word from memory
             quint16 word = 0;
-            bool okValid = true;
+            int okValid = true;
+            int addrtype = ADDRTYPE_NONE;
             bool okHalt = false;
             quint16 wChanged = 0;
             switch (m_Mode) {
@@ -218,17 +219,18 @@ void QMemoryView::paintEvent(QPaintEvent * /*event*/)
                     break;
                 case MEMMODE_CPU:
                     okHalt = g_pBoard->GetCPU()->IsHaltMode();
-                    word = g_pBoard->GetCPUMemoryController()->GetWordView(address, okHalt, false, &okValid);
+                    word = g_pBoard->GetCPUMemoryController()->GetWordView(address, okHalt, false, &addrtype);
+                    okValid = (addrtype != ADDRTYPE_IO) && (addrtype != ADDRTYPE_DENY);
                     wChanged = Emulator_GetChangeRamStatus(ADDRTYPE_RAM12, address);
                     break;
                 case MEMMODE_PPU:
                     okHalt = g_pBoard->GetPPU()->IsHaltMode();
-                    word = g_pBoard->GetPPUMemoryController()->GetWordView(address, okHalt, false, &okValid);
+                    word = g_pBoard->GetPPUMemoryController()->GetWordView(address, okHalt, false, &addrtype);
+                    okValid = (addrtype != ADDRTYPE_IO) && (addrtype != ADDRTYPE_DENY);
                     if (address < 0100000)
                         wChanged = Emulator_GetChangeRamStatus(ADDRTYPE_RAM0, address);
                     else
                         wChanged = 0;
-                    break;
                     break;
             }
 
