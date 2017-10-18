@@ -298,20 +298,22 @@ void Emulator_PrepareScreenRGB32(void* pImageBits, const quint32* colors)
     if (!g_okEmulatorInitialized) return;
 
     // Tag parsing loop
-    quint8 cursorYRGB;
-    bool okCursorType;
+    quint8 cursorYRGB = 0;
+    bool okCursorType = false;
     quint8 cursorPos = 128;
     bool cursorOn = false;
-    quint8 cursorAddress;      // Address of graphical cursor
+    quint8 cursorAddress = 0;  // Address of graphical cursor
     quint16 address = 0000270;  // Tag sequence start address
     bool okTagSize = false;  // Tag size: true - 4-word, false - 2-word (first tag is always 2-word)
     bool okTagType = false;  // Type of 4-word tag: true - set palette, false - set params
     int scale = 1;           // Horizontal scale: 1, 2, 4, or 8
     quint32 palette = 0;       // Palette
-    quint8 pbpgpr = 7;         // 3-bit Y-value modifier
-    for (int yy = 0; yy < 307; yy++) {
-
-        if (okTagSize) {  // 4-word tag
+    qint32 palettecurrent[8];  memset(palettecurrent, 0, sizeof(palettecurrent)); // Current palette; update each time we change the "palette" variable
+    quint8 pbpgpr = 0;         // 3-bit Y-value modifier
+    for (int yy = 0; yy < 307; yy++)
+    {
+        if (okTagSize)  // 4-word tag
+        {
             quint16 tag1 = g_pBoard->GetRAMWord(0, address);
             address += 2;
             quint16 tag2 = g_pBoard->GetRAMWord(0, address);
@@ -319,21 +321,24 @@ void Emulator_PrepareScreenRGB32(void* pImageBits, const quint32* colors)
 
             if (okTagType)  // 4-word palette tag
             {
-                palette = MAKELONG(tag1, tag2);
+                palette = ((quint32)tag1) | ((quint32)tag2 << 16);
             }
             else  // 4-word params tag
             {
                 scale = (tag2 >> 4) & 3;  // Bits 4-5 - new scale value
-                //TODO: use Y-value modifier
-                pbpgpr = tag2 & 7;  // Y-value modifier
-                cursorYRGB = tag1 & 15;  // Cursor color
+                pbpgpr = (quint8)((7 - (tag2 & 7)) << 4);  // Y-value modifier
+                cursorYRGB = (quint8)(tag1 & 15);  // Cursor color
                 okCursorType = ((tag1 & 16) != 0);  // true - graphical cursor, false - symbolic cursor
-                ASSERT(okCursorType==0);  //DEBUG
-                cursorPos = ((tag1 >> 8) >> scale) & 0x7f;  // Cursor position in the line
-                //TODO: Use cursorAddress
-                cursorAddress = (tag1 >> 5) & 7;
+                //ASSERT(okCursorType==0);  //DEBUG
+                cursorPos = (quint8)(((tag1 >> 8) >> scale) & 0x7f);  // Cursor position in the line
+                cursorAddress = (quint8)((tag1 >> 5) & 7);
                 scale = 1 << scale;
-
+            }
+            for (uint8_t c = 0; c < 8; c++)  // Update palettecurrent
+            {
+                quint8 valueYRGB = (uint8_t) (palette >> (c << 2)) & 15;
+                palettecurrent[c] = colors[pbpgpr | valueYRGB];
+                //if (pbpgpr != 0) DebugLogFormat(_T("pbpgpr %02x\r\n"), pbpgpr | valueYRGB);
             }
         }
 
@@ -354,53 +359,76 @@ void Emulator_PrepareScreenRGB32(void* pImageBits, const quint32* colors)
             cursorOn = !cursorOn;
 
         // Draw bits into the bitmap, from line 20 to line 307
-        if (yy >= 19 && yy <= 306)
-        {
-            // Loop thru bits from addressBits, planes 0,1,2
-            // For each pixel:
-            //   Get bit from planes 0,1,2 and make value
-            //   Map value to palette; result is 4-bit value YRGB
-            //   Translate value to 24-bit RGB
-            //   Put value to m_bits; repeat using scale value
+        if (yy < 19 /*|| yy > 306*/)
+            continue;
 
-            int x = 0;
-            int y = yy - 19;
-            quint32* pBits = ((quint32*)pImageBits) + y * 640;
-            for (int pos = 0; ; pos++)
+        // Loop thru bits from addressBits, planes 0,1,2
+        // For each pixel:
+        //   Get bit from planes 0,1,2 and make value
+        //   Map value to palette; result is 4-bit value YRGB
+        //   Translate value to 24-bit RGB
+        //   Put value to m_bits; repeat using scale value
+
+        int xr = 640;
+        int y = yy - 19;
+        quint32* pBits = ((quint32*)pImageBits) + y * 640;
+        int pos = 0;
+        for (;;)
+        {
+            // Get bit from planes 0,1,2
+            quint8 src0 = g_pBoard->GetRAMByte(0, addressBits);
+            quint8 src1 = g_pBoard->GetRAMByte(1, addressBits);
+            quint8 src2 = g_pBoard->GetRAMByte(2, addressBits);
+            // Loop through the bits of the byte
+            int bit = 0;
+            for (;;)
             {
-                // Get bit from planes 0,1,2
-                quint8 src0 = g_pBoard->GetRAMByte(0, addressBits);
-                quint8 src1 = g_pBoard->GetRAMByte(1, addressBits);
-                quint8 src2 = g_pBoard->GetRAMByte(2, addressBits);
-                // Loop through the bits of the byte
-                for (int bit = 0; bit < 8; bit++)
+                quint32 valueRGB;
+                if (cursorOn && (pos == cursorPos) && (!okCursorType || (okCursorType && bit == cursorAddress)))
+                    valueRGB = colors[cursorYRGB];  // 4-bit to 32-bit color
+                else
                 {
                     // Make 3-bit value from the bits
-                    quint8 value012 = (src0 & 1) | (src1 & 1) * 2 | (src2 & 1) * 4;
-                    // Map value to palette; result is 4-bit value YRGB
-                    quint8 valueYRGB;
-                    if (cursorOn && (pos == cursorPos) && (!okCursorType || (okCursorType && bit == cursorAddress)))
-                        valueYRGB = cursorYRGB;
-                    else
-                        valueYRGB = (quint8) (palette >> (value012 * 4)) & 15;
-                    quint32 valueRGB = colors[valueYRGB];
-
-                    // Put value to m_bits; repeat using scale value
-                    for (int s = 0; s < scale; s++)
-                        *pBits++ = valueRGB;
-                    x += scale;
-
-                    // Shift to the next bit
-                    src0 = src0 >> 1;
-                    src1 = src1 >> 1;
-                    src2 = src2 >> 1;
+                    quint8 value012 = (src0 & 1) | ((src1 & 1) << 1) | ((src2 & 1) << 2);
+                    valueRGB = palettecurrent[value012];  // 3-bit to 32-bit color
                 }
-                if (x >= 640)
-                    break;  // End of line
-                addressBits++;  // Go to the next byte
-            }
-        }
 
+                // Put value to m_bits; repeat using scale value
+                //WAS: for (int s = 0; s < scale; s++) *pBits++ = valueRGB;
+                switch (scale)
+                {
+                case 8:
+                    *pBits++ = valueRGB;
+                    *pBits++ = valueRGB;
+                    *pBits++ = valueRGB;
+                    *pBits++ = valueRGB;
+                case 4:
+                    *pBits++ = valueRGB;
+                    *pBits++ = valueRGB;
+                case 2:
+                    *pBits++ = valueRGB;
+                case 1:
+                    *pBits++ = valueRGB;
+                default:
+                    break;
+                }
+
+                xr -= scale;
+
+                if (bit == 7)
+                    break;
+                bit++;
+
+                // Shift to the next bit
+                src0 >>= 1;
+                src1 >>= 1;
+                src2 >>= 1;
+            }
+            if (xr <= 0)
+                break;  // End of line
+            addressBits++;  // Go to the next byte
+            pos++;
+        }
     }
 }
 
