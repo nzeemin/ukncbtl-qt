@@ -232,7 +232,7 @@ bool QDisasmView::checkForJump(const quint16 *memory, int *pDelta)
     }
 
     // SOB
-    if ((instr & ~(WORD)0777) == PI_SOB)
+    if ((instr & ~(quint16)0777) == PI_SOB)
     {
         *pDelta = -(GetDigit(instr, 1) * 8 + GetDigit(instr, 0)) + 1;
         return true;
@@ -330,7 +330,7 @@ bool QDisasmView::getJumpConditionHint(const quint16 *memory, const CProcessor *
     {
         quint16 spvalue = pProc->GetSP();
         int addrtype;
-        quint16 value = pMemCtl->GetWordView(spvalue, pProc->IsHaltMode(), FALSE, &addrtype);
+        quint16 value = pMemCtl->GetWordView(spvalue, pProc->IsHaltMode(), false, &addrtype);
         if (instr == 000207)  // RETURN
             buffer.sprintf("(SP)=%06o", value);  // "(SP)=XXXXXX"
         else  // RTS

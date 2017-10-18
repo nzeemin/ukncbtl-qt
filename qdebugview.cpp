@@ -389,7 +389,7 @@ void QDebugView::drawPPUMemoryMap(QPainter &painter, int x, int y, const CMemory
         int slot = ((value177054 & 8) == 0) ? 1 : 2;
         int bank = (value177054 & 6) >> 1;
         TCHAR buffer[10];
-        wsprintf(buffer, _T("Cart %d/%d"), slot, bank);
+        _sntprintf(buffer, 10, _T("Cart %d/%d"), slot, bank);
         painter.drawText(xtype, yb0, buffer);
     }
 

@@ -330,9 +330,9 @@ void MainWindow::helpAbout()
 {
     QMessageBox::about(this, _T("About"), _T(
         "QtUkncBtl Version 1.0\n"
-        "Copyright (C) 2007-2013\n\n"
-        "http://www.felixl.com/Uknc\r\nhttp://code.google.com/p/ukncbtl/\n\n"
-        "Authors:\r\nNikita Zeemin (nzeemin@gmail.com)\nFelix Lazarev (felix.lazarev@gmail.com)\nAlexey Kisly\n\n"
+        "Copyright (C) 2007-2017\n\n"
+        "https://github.com/nzeemin/ukncbtl-qt\n\n"
+        "Authors:\r\nNikita Zimin (nzeemin@gmail.com)\nFelix Lazarev (felix.lazarev@gmail.com)\nAlexey Kisly\n\n"
         "Special thanks to:\nArseny Gordin\n\n"
         "Build date:\t" __DATE__ " " __TIME__ "\n"
         "Qt version:\t" QT_VERSION_STR));
