@@ -53,3 +53,4 @@ QT += widgets
 QT += script
 QT += testlib 
 DEFINES -= UNICODE
+TRANSLATIONS = ukncbtl_en.ts

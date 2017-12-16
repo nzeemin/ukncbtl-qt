@@ -64,7 +64,7 @@ bool Emulator_Init()
     QFile romFile(":/uknc_rom.bin");
     if (!romFile.open(QIODevice::ReadOnly))
     {
-        AlertWarning(_T("Failed to load ROM file."));
+        AlertWarning(QT_TRANSLATE_NOOP("Emulator", "Failed to load ROM file."));
         return false;
     }
     qint64 bytesRead = romFile.read((char*)buffer, 32256);
@@ -268,10 +268,10 @@ quint16 Emulator_GetChangeRamStatus(int addrtype, quint16 address)
 void Emulator_LoadROMCartridge(int slot, LPCTSTR sFilePath)
 {
     // Open file
-    FILE* fpFile = ::_tfopen(sFilePath, _T("rb"));
+    FILE* fpFile = ::fopen(sFilePath, "rb");
     if (fpFile == NULL)
     {
-        AlertWarning(_T("Failed to load ROM cartridge image."));
+        AlertWarning(QT_TRANSLATE_NOOP("Emulator", "Failed to load ROM cartridge image."));
         return;
     }
 
@@ -281,7 +281,7 @@ void Emulator_LoadROMCartridge(int slot, LPCTSTR sFilePath)
     size_t dwBytesRead = ::fread(pImage, 1, 24 * 1024, fpFile);
     if (dwBytesRead != 24 * 1024)
     {
-        AlertWarning(_T("Failed to load ROM cartridge image."));
+        AlertWarning(QT_TRANSLATE_NOOP("Emulator", "Failed to load ROM cartridge image."));
         return;
     }
 
@@ -338,7 +338,7 @@ void Emulator_PrepareScreenRGB32(void* pImageBits, const quint32* colors)
             {
                 quint8 valueYRGB = (uint8_t) (palette >> (c << 2)) & 15;
                 palettecurrent[c] = colors[pbpgpr | valueYRGB];
-                //if (pbpgpr != 0) DebugLogFormat(_T("pbpgpr %02x\r\n"), pbpgpr | valueYRGB);
+                //if (pbpgpr != 0) DebugLogFormat("pbpgpr %02x\r\n", pbpgpr | valueYRGB);
             }
         }
 
@@ -500,7 +500,7 @@ void Emulator_SaveImage(const QString& sFilePath)
     QFile file(sFilePath);
     if (! file.open(QIODevice::Truncate | QIODevice::WriteOnly))
     {
-        AlertWarning(_T("Failed to save image file."));
+        AlertWarning(QT_TRANSLATE_NOOP("Emulator", "Failed to save image file."));
         return;
     }
 
@@ -521,7 +521,7 @@ void Emulator_SaveImage(const QString& sFilePath)
     qint64 bytesWritten = file.write((const char *)pImage, UKNCIMAGE_SIZE);
     if (bytesWritten != UKNCIMAGE_SIZE)
     {
-        AlertWarning(_T("Failed to save image file data."));
+        AlertWarning(QT_TRANSLATE_NOOP("Emulator", "Failed to save image file data."));
         return;
     }
 
@@ -535,7 +535,7 @@ void Emulator_LoadImage(const QString &sFilePath)
     QFile file(sFilePath);
     if (! file.open(QIODevice::ReadOnly))
     {
-        AlertWarning(_T("Failed to load image file."));
+        AlertWarning(QT_TRANSLATE_NOOP("Emulator", "Failed to load image file."));
         return;
     }
 
@@ -556,7 +556,7 @@ void Emulator_LoadImage(const QString &sFilePath)
     bytesRead = file.read((char*)pImage, UKNCIMAGE_SIZE);
     if (bytesRead != UKNCIMAGE_SIZE)
     {
-        AlertWarning(_T("Failed to load image file data."));
+        AlertWarning(QT_TRANSLATE_NOOP("Emulator", "Failed to load image file data."));
         return;
     }
     else

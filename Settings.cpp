@@ -8,57 +8,57 @@
 
 void Settings_SetFloppyFilePath(int slot, const QString & sFilePath)
 {
-    TCHAR bufValueName[] = _T("Floppy0");
-    bufValueName[6] = slot + _T('0');
+    char bufValueName[] = "Floppy0";
+    bufValueName[6] = slot + '0';
     Global_getSettings()->setValue(bufValueName, sFilePath);
 }
 
 QString Settings_GetFloppyFilePath(int slot)
 {
-    TCHAR bufValueName[] = _T("Floppy0");
-    bufValueName[6] = slot + _T('0');
-    QVariant value = Global_getSettings()->value(bufValueName, _T(""));
+    char bufValueName[] = "Floppy0";
+    bufValueName[6] = slot + '0';
+    QVariant value = Global_getSettings()->value(bufValueName, "");
     return value.toString();
 }
 
 void Settings_SetCartridgeFilePath(int slot, const QString &sFilePath)
 {
-    TCHAR bufValueName[] = _T("Cartridge1");
-    bufValueName[9] = slot + _T('0');
+    char bufValueName[] = "Cartridge1";
+    bufValueName[9] = slot + '0';
     Global_getSettings()->setValue(bufValueName, sFilePath);
 }
 
 QString Settings_GetCartridgeFilePath(int slot)
 {
-    TCHAR bufValueName[] = _T("Cartridge1");
-    bufValueName[9] = slot + _T('0');
-    QVariant value = Global_getSettings()->value(bufValueName, _T(""));
+    char bufValueName[] = "Cartridge1";
+    bufValueName[9] = slot + '0';
+    QVariant value = Global_getSettings()->value(bufValueName, "");
     return value.toString();
 }
 
 void Settings_SetHardFilePath(int slot, const QString &sFilePath)
 {
-    TCHAR bufValueName[] = _T("Hard1");
-    bufValueName[4] = slot + _T('0');
+    char bufValueName[] = "Hard1";
+    bufValueName[4] = slot + '0';
     Global_getSettings()->setValue(bufValueName, sFilePath);
 }
 
 QString Settings_GetHardFilePath(int slot)
 {
-    TCHAR bufValueName[] = _T("Hard1");
-    bufValueName[4] = slot + _T('0');
-    QVariant value = Global_getSettings()->value(bufValueName, _T(""));
+    char bufValueName[] = "Hard1";
+    bufValueName[4] = slot + '0';
+    QVariant value = Global_getSettings()->value(bufValueName, "");
     return value.toString();
 }
 
 void Settings_SetSound(bool flag)
 {
-    Global_getSettings()->setValue(_T("Sound"), flag);
+    Global_getSettings()->setValue("Sound", flag);
 }
 
 bool Settings_GetSound()
 {
-    QVariant value = Global_getSettings()->value(_T("Sound"), false);
+    QVariant value = Global_getSettings()->value("Sound", false);
     return value.toBool();
 }
 

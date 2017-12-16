@@ -118,7 +118,7 @@ void QKeyboardView::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
 
-    QImage imageKeyboard(_T(":/images/keyboard.png"));
+    QImage imageKeyboard(":/images/keyboard.png");
 
     // Center image
     int cxBitmap = (int) imageKeyboard.width();

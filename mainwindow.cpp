@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    this->setWindowTitle(_T("UKNC Back to Life"));
+    this->setWindowTitle(tr("UKNC Back to Life"));
 
     // Assign signals
     QObject::connect(ui->actionSaveStateImage, SIGNAL(triggered()), this, SLOT(saveStateImage()));
@@ -76,17 +76,17 @@ MainWindow::MainWindow(QWidget *parent) :
     int maxwid = m_screen->maximumWidth() > m_keyboard->maximumWidth() ? m_screen->maximumWidth() : m_keyboard->maximumWidth();
     ui->centralWidget->setMaximumWidth(maxwid);
 
-    m_dockDebug = new QDockWidget(_T("Processor"));
-    m_dockDebug->setObjectName(_T("dockDebug"));
+    m_dockDebug = new QDockWidget(tr("Processor"));
+    m_dockDebug->setObjectName("dockDebug");
     m_dockDebug->setWidget(m_debug);
-    m_dockDisasm = new QDockWidget(_T("Disassemble"));
-    m_dockDisasm->setObjectName(_T("dockDisasm"));
+    m_dockDisasm = new QDockWidget(tr("Disassemble"));
+    m_dockDisasm->setObjectName("dockDisasm");
     m_dockDisasm->setWidget(m_disasm);
-    m_dockMemory = new QDockWidget(_T("Memory"));
-    m_dockMemory->setObjectName(_T("dockMemory"));
+    m_dockMemory = new QDockWidget(tr("Memory"));
+    m_dockMemory->setObjectName("dockMemory");
     m_dockMemory->setWidget(m_memory);
-    m_dockConsole = new QDockWidget(_T("Debug Console"));
-    m_dockConsole->setObjectName(_T("dockConsole"));
+    m_dockConsole = new QDockWidget(tr("Debug Console"));
+    m_dockConsole->setObjectName("dockConsole");
     m_dockConsole->setWidget(m_console);
 
     this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
@@ -189,23 +189,23 @@ void MainWindow::UpdateMenu()
     ui->actionViewSizeUpscaled4->setChecked(m_screen->sizeMode() == UpscaledScreen4);
 
     ui->actionDrivesFloppy0->setIcon(QIcon(
-            g_pBoard->IsFloppyImageAttached(0) ? _T(":/images/iconFloppy.png") : _T(":/images/iconFloppySlot.png") ));
+            g_pBoard->IsFloppyImageAttached(0) ? ":/images/iconFloppy.png" : ":/images/iconFloppySlot.png" ));
     ui->actionDrivesFloppy1->setIcon(QIcon(
-            g_pBoard->IsFloppyImageAttached(1) ? _T(":/images/iconFloppy.png") : _T(":/images/iconFloppySlot.png") ));
+            g_pBoard->IsFloppyImageAttached(1) ? ":/images/iconFloppy.png" : ":/images/iconFloppySlot.png" ));
     ui->actionDrivesFloppy2->setIcon(QIcon(
-            g_pBoard->IsFloppyImageAttached(2) ? _T(":/images/iconFloppy.png") : _T(":/images/iconFloppySlot.png") ));
+            g_pBoard->IsFloppyImageAttached(2) ? ":/images/iconFloppy.png" : ":/images/iconFloppySlot.png" ));
     ui->actionDrivesFloppy3->setIcon(QIcon(
-            g_pBoard->IsFloppyImageAttached(3) ? _T(":/images/iconFloppy.png") : _T(":/images/iconFloppySlot.png") ));
+            g_pBoard->IsFloppyImageAttached(3) ? ":/images/iconFloppy.png" : ":/images/iconFloppySlot.png" ));
 
     ui->actionDrivesCartridge1->setIcon(QIcon(
-            g_pBoard->IsROMCartridgeLoaded(1) ? _T(":/images/iconCartridge.png") : _T(":/images/iconCartridgeSlot.png") ));
+            g_pBoard->IsROMCartridgeLoaded(1) ? ":/images/iconCartridge.png" : ":/images/iconCartridgeSlot.png" ));
     ui->actionDrivesCartridge2->setIcon(QIcon(
-            g_pBoard->IsROMCartridgeLoaded(2) ? _T(":/images/iconCartridge.png") : _T(":/images/iconCartridgeSlot.png") ));
+            g_pBoard->IsROMCartridgeLoaded(2) ? ":/images/iconCartridge.png" : ":/images/iconCartridgeSlot.png" ));
 
     ui->actionDrivesHard1->setIcon(QIcon(
-            g_pBoard->IsHardImageAttached(1) ? _T(":/images/iconHdd.png") : _T(":/images/iconHddSlot.png") ));
+            g_pBoard->IsHardImageAttached(1) ? ":/images/iconHdd.png" : ":/images/iconHddSlot.png" ));
     ui->actionDrivesHard2->setIcon(QIcon(
-            g_pBoard->IsHardImageAttached(2) ? _T(":/images/iconHdd.png") : _T(":/images/iconHddSlot.png") ));
+            g_pBoard->IsHardImageAttached(2) ? ":/images/iconHdd.png" : ":/images/iconHddSlot.png" ));
 
     ui->actionDebugConsoleView->setChecked(m_console->isVisible());
     ui->actionDebugDebugView->setChecked(m_dockDebug->isVisible());
@@ -253,22 +253,21 @@ void MainWindow::showUptime(int uptimeMillisec)
     int minutes = (int) (uptimeMillisec / 60 % 60);
     int hours   = (int) (uptimeMillisec / 3600 % 60);
 
-    TCHAR buffer[20];
-    _sntprintf(buffer, 20, _T("Uptime: %02d:%02d:%02d"), hours, minutes, seconds);
-
-    m_statusLabelUptime->setText(buffer);
+    char buffer[12];
+    _snprintf(buffer, 20, "%02d:%02d:%02d", hours, minutes, seconds);
+    m_statusLabelUptime->setText(tr("Uptime: %1").arg(buffer));
 }
 void MainWindow::showFps(double framesPerSecond)
 {
     if (framesPerSecond <= 0)
     {
-        m_statusLabelFrames->setText(_T(""));
+        m_statusLabelFrames->setText("");
     }
     else
     {
         double speed = framesPerSecond / 25.0 * 100.0;
-        TCHAR buffer[16];
-        _sntprintf(buffer, 16, _T("%03.f%%"), speed);
+        char buffer[16];
+        _snprintf(buffer, 16, "%03.f%%", speed);
         m_statusLabelFrames->setText(buffer);
     }
 }
@@ -277,7 +276,7 @@ void MainWindow::saveStateImage()
 {
     QFileDialog dlg;
     dlg.setAcceptMode(QFileDialog::AcceptSave);
-    dlg.setNameFilter(_T("UKNC state images (*.uknc)"));
+    dlg.setNameFilter(tr("UKNC state images (*.uknc)"));
     if (dlg.exec() == QDialog::Rejected)
         return;
 
@@ -293,7 +292,7 @@ void MainWindow::saveStateImage(const QString& strFileName)
 void MainWindow::loadStateImage()
 {
     QFileDialog dlg;
-    dlg.setNameFilter(_T("UKNC state images (*.uknc)"));
+    dlg.setNameFilter(tr("UKNC state images (*.uknc)"));
     if (dlg.exec() == QDialog::Rejected)
         return;
 
@@ -313,7 +312,7 @@ void MainWindow::saveScreenshot()
 {
     QFileDialog dlg;
     dlg.setAcceptMode(QFileDialog::AcceptSave);
-    dlg.setNameFilter(_T("PNG images (*.png)"));
+    dlg.setNameFilter(tr("PNG images (*.png)"));
     if (dlg.exec() == QDialog::Rejected)
         return;
 
@@ -328,14 +327,15 @@ void MainWindow::saveScreenshot(const QString& strFileName)
 
 void MainWindow::helpAbout()
 {
-    QMessageBox::about(this, _T("About"), _T(
-        "QtUkncBtl Version 1.0\n"
+    QMessageBox::about(this, tr("About"), tr(
+        "UKNCBTL Qt Version 1.0\n"
         "Copyright (C) 2007-2017\n\n"
         "https://github.com/nzeemin/ukncbtl-qt\n\n"
         "Authors:\r\nNikita Zimin (nzeemin@gmail.com)\nFelix Lazarev (felix.lazarev@gmail.com)\nAlexey Kisly\n\n"
         "Special thanks to:\nArseny Gordin\n\n"
-        "Build date:\t" __DATE__ " " __TIME__ "\n"
-        "Qt version:\t" QT_VERSION_STR));
+        "Build date:\t%1 %2\n"
+        "Qt version:\t%3")
+        .arg(__DATE__).arg(__TIME__).arg(QT_VERSION_STR));
 }
 
 void MainWindow::viewRgbScreen()
@@ -414,12 +414,12 @@ void MainWindow::emulatorRun()
 {
     if (g_okEmulatorRunning)
     {
-        this->setWindowTitle(_T("UKNC Back to Life"));
+        this->setWindowTitle(tr("UKNC Back to Life"));
         Emulator_Stop();
     }
     else
     {
-        this->setWindowTitle(_T("UKNC Back to Life [run]"));
+        this->setWindowTitle(tr("UKNC Back to Life [run]"));
         Emulator_Start();
     }
 }
@@ -449,7 +449,7 @@ void MainWindow::emulatorCartridge(int slot)
     else
     {
         QFileDialog dlg;
-        dlg.setNameFilter(_T("UKNC ROM cartridge images (*.bin)"));
+        dlg.setNameFilter(tr("UKNC ROM cartridge images (*.bin)"));
         if (dlg.exec() == QDialog::Rejected)
             return;
 
@@ -495,7 +495,7 @@ void MainWindow::emulatorFloppy(int slot)
     else
     {
         QFileDialog dlg;
-        dlg.setNameFilter(_T("UKNC floppy images (*.dsk *.rtd)"));
+        dlg.setNameFilter(tr("UKNC floppy images (*.dsk *.rtd)"));
         if (dlg.exec() == QDialog::Rejected)
             return;
 
@@ -503,7 +503,7 @@ void MainWindow::emulatorFloppy(int slot)
 
         if (! attachFloppy(slot, strFileName))
         {
-            AlertWarning(_T("Failed to attach floppy image."));
+            AlertWarning(tr("Failed to attach floppy image."));
             return;
         }
     }
@@ -546,20 +546,20 @@ void MainWindow::emulatorHardDrive(int slot)
         bool okCartLoaded = g_pBoard->IsROMCartridgeLoaded(slot);
         if (!okCartLoaded)
         {
-            AlertWarning(_T("Please select HDD ROM image as cartridge first."));
+            AlertWarning(tr("Please select HDD ROM image as cartridge first."));
             return;
         }
 
         // Select HDD disk image
         QFileDialog dlg;
-        dlg.setNameFilter(_T("UKNC HDD images (*.img)"));
+        dlg.setNameFilter(tr("UKNC HDD images (*.img)"));
         if (dlg.exec() == QDialog::Rejected)
             return;
 
         QString strFileName = dlg.selectedFiles().at(0);
         if (! attachHardDrive(slot, strFileName))
         {
-            AlertWarning(_T("Failed to attach hard drive image."));
+            AlertWarning(tr("Failed to attach hard drive image."));
             return;
         }
     }
@@ -622,12 +622,12 @@ void MainWindow::debugMemoryView()
 void MainWindow::debugStepInto()
 {
     if (!g_okEmulatorRunning)
-        m_console->execConsoleCommand(_T("s"));
+        m_console->execConsoleCommand("s");
 }
 void MainWindow::debugStepOver()
 {
     if (!g_okEmulatorRunning)
-        m_console->execConsoleCommand(_T("so"));
+        m_console->execConsoleCommand("so");
 }
 
 void MainWindow::scriptRun()
@@ -637,7 +637,7 @@ void MainWindow::scriptRun()
 
     QFileDialog dlg;
     dlg.setAcceptMode(QFileDialog::AcceptOpen);
-    dlg.setNameFilter(_T("Script files (*.js)"));
+    dlg.setNameFilter(tr("Script files (*.js)"));
     if (dlg.exec() == QDialog::Rejected)
         return;
 

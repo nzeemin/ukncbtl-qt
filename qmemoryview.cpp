@@ -66,13 +66,13 @@ void QMemoryView::updateScrollPos()
 static const char * GetMemoryModeName(int mode)
 {
     if (mode < 0 || mode > MEMMODE_LAST)
-        return _T("UKWN");  // Unknown mode
+        return "UKWN";  // Unknown mode
     return MemoryView_ModeNames[mode];
 }
 
 void QMemoryView::updateWindowText()
 {
-    QString buffer = QString(_T("Memory - %1")).arg(GetMemoryModeName(m_Mode));
+    QString buffer = QString(tr("Memory - %1")).arg(GetMemoryModeName(m_Mode));
     parentWidget()->setWindowTitle(buffer);
 }
 
@@ -182,8 +182,8 @@ void QMemoryView::paintEvent(QPaintEvent * /*event*/)
 
     m_cyLineMemory = cyLine;
 
-    TCHAR buffer[7];
-    const TCHAR* ADDRESS_LINE = _T(" address  0      2      4      6      10     12     14     16");
+    char buffer[7];
+    const char* ADDRESS_LINE = " address  0      2      4      6      10     12     14     16";
     painter.drawText(0, cyLine, ADDRESS_LINE);
 
     // Calculate m_nPageSize

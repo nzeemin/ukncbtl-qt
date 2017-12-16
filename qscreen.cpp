@@ -158,7 +158,7 @@ void QEmulatorScreen::setSizeMode(ScreenSizeMode mode)
 
 void QEmulatorScreen::saveScreenshot(QString strFileName)
 {
-    m_image->save(strFileName, _T("PNG"), -1);
+    m_image->save(strFileName, "PNG", -1);
 }
 
 void QEmulatorScreen::createDisplay()

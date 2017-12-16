@@ -13,17 +13,6 @@ class QString;
 // Defines for compilation under MinGW and GCC
 
 #ifndef _TCHAR_DEFINED
-#ifdef	_UNICODE
-typedef wchar_t TCHAR;
-#define _tfopen     _wfopen
-#define _tfsopen    _wfsopen
-#define _tcscpy     wcscpy
-#define _tstat      _wstat
-#define _tcsrchr    wcsrchr
-#define _tcsicmp    _wcsicmp
-#define _tcslen     wcslen
-#define _sntprintf  _snwprintf
-#else
 typedef char TCHAR;
 #define _tfopen     fopen
 #define _tfsopen    _fsopen
@@ -33,7 +22,6 @@ typedef char TCHAR;
 #define _tcsicmp    _stricmp
 #define _tcslen     strlen
 #define _sntprintf  _snprintf
-#endif
 #define _T(x)       x
 #endif
 
@@ -43,11 +31,7 @@ typedef char TCHAR;
 #define _snprintf   snprintf
 #endif
 
-#ifdef	_UNICODE
-typedef const wchar_t * LPCTSTR;
-#else
 typedef const char * LPCTSTR;
-#endif
 
 #define MAKELONG(a, b)      ((qint16)(((quint16)(((quint32)(a)) & 0xffff)) | ((quint32)((quint16)(((quint32)(b)) & 0xffff))) << 16))
 #define MAKEWORD(a, b)      ((quint16)(((quint8)(((quint32)(a)) & 0xff)) | ((quint16)((quint8)(((quint32)(b)) & 0xff))) << 8))
@@ -87,8 +71,8 @@ bool AssertFailedLine(const char * lpszFileName, int nLine);
 //////////////////////////////////////////////////////////////////////
 
 
-void AlertWarning(LPCTSTR sMessage);
-bool AlertOkCancel(LPCTSTR sMessage);
+void AlertWarning(const QString &sMessage);
+bool AlertOkCancel(const QString &sMessage);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -96,10 +80,10 @@ bool AlertOkCancel(LPCTSTR sMessage);
 
 #if !defined(PRODUCT)
 
-void DebugPrint(LPCTSTR message);
-void DebugPrintFormat(LPCTSTR pszFormat, ...);
-void DebugLog(LPCTSTR message);
-void DebugLogFormat(LPCTSTR pszFormat, ...);
+void DebugPrint(const char* message);
+void DebugPrintFormat(const char* pszFormat, ...);
+void DebugLog(const char* message);
+void DebugLogFormat(const char* pszFormat, ...);
 
 #endif // !defined(PRODUCT)
 
@@ -108,19 +92,19 @@ void DebugLogFormat(LPCTSTR pszFormat, ...);
 
 
 // Processor register names
-const LPCTSTR REGISTER_NAME[] = { _T("R0"), _T("R1"), _T("R2"), _T("R3"), _T("R4"), _T("R5"), _T("SP"), _T("PC") };
+const LPCTSTR REGISTER_NAME[] = { "R0", "R1", "R2", "R3", "R4", "R5", "SP", "PC" };
 
 const int UKNC_SCREEN_WIDTH = 640;
 const int UKNC_SCREEN_HEIGHT = 288;
 
 QFont Common_GetMonospacedFont();
 void Common_Cleanup();
-void PrintOctalValue(TCHAR* buffer, quint16 value);
-void PrintBinaryValue(TCHAR* buffer, quint16 value);
+void PrintOctalValue(char* buffer, quint16 value);
+void PrintBinaryValue(char* buffer, quint16 value);
 void DrawOctalValue(QPainter &painter, int x, int y, quint16 value);
 void DrawHexValue(QPainter &painter, int x, int y, quint16 value);
 void DrawBinaryValue(QPainter &painter, int x, int y, quint16 value);
-bool ParseOctalValue(LPCTSTR text, quint16* pValue);
+bool ParseOctalValue(const char* text, quint16* pValue);
 bool ParseOctalValue(const QString &text, quint16* pValue);
 ushort Translate_KOI8R(quint8 ch);
 

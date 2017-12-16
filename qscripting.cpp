@@ -266,7 +266,7 @@ QScriptValue QEmulatorProcessor::disassemble(ushort addr)
         current += 2;
     }
 
-    TCHAR instr[8], args[32];
+    char instr[8], args[32];
     int instrlen = DisassembleInstruction(buffer, addr, instr, args);
 
     QScriptValue list = m_engine->newArray(4);

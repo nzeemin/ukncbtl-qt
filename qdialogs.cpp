@@ -7,7 +7,7 @@ QInputOctalDialog::QInputOctalDialog(QWidget *parent, const QString & title, con
 {
     m_result = value;
 
-    TCHAR buffer[8];
+    char buffer[8];
     PrintOctalValue(buffer, *value);
 
     setWindowTitle(title);

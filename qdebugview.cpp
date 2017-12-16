@@ -29,7 +29,7 @@ QDebugView::QDebugView(QWidget *parent) :
 void QDebugView::updateWindowText()
 {
     CProcessor* pDebugPU = m_okDebugProcessor ? g_pBoard->GetCPU() : g_pBoard->GetPPU();
-    QString buffer = QString(_T("Debug - %1")).arg(pDebugPU->GetName());
+    QString buffer = QString(tr("Debug - %1")).arg(pDebugPU->GetName());
     parentWidget()->setWindowTitle(buffer);
 }
 
@@ -162,36 +162,36 @@ void QDebugView::drawProcessor(QPainter &painter, const CProcessor *pProc, int x
     painter.setPen(colorText);
 
     // CPC value
-    painter.drawText(x, y + 9 * cyLine, _T("PC'"));
+    painter.drawText(x, y + 9 * cyLine, "PC'");
     quint16 cpc = pProc->GetCPC();
     DrawOctalValue(painter, x + cxChar * 3, y + 9 * cyLine, cpc);
     DrawBinaryValue(painter, x + cxChar * 15, y + 9 * cyLine, cpc);
 
     // PSW value
     painter.setPen(QColor(arrRChanged[8] ? Qt::red : colorText));
-    painter.drawText(x, y + 11 * cyLine, _T("PS"));
+    painter.drawText(x, y + 11 * cyLine, "PS");
     quint16 psw = arrR[8]; // pProc->GetPSW();
     DrawOctalValue(painter, x + cxChar * 3, y + 11 * cyLine, psw);
     DrawHexValue(painter, x + cxChar * 10, y + 11 * cyLine, psw);
-    painter.drawText(x + cxChar * 15, y + 10 * cyLine, _T("       HP  TNZVC"));
+    painter.drawText(x + cxChar * 15, y + 10 * cyLine, "       HP  TNZVC");
     DrawBinaryValue(painter, x + cxChar * 15, y + 11 * cyLine, psw);
 
     painter.setPen(colorText);
 
     // CPSW value
-    painter.drawText(x, y + 12 * cyLine, _T("PS'"));
+    painter.drawText(x, y + 12 * cyLine, "PS'");
     quint16 cpsw = pProc->GetCPSW();
     DrawOctalValue(painter, x + cxChar * 3, y + 12 * cyLine, cpsw);
     DrawBinaryValue(painter, x + cxChar * 15, y + 12 * cyLine, cpsw);
 
     // Processor mode - HALT or USER
     bool okHaltMode = pProc->IsHaltMode();
-    painter.drawText(x, y + 14 * cyLine, okHaltMode ? _T("HALT") : _T("USER"));
+    painter.drawText(x, y + 14 * cyLine, okHaltMode ? "HALT" : "USER");
 
     // "Stopped" flag
     bool okStopped = pProc->IsStopped();
     if (okStopped)
-        painter.drawText(x + 6 * cxChar, y + 14 * cyLine, _T("STOP"));
+        painter.drawText(x + 6 * cxChar, y + 14 * cyLine, "STOP");
 }
 
 void QDebugView::drawMemoryForRegister(QPainter &painter, int reg, CProcessor *pProc, int x, int y)
@@ -244,7 +244,7 @@ void QDebugView::drawPorts(QPainter &painter, bool okProcessor, CMemoryControlle
     int cxChar = fontmetrics.averageCharWidth();
     int cyLine = fontmetrics.height();
 
-    painter.drawText(x, y, _T("Ports:"));
+    painter.drawText(x, y, tr("Ports:"));
 
     if (okProcessor)  // CPU
     {
@@ -388,9 +388,8 @@ void QDebugView::drawPPUMemoryMap(QPainter &painter, int x, int y, const CMemory
     {
         int slot = ((value177054 & 8) == 0) ? 1 : 2;
         int bank = (value177054 & 6) >> 1;
-        TCHAR buffer[10];
-        _sntprintf(buffer, 10, _T("Cart %d/%d"), slot, bank);
-        painter.drawText(xtype, yb0, buffer);
+        QString carttext = tr("Cart %1/%2").arg(slot).arg(bank);
+        painter.drawText(xtype, yb0, carttext);
     }
 
     // 120000-137777 - Window block 1

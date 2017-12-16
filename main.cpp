@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     QApplication application(argc, argv);
     g_Application = &application;
 
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, _T("Back to Life"), _T("UKNCBTL"));
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "Back to Life", "UKNCBTL");
     g_Settings = &settings;
 
     MainWindow w;
