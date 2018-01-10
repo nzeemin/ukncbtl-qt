@@ -4,6 +4,7 @@
 #include <QPainter>
 #include <QScrollBar>
 #include <QStyle>
+#include <QStyleFactory>
 #include <QStyleOptionFocusRect>
 #include <QToolBar>
 #include "main.h"
@@ -57,6 +58,7 @@ QMemoryView::QMemoryView()
     m_toolbar->setIconSize(QSize(16, 16));
     m_toolbar->setToolButtonStyle(Qt::ToolButtonIconOnly);
     m_toolbar->setFocusPolicy(Qt::NoFocus);
+    m_toolbar->setStyle(QStyleFactory::create("windows"));  // fix for macOS to remove gradient background
 
     QAction* actionGotoAddr = m_toolbar->addAction(QIcon(":/images/iconEditAddress.png"), "");
     m_toolbar->addSeparator();

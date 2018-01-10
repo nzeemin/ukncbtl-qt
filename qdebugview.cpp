@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include <QtGui>
 #include <QMenu>
+#include <QStyleFactory>
 #include <QStyleOptionFocusRect>
 #include <QToolBar>
 #include "main.h"
@@ -30,6 +31,7 @@ QDebugView::QDebugView(QWidget *mainWindow) :
     m_toolbar->setIconSize(QSize(16, 16));
     m_toolbar->setToolButtonStyle(Qt::ToolButtonIconOnly);
     m_toolbar->setFocusPolicy(Qt::NoFocus);
+    m_toolbar->setStyle(QStyleFactory::create("windows"));  // fix for macOS to remove gradient background
 
     QAction* actionCpuPpu = m_toolbar->addAction(QIcon(":/images/iconCpuPpu.png"), "");
     m_toolbar->addSeparator();
