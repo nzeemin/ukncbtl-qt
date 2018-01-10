@@ -49,6 +49,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionDebugStepInto, SIGNAL(triggered()), this, SLOT(debugStepInto()));
     QObject::connect(ui->actionDebugStepOver, SIGNAL(triggered()), this, SLOT(debugStepOver()));
     QObject::connect(ui->actionHelpAbout, SIGNAL(triggered()), this, SLOT(helpAbout()));
+    QObject::connect(ui->actionViewKeyboard, SIGNAL(triggered()), this, SLOT(viewKeyboard()));
     QObject::connect(ui->actionViewRgbScreen, SIGNAL(triggered()), this, SLOT(viewRgbScreen()));
     QObject::connect(ui->actionViewGrayscaleScreen, SIGNAL(triggered()), this, SLOT(viewGrayscaleScreen()));
     QObject::connect(ui->actionViewSizeRegular, SIGNAL(triggered()), this, SLOT(viewSizeRegular()));
@@ -188,6 +189,8 @@ void MainWindow::UpdateMenu()
     ui->actionViewSizeDouble->setChecked(m_screen->sizeMode() == DoubleScreen);
     ui->actionViewSizeUpscaled3->setChecked(m_screen->sizeMode() == UpscaledScreen3);
     ui->actionViewSizeUpscaled4->setChecked(m_screen->sizeMode() == UpscaledScreen4);
+
+    ui->actionViewKeyboard->setChecked(m_keyboard->isVisible());
 
     ui->actionDrivesFloppy0->setIcon(QIcon(
             g_pBoard->IsFloppyImageAttached(0) ? ":/images/iconFloppy.png" : ":/images/iconFloppySlot.png" ));
@@ -330,13 +333,19 @@ void MainWindow::helpAbout()
 {
     QMessageBox::about(this, tr("About"), tr(
         "UKNCBTL Qt Version 1.0\n"
-        "Copyright (C) 2007-2017\n\n"
+        "Copyright (C) 2007-2018\n\n"
         "https://github.com/nzeemin/ukncbtl-qt\n\n"
-        "Authors:\r\nNikita Zimin (nzeemin@gmail.com)\nFelix Lazarev (felix.lazarev@gmail.com)\nAlexey Kisly\n\n"
+        "Authors:\r\nNikita Zimin\nFelix Lazarev\nAlexey Kisly\n\n"
         "Special thanks to:\nArseny Gordin\n\n"
         "Build date:\t%1 %2\n"
         "Qt version:\t%3")
         .arg(__DATE__).arg(__TIME__).arg(QT_VERSION_STR));
+}
+
+void MainWindow::viewKeyboard()
+{
+    m_keyboard->setVisible(!m_keyboard->isVisible());
+    UpdateMenu();
 }
 
 void MainWindow::viewRgbScreen()

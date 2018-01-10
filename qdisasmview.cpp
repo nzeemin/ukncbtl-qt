@@ -356,7 +356,7 @@ bool QDisasmView::getJumpConditionHint(const quint16 *memory, const CProcessor *
     {
         quint16 spvalue = pProc->GetSP();
         int addrtype;
-        quint16 value = pMemCtl->GetWordView(spvalue, pProc->IsHaltMode(), FALSE, &addrtype);
+        quint16 value = pMemCtl->GetWordView(spvalue, pProc->IsHaltMode(), false, &addrtype);
         buffer.sprintf("(SP)=%06o", value);  // "(SP)=XXXXXX"
         return true;
     }

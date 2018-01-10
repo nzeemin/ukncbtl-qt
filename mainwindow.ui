@@ -45,18 +45,10 @@
     <addaction name="separator"/>
     <addaction name="actionSoundEnabled"/>
     <addaction name="separator"/>
-    <addaction name="actionViewRgbScreen"/>
-    <addaction name="actionViewGrayscaleScreen"/>
-    <addaction name="separator"/>
-    <addaction name="actionViewSizeRegular"/>
-    <addaction name="actionViewSizeUpscaled"/>
-    <addaction name="actionViewSizeDouble"/>
-    <addaction name="actionViewSizeUpscaled3"/>
-    <addaction name="actionViewSizeUpscaled4"/>
    </widget>
    <widget class="QMenu" name="menuDrives">
     <property name="title">
-     <string>Drives</string>
+     <string>Configuration</string>
     </property>
     <addaction name="actionDrivesFloppy0"/>
     <addaction name="actionDrivesFloppy1"/>
@@ -87,7 +79,23 @@
     <addaction name="actionDebugStepInto"/>
     <addaction name="actionDebugStepOver"/>
    </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actionViewKeyboard"/>
+    <addaction name="separator"/>
+    <addaction name="actionViewRgbScreen"/>
+    <addaction name="actionViewGrayscaleScreen"/>
+    <addaction name="separator"/>
+    <addaction name="actionViewSizeRegular"/>
+    <addaction name="actionViewSizeUpscaled"/>
+    <addaction name="actionViewSizeDouble"/>
+    <addaction name="actionViewSizeUpscaled3"/>
+    <addaction name="actionViewSizeUpscaled4"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuView"/>
    <addaction name="menuEmulator"/>
    <addaction name="menuDrives"/>
    <addaction name="menuDebug"/>
@@ -300,11 +308,19 @@
    </property>
   </action>
   <action name="actionDebugStepInto">
+   <property name="icon">
+    <iconset resource="QtUkncBtl.qrc">
+     <normaloff>:/images/iconStepInto.png</normaloff>:/images/iconStepInto.png</iconset>
+   </property>
    <property name="text">
     <string>Step Into</string>
    </property>
   </action>
   <action name="actionDebugStepOver">
+   <property name="icon">
+    <iconset resource="QtUkncBtl.qrc">
+     <normaloff>:/images/iconStepOver.png</normaloff>:/images/iconStepOver.png</iconset>
+   </property>
    <property name="text">
     <string>Step Over</string>
    </property>
@@ -433,6 +449,17 @@
   <action name="actionLoadStateImage">
    <property name="text">
     <string>Load State...</string>
+   </property>
+  </action>
+  <action name="actionViewKeyboard">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Keyboard</string>
    </property>
   </action>
  </widget>
