@@ -5,6 +5,7 @@
 #include <QScrollBar>
 #include <QStyle>
 #include <QStyleOptionFocusRect>
+#include <QToolBar>
 #include "main.h"
 #include "qmemoryview.h"
 #include "Emulator.h"
@@ -49,6 +50,20 @@ QMemoryView::QMemoryView()
     m_scrollbar->setRange(0, 65536 - 16);
     m_scrollbar->setSingleStep(16);
     QObject::connect(m_scrollbar, SIGNAL(valueChanged(int)), this, SLOT(scrollValueChanged()));
+
+    m_toolbar = new QToolBar(this);
+    m_toolbar->setGeometry(4, 4, 28, 2000);
+    m_toolbar->setOrientation(Qt::Vertical);
+    m_toolbar->setIconSize(QSize(16, 16));
+    m_toolbar->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    m_toolbar->setFocusPolicy(Qt::NoFocus);
+
+    QAction* actionGotoAddr = m_toolbar->addAction(QIcon(":/images/iconEditAddress.png"), "");
+    m_toolbar->addSeparator();
+    QAction* actionWordByte = m_toolbar->addAction(QIcon(":/images/iconWordByte.png"), "");
+
+    QObject::connect(actionGotoAddr, SIGNAL(triggered()), this, SLOT(gotoAddress()));
+    QObject::connect(actionWordByte, SIGNAL(triggered()), this, SLOT(changeWordByteMode()));
 
     setFocusPolicy(Qt::ClickFocus);
 }
@@ -183,8 +198,8 @@ void QMemoryView::paintEvent(QPaintEvent * /*event*/)
     m_cyLineMemory = cyLine;
 
     char buffer[7];
-    const char* ADDRESS_LINE = " address  0      2      4      6      10     12     14     16";
-    painter.drawText(0, cyLine, ADDRESS_LINE);
+    const char* ADDRESS_LINE = "  addr   0      2      4      6      10     12     14     16";
+    painter.drawText(30, cyLine, ADDRESS_LINE);
 
     // Calculate m_nPageSize
     m_nPageSize = this->height() / cyLine - 1;
@@ -192,9 +207,9 @@ void QMemoryView::paintEvent(QPaintEvent * /*event*/)
     quint16 address = m_wBaseAddress;
     int y = 2 * cyLine;
     for (;;) {  // Draw lines
-        DrawOctalValue(painter, 2 * cxChar, y, address);
+        DrawOctalValue(painter, 30 + 1 * cxChar, y, address);
 
-        int x = 10 * cxChar;
+        int x = 30 + 9 * cxChar;
         ushort wchars[16];
 
         for (int j = 0; j < 8; j++) {  // Draw words as octal value
@@ -279,7 +294,7 @@ void QMemoryView::paintEvent(QPaintEvent * /*event*/)
         option.initFrom(this);
         option.state |= QStyle::State_KeyboardFocusChange;
         option.backgroundColor = QColor(Qt::gray);
-        option.rect = QRect(0, cyLine + 1, 85 * cxChar, cyLine * m_nPageSize);
+        option.rect = QRect(30, cyLine + 1, 83 * cxChar, cyLine * m_nPageSize);
         style()->drawPrimitive(QStyle::PE_FrameFocusRect, &option, &painter, this);
     }
 }

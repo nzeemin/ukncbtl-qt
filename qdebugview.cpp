@@ -2,6 +2,7 @@
 #include <QtGui>
 #include <QMenu>
 #include <QStyleOptionFocusRect>
+#include <QToolBar>
 #include "main.h"
 #include "qdebugview.h"
 #include "Emulator.h"
@@ -11,8 +12,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
-QDebugView::QDebugView(QWidget *parent) :
-        QWidget(parent)
+QDebugView::QDebugView(QWidget *mainWindow) :
+        QWidget()
 {
     m_okDebugProcessor = false;
 
@@ -22,6 +23,22 @@ QDebugView::QDebugView(QWidget *parent) :
     int cyLine = fontmetrics.height();
     this->setMinimumSize(cxChar * 55, cyLine * 16 + cyLine / 2);
     this->setMaximumHeight(cyLine * 16 + cyLine / 2);
+
+    m_toolbar = new QToolBar(this);
+    m_toolbar->setGeometry(4, 4, 28, cyLine * 16);
+    m_toolbar->setOrientation(Qt::Vertical);
+    m_toolbar->setIconSize(QSize(16, 16));
+    m_toolbar->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    m_toolbar->setFocusPolicy(Qt::NoFocus);
+
+    QAction* actionCpuPpu = m_toolbar->addAction(QIcon(":/images/iconCpuPpu.png"), "");
+    m_toolbar->addSeparator();
+    QAction* actionStepInto = m_toolbar->addAction(QIcon(":/images/iconStepInto.png"), "");
+    QAction* actionStepOver = m_toolbar->addAction(QIcon(":/images/iconStepOver.png"), "");
+
+    QObject::connect(actionCpuPpu, SIGNAL(triggered()), this, SLOT(switchCpuPpu()));
+    QObject::connect(actionStepInto, SIGNAL(triggered()), mainWindow, SLOT(debugStepInto()));
+    QObject::connect(actionStepOver, SIGNAL(triggered()), mainWindow, SLOT(debugStepOver()));
 
     setFocusPolicy(Qt::ClickFocus);
 }
@@ -109,21 +126,18 @@ void QDebugView::paintEvent(QPaintEvent * /*event*/)
     quint16* arrR = (m_okDebugProcessor) ? m_wDebugCpuR : m_wDebugPpuR;
     bool* arrRChanged = (m_okDebugProcessor) ? m_okDebugCpuRChanged : m_okDebugPpuRChanged;
 
-    //LPCTSTR sProcName = pDebugPU->GetName();
-    //painter.drawText(cxChar * 1, 2 * cyLine, sProcName);
-
-    drawProcessor(painter, pDebugPU, cxChar * 2, 1 * cyLine, arrR, arrRChanged);
+    drawProcessor(painter, pDebugPU, 30 + cxChar * 2, 1 * cyLine, arrR, arrRChanged);
 
     // Draw stack
-    drawMemoryForRegister(painter, 6, pDebugPU, 35 * cxChar, 1 * cyLine);
+    drawMemoryForRegister(painter, 6, pDebugPU, 30 + 35 * cxChar, 1 * cyLine);
 
     CMemoryController* pDebugMemCtl = pDebugPU->GetMemoryController();
-    drawPorts(painter, m_okDebugProcessor, pDebugMemCtl, g_pBoard, 54 * cxChar, 1 * cyLine);
+    drawPorts(painter, m_okDebugProcessor, pDebugMemCtl, g_pBoard, 30 + 54 * cxChar, 1 * cyLine);
 
     if (m_okDebugProcessor)
-        drawCPUMemoryMap(painter, 70 * cxChar, 0 * cyLine, pDebugPU->IsHaltMode());
+        drawCPUMemoryMap(painter, 30 + 70 * cxChar, 0 * cyLine, pDebugPU->IsHaltMode());
     else
-        drawPPUMemoryMap(painter, 70 * cxChar, 0 * cyLine, pDebugMemCtl);
+        drawPPUMemoryMap(painter, 30 + 70 * cxChar, 0 * cyLine, pDebugMemCtl);
 
     // Draw focus rect
     if (hasFocus())
@@ -133,6 +147,7 @@ void QDebugView::paintEvent(QPaintEvent * /*event*/)
         option.state |= QStyle::State_KeyboardFocusChange;
         option.backgroundColor = QColor(Qt::gray);
         option.rect = this->rect();
+        option.rect.setLeft(option.rect.left() + 30);
         style()->drawPrimitive(QStyle::PE_FrameFocusRect, &option, &painter, this);
     }
 }

@@ -31,10 +31,20 @@ QDisasmView::QDisasmView()
     setFocusPolicy(Qt::ClickFocus);
 }
 
+void QDisasmView::updateWindowText()
+{
+    CProcessor* pDebugPU = m_okDisasmProcessor ? g_pBoard->GetCPU() : g_pBoard->GetPPU();
+    QString buffer = QString(tr("Disassemble - %1")).arg(pDebugPU->GetName());
+    if (!m_SubtitleItems.isEmpty())
+        buffer.append(tr(" - Subtitles"));
+    parentWidget()->setWindowTitle(buffer);
+}
+
 void QDisasmView::setCurrentProc(bool okProc)
 {
     m_okDisasmProcessor = okProc;
     this->updateData();
+    updateWindowText();
 }
 
 void QDisasmView::updateData()
@@ -92,7 +102,7 @@ void QDisasmView::showHideSubtitles()
         parseSubtitles(stream);
     }
 
-    //TODO: updateTitle();
+    updateWindowText();
     repaint();
 }
 
@@ -224,8 +234,8 @@ bool QDisasmView::checkForJump(const quint16 *memory, int *pDelta)
 
     // BR, BNE, BEQ, BGE, BLT, BGT, BLE
     // BPL, BMI, BHI, BLOS, BVC, BVS, BHIS, BLO
-    if ((instr & 0177400) >= 0000400 && (instr & 0177400) < 0004000 ||
-        (instr & 0177400) >= 0100000 && (instr & 0177400) < 0104000)
+    if (((instr & 0177400) >= 0000400 && (instr & 0177400) < 0004000) ||
+        ((instr & 0177400) >= 0100000 && (instr & 0177400) < 0104000))
     {
         *pDelta = ((int)(char)(instr & 0xff)) + 1;
         return true;
@@ -342,12 +352,33 @@ bool QDisasmView::getJumpConditionHint(const quint16 *memory, const CProcessor *
         return true;
     }
 
-    //TODO: RTI, RTT
+    if (instr == 000002 || instr == 000006)  // RTI, RTT
+    {
+        quint16 spvalue = pProc->GetSP();
+        int addrtype;
+        quint16 value = pMemCtl->GetWordView(spvalue, pProc->IsHaltMode(), FALSE, &addrtype);
+        buffer.sprintf("(SP)=%06o", value);  // "(SP)=XXXXXX"
+        return true;
+    }
+    if (instr == 000003 || instr == 000004 ||  // IOT, BPT
+        (instr >= 0104000 && instr <= 0104777))  // TRAP, EMT
+    {
+        quint16 intvec;
+        if (instr == 000003) intvec = 000014;
+        else if (instr == 000004) intvec = 000020;
+        else if (instr < 0104400) intvec = 000030;
+        else intvec = 000034;
+
+        int addrtype;
+        quint16 value = pMemCtl->GetWordView(intvec, pProc->IsHaltMode(), false, &addrtype);
+        buffer.sprintf("(%06o)=%06o", intvec, value);  // "(VVVVVV)=XXXXXX"
+        return true;
+    }
 
     return true;  // All other jumps are non-conditional
 }
 
-bool QDisasmView::getInstructionHint(const quint16 *memory, const CProcessor *pProc, const CMemoryController *pMemCtl, QString &buffer)
+bool QDisasmView::getInstructionHint(const quint16 *memory, const CProcessor *pProc, const CMemoryController */*pMemCtl*/, QString &buffer)
 {
     buffer.clear();
     quint16 instr = *memory;
@@ -424,7 +455,7 @@ bool QDisasmView::getInstructionHint(const quint16 *memory, const CProcessor *pP
     }
 
     // CLC..CCC, SEC..SCC -- show flags
-    if (instr >= 0000241 && instr <= 0000257 || instr >= 0000261 && instr <= 0000277)
+    if ((instr >= 0000241 && instr <= 0000257) || (instr >= 0000261 && instr <= 0000277))
     {
         uint16_t psw = pProc->GetPSW();
         buffer.sprintf("C=%c, V=%c, Z=%c, N=%c",

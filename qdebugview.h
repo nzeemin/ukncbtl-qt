@@ -7,12 +7,13 @@
 class CMotherboard;
 class CProcessor;
 class CMemoryController;
+class QToolBar;
 
 class QDebugView : public QWidget
 {
     Q_OBJECT
 public:
-    QDebugView(QWidget *parent = 0);
+    QDebugView(QWidget *mainWindow);
 
     void setCurrentProc(bool okProc);
     void updateData();
@@ -28,6 +29,7 @@ protected:
     void focusOutEvent(QFocusEvent *);
 
 private:
+    QToolBar* m_toolbar;
     bool m_okDebugProcessor;        // TRUE - CPU, FALSE - PPU
     unsigned short m_wDebugCpuR[9];  // Old register values - R0..R7, PSW
     unsigned short m_wDebugPpuR[9];  // Old register values - R0..R7, PSW

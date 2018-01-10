@@ -33,6 +33,7 @@ public:
 
     void setCurrentProc(bool okProc);
     void updateData();
+    void updateWindowText();
 
 public slots:
     void switchCpuPpu();
