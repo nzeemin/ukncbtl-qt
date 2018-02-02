@@ -12,7 +12,7 @@ matrix:
         - sudo apt-get -qq update
       install:
         - sudo apt-get install -y qt53base
-        - sudo apt-get install -y qt5-qmake qtbase5-dev qtmultimedia5-dev
+        - sudo apt-get install -y qt5-qmake qtbase5-dev qtmultimedia5-dev qtmobility-dev
       before_script:
         - qmake -v
       script:

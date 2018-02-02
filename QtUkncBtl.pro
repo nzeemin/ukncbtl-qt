@@ -1,7 +1,6 @@
 # -------------------------------------------------
 # Project created by QtCreator 2010-05-06T17:43:10
 # -------------------------------------------------
-QT += multimedia
 TARGET = QtUkncBtl
 TEMPLATE = app
 SOURCES += main.cpp \
@@ -52,5 +51,6 @@ RESOURCES += QtUkncBtl.qrc
 QT += widgets
 QT += script
 QT += testlib 
+QT += multimedia
 DEFINES -= UNICODE
 TRANSLATIONS = ukncbtl_en.ts
