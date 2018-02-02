@@ -16,7 +16,7 @@ matrix:
       before_script:
         - qmake -v
       script:
-        - qmake "CONFIG+=debug" QtBkBtl.pro
+        - qmake "CONFIG+=debug" QtUkncBtl.pro
         - make
     - os: osx
       compiler: clang
@@ -28,5 +28,5 @@ matrix:
       before_script:
         - qmake -v
       script:
-        - qmake "CONFIG+=debug" QtBkBtl.pro
+        - qmake "CONFIG+=debug" QtUkncBtl.pro
         - make
