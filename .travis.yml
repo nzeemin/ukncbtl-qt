@@ -14,6 +14,9 @@ matrix:
         - sudo apt-get install -y qt53base
         - sudo apt-get install -y qt5-qmake qtbase5-dev qtmultimedia5-dev qtmobility-dev
       before_script:
+        - export QMAKESPEC=linux-g++
+        - . /opt/qt53/bin/qt53-env.sh
+        - export QT_SELECT=qt5
         - qmake -v
       script:
         - qmake "CONFIG+=debug" QtUkncBtl.pro
