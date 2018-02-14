@@ -53,6 +53,8 @@ bool Emulator_Init()
 {
     ASSERT(g_pBoard == NULL);
 
+    ::memset(g_pEmulatorRam, 0, sizeof(g_pEmulatorRam));
+    ::memset(g_pEmulatorChangedRam, 0, sizeof(g_pEmulatorChangedRam));
     CProcessor::Init();
 
     g_pBoard = new CMotherboard();
@@ -68,10 +70,16 @@ bool Emulator_Init()
         return false;
     }
     qint64 bytesRead = romFile.read((char*)buffer, 32256);
-    ASSERT(bytesRead == 32256);
     romFile.close();
+    if (bytesRead != 32256)
+    {
+        AlertWarning(QT_TRANSLATE_NOOP("Emulator", "Failed to load ROM file."));
+        return false;
+    }
 
     g_pBoard->LoadROM(buffer);
+
+    //g_pBoard->SetNetStation((uint16_t)Settings_GetNetStation());
 
     g_pBoard->Reset();
 
@@ -87,8 +95,8 @@ bool Emulator_Init()
     // Allocate memory for old RAM values
     for (int i = 0; i < 3; i++)
     {
-        g_pEmulatorRam[i] = (quint8*) ::malloc(65536);  memset(g_pEmulatorRam[i], 0, 65536);
-        g_pEmulatorChangedRam[i] = (quint8*) ::malloc(65536);  memset(g_pEmulatorChangedRam[i], 0, 65536);
+        g_pEmulatorRam[i] = (quint8*) ::calloc(65536, 1);
+        g_pEmulatorChangedRam[i] = (quint8*) ::calloc(65536, 1);
     }
 
     g_okEmulatorInitialized = true;
@@ -181,7 +189,7 @@ int Emulator_SystemFrame()
     //ScreenView_ScanKeyboard();
     Emulator_ProcessKeyEvent();
     
-	if (!g_pBoard->SystemFrame())
+    if (!g_pBoard->SystemFrame())
         return 0;
 
     // Calculate frames per second
@@ -265,24 +273,28 @@ quint16 Emulator_GetChangeRamStatus(int addrtype, quint16 address)
     }
 }
 
-void Emulator_LoadROMCartridge(int slot, LPCTSTR sFilePath)
+bool Emulator_LoadROMCartridge(int slot, LPCTSTR sFilePath)
 {
     // Open file
     FILE* fpFile = ::fopen(sFilePath, "rb");
     if (fpFile == NULL)
     {
         AlertWarning(QT_TRANSLATE_NOOP("Emulator", "Failed to load ROM cartridge image."));
-        return;
+        return false;
     }
 
     // Allocate memory
-    quint8* pImage = (quint8*) ::malloc(24 * 1024);
-
+    quint8* pImage = (quint8*) ::calloc(24 * 1024, 1);
+    if (pImage == NULL)
+    {
+        ::fclose(fpFile);
+        return false;
+    }
     size_t dwBytesRead = ::fread(pImage, 1, 24 * 1024, fpFile);
     if (dwBytesRead != 24 * 1024)
     {
         AlertWarning(QT_TRANSLATE_NOOP("Emulator", "Failed to load ROM cartridge image."));
-        return;
+        return false;
     }
 
     g_pBoard->LoadROMCartridge(slot, pImage);
@@ -290,6 +302,10 @@ void Emulator_LoadROMCartridge(int slot, LPCTSTR sFilePath)
     // Free memory, close file
     ::free(pImage);
     ::fclose(fpFile);
+
+    //TODO: Save the file name for a future SaveImage() call
+
+    return true;
 }
 
 void Emulator_PrepareScreenRGB32(void* pImageBits, const quint32* colors)
@@ -493,20 +509,35 @@ void Emulator_SetSound(bool enable)
 
 
 //////////////////////////////////////////////////////////////////////
-// Save/restore state
+//
+// Emulator image format - see CMotherboard::SaveToImage()
+// Image header format (32 bytes):
+//   4 bytes        UKNC_IMAGE_HEADER1
+//   4 bytes        UKNC_IMAGE_HEADER2
+//   4 bytes        UKNC_IMAGE_VERSION
+//   4 bytes        UKNC_IMAGE_SIZE
+//   4 bytes        UKNC uptime
+//   12 bytes       Not used
+//TODO: 256 bytes * 2 - Cartridge 1..2 path
+//TODO: 256 bytes * 4 - Floppy 1..4 path
+//TODO: 256 bytes * 2 - Hard 1..2 path
 
-void Emulator_SaveImage(const QString& sFilePath)
+bool Emulator_SaveImage(const QString& sFilePath)
 {
     QFile file(sFilePath);
     if (! file.open(QIODevice::Truncate | QIODevice::WriteOnly))
     {
         AlertWarning(QT_TRANSLATE_NOOP("Emulator", "Failed to save image file."));
-        return;
+        return false;
     }
 
     // Allocate memory
-    quint8* pImage = (quint8*) ::malloc(UKNCIMAGE_SIZE);
-    memset(pImage, 0, UKNCIMAGE_SIZE);
+    quint8* pImage = (quint8*) ::calloc(UKNCIMAGE_SIZE, 1);
+    if (pImage == NULL)
+    {
+        file.close();
+        return false;
+    }
     // Prepare header
     quint32* pHeader = (quint32*) pImage;
     *pHeader++ = UKNCIMAGE_HEADER1;
@@ -522,42 +553,55 @@ void Emulator_SaveImage(const QString& sFilePath)
     if (bytesWritten != UKNCIMAGE_SIZE)
     {
         AlertWarning(QT_TRANSLATE_NOOP("Emulator", "Failed to save image file data."));
-        return;
+        return false;
     }
 
     // Free memory, close file
     ::free(pImage);
     file.close();
+
+    return true;
 }
 
-void Emulator_LoadImage(const QString &sFilePath)
+bool Emulator_LoadImage(const QString &sFilePath)
 {
+    Emulator_Stop();
+
     QFile file(sFilePath);
     if (! file.open(QIODevice::ReadOnly))
     {
         AlertWarning(QT_TRANSLATE_NOOP("Emulator", "Failed to load image file."));
-        return;
+        return false;
     }
-
-    Emulator_Stop();
 
     // Read header
     quint32 bufHeader[UKNCIMAGE_HEADER_SIZE / sizeof(quint32)];
     qint64 bytesRead = file.read((char*)bufHeader, UKNCIMAGE_HEADER_SIZE);
-    //TODO: Check if bytesRead != UKNCIMAGE_HEADER_SIZE
+    if (bytesRead != UKNCIMAGE_HEADER_SIZE)
+    {
+        file.close();
+        return false;
+    }
 
     //TODO: Check version and size
 
     // Allocate memory
     quint8* pImage = (quint8*) ::malloc(UKNCIMAGE_SIZE);
+    if (pImage == NULL)
+    {
+        file.close();
+        return false;
+    }
 
     // Read image
     file.seek(0);
     bytesRead = file.read((char*)pImage, UKNCIMAGE_SIZE);
     if (bytesRead != UKNCIMAGE_SIZE)
     {
+        ::free(pImage);
+        file.close();
         AlertWarning(QT_TRANSLATE_NOOP("Emulator", "Failed to load image file data."));
-        return;
+        return false;
     }
     else
     {
@@ -570,6 +614,8 @@ void Emulator_LoadImage(const QString &sFilePath)
     // Free memory, close file
     ::free(pImage);
     file.close();
+
+    return true;
 }
 
 

@@ -39,14 +39,14 @@ void Emulator_KeyEvent(quint8 keyPressed, bool pressed);
 quint16 Emulator_GetKeyEventFromQueue();
 void Emulator_ProcessKeyEvent();
 
-void Emulator_LoadROMCartridge(int slot, LPCTSTR sFilePath);
+bool Emulator_LoadROMCartridge(int slot, LPCTSTR sFilePath);
 
 // Update cached values after Run or Step
 void Emulator_OnUpdate();
 quint16 Emulator_GetChangeRamStatus(int addrtype, quint16 address);
 
-void Emulator_SaveImage(const QString &sFilePath);
-void Emulator_LoadImage(const QString &sFilePath);
+bool Emulator_SaveImage(const QString &sFilePath);
+bool Emulator_LoadImage(const QString &sFilePath);
 
 
 //////////////////////////////////////////////////////////////////////
