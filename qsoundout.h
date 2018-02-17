@@ -20,12 +20,12 @@ class QSoundOut : public QObject
 public:
     explicit QSoundOut(QObject *parent = 0);
     ~QSoundOut();
-    
+
 signals:
 
 public slots:
     void FeedDAC(unsigned short left, unsigned short right);
-    
+
 private slots:
     void OnNotify();
 

@@ -128,7 +128,8 @@ MainWindow::~MainWindow()
 void MainWindow::changeEvent(QEvent *e)
 {
     QMainWindow::changeEvent(e);
-    switch (e->type()) {
+    switch (e->type())
+    {
     case QEvent::LanguageChange:
         ui->retranslateUi(this);
         break;
@@ -332,14 +333,14 @@ void MainWindow::saveScreenshot(const QString& strFileName)
 void MainWindow::helpAbout()
 {
     QMessageBox::about(this, tr("About"), tr(
-        "UKNCBTL Qt Version 1.0\n"
-        "Copyright (C) 2007-2018\n\n"
-        "https://github.com/nzeemin/ukncbtl-qt\n\n"
-        "Authors:\r\nNikita Zimin\nFelix Lazarev\nAlexey Kisly\n\n"
-        "Special thanks to:\nArseny Gordin\n\n"
-        "Build date:\t%1 %2\n"
-        "Qt version:\t%3")
-        .arg(__DATE__).arg(__TIME__).arg(QT_VERSION_STR));
+            "UKNCBTL Qt Version 1.0\n"
+            "Copyright (C) 2007-2018\n\n"
+            "https://github.com/nzeemin/ukncbtl-qt\n\n"
+            "Authors:\r\nNikita Zimin\nFelix Lazarev\nAlexey Kisly\n\n"
+            "Special thanks to:\nArseny Gordin\n\n"
+            "Build date:\t%1 %2\n"
+            "Qt version:\t%3")
+            .arg(__DATE__).arg(__TIME__).arg(QT_VERSION_STR));
 }
 
 void MainWindow::viewKeyboard()

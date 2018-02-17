@@ -110,7 +110,7 @@ void Emulator_Done()
     CProcessor::Done();
 
     g_pBoard->SetSoundGenCallback(NULL);
-    if(g_sound)
+    if (g_sound)
     {
         delete g_sound;
         g_sound = NULL;
@@ -188,7 +188,7 @@ int Emulator_SystemFrame()
 
     //ScreenView_ScanKeyboard();
     Emulator_ProcessKeyEvent();
-    
+
     if (!g_pBoard->SystemFrame())
         return 0;
 
@@ -491,7 +491,7 @@ void CALLBACK Emulator_FeedDAC(unsigned short l, unsigned short r)
     if (g_sound)
     {
         if (m_okEmulatorSound)
-            g_sound->FeedDAC(l,r);
+            g_sound->FeedDAC(l, r);
     }
 }
 

@@ -99,7 +99,7 @@ HWAVPCMFILE WavPcmFile_Create(LPCTSTR filename, int sampleRate)
 
     memcpy(&consolidated_header[0], magic1, 4);  // RIFF
     memcpy(&consolidated_header[8], magic2, 4);  // WAVE
-    
+
     memcpy(&consolidated_header[12], format_tag_id, 4);  // fmt
     *((quint32*)(consolidated_header + 16)) = 16;  // Size of "fmt" chunk
     *((quint16*)(consolidated_header + 20)) = WAV_FORMAT_PCM;  // AudioFormat = PCM

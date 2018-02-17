@@ -14,7 +14,8 @@
 #include "qdialogs.h"
 
 
-enum MemoryViewMode {
+enum MemoryViewMode
+{
     MEMMODE_RAM0 = 0,  // RAM plane 0
     MEMMODE_RAM1 = 1,  // RAM plane 1
     MEMMODE_RAM2 = 2,  // RAM plane 2
@@ -24,7 +25,8 @@ enum MemoryViewMode {
     MEMMODE_LAST = 5   // Last mode number
 };
 
-static const char * MemoryView_ModeNames[] = {
+static const char * MemoryView_ModeNames[] =
+{
     "RAM0", "RAM1", "RAM2", "ROM", "CPU", "PPU"
 };
 
@@ -187,7 +189,7 @@ void QMemoryView::paintEvent(QPaintEvent * /*event*/)
     if (g_pBoard == NULL) return;
 
     QPainter painter(this);
-    painter.fillRect(0,0, this->width(), this->height(), Qt::white);
+    painter.fillRect(0, 0, this->width(), this->height(), Qt::white);
 
     QFont font = Common_GetMonospacedFont();
     painter.setFont(font);
@@ -208,47 +210,50 @@ void QMemoryView::paintEvent(QPaintEvent * /*event*/)
 
     quint16 address = m_wBaseAddress;
     int y = 2 * cyLine;
-    for (;;) {  // Draw lines
+    for (;;)    // Draw lines
+    {
         DrawOctalValue(painter, 30 + 1 * cxChar, y, address);
 
         int x = 30 + 9 * cxChar;
         ushort wchars[16];
 
-        for (int j = 0; j < 8; j++) {  // Draw words as octal value
+        for (int j = 0; j < 8; j++)    // Draw words as octal value
+        {
             // Get word from memory
             quint16 word = 0;
             int okValid = true;
             int addrtype = ADDRTYPE_NONE;
             bool okHalt = false;
             quint16 wChanged = 0;
-            switch (m_Mode) {
-                case MEMMODE_RAM0:
-                case MEMMODE_RAM1:
-                case MEMMODE_RAM2:
-                    word = g_pBoard->GetRAMWord(m_Mode, address);
-                    wChanged = Emulator_GetChangeRamStatus(m_Mode, address);
-                    break;
-                case MEMMODE_ROM:  // ROM - only 32 Kbytes
-                    if (address < 0100000)
-                        okValid = false;
-                    else
-                        word = g_pBoard->GetROMWord(address - 0100000);
-                    break;
-                case MEMMODE_CPU:
-                    okHalt = g_pBoard->GetCPU()->IsHaltMode();
-                    word = g_pBoard->GetCPUMemoryController()->GetWordView(address, okHalt, false, &addrtype);
-                    okValid = (addrtype != ADDRTYPE_IO) && (addrtype != ADDRTYPE_DENY);
-                    wChanged = Emulator_GetChangeRamStatus(ADDRTYPE_RAM12, address);
-                    break;
-                case MEMMODE_PPU:
-                    okHalt = g_pBoard->GetPPU()->IsHaltMode();
-                    word = g_pBoard->GetPPUMemoryController()->GetWordView(address, okHalt, false, &addrtype);
-                    okValid = (addrtype != ADDRTYPE_IO) && (addrtype != ADDRTYPE_DENY);
-                    if (address < 0100000)
-                        wChanged = Emulator_GetChangeRamStatus(ADDRTYPE_RAM0, address);
-                    else
-                        wChanged = 0;
-                    break;
+            switch (m_Mode)
+            {
+            case MEMMODE_RAM0:
+            case MEMMODE_RAM1:
+            case MEMMODE_RAM2:
+                word = g_pBoard->GetRAMWord(m_Mode, address);
+                wChanged = Emulator_GetChangeRamStatus(m_Mode, address);
+                break;
+            case MEMMODE_ROM:  // ROM - only 32 Kbytes
+                if (address < 0100000)
+                    okValid = false;
+                else
+                    word = g_pBoard->GetROMWord(address - 0100000);
+                break;
+            case MEMMODE_CPU:
+                okHalt = g_pBoard->GetCPU()->IsHaltMode();
+                word = g_pBoard->GetCPUMemoryController()->GetWordView(address, okHalt, false, &addrtype);
+                okValid = (addrtype != ADDRTYPE_IO) && (addrtype != ADDRTYPE_DENY);
+                wChanged = Emulator_GetChangeRamStatus(ADDRTYPE_RAM12, address);
+                break;
+            case MEMMODE_PPU:
+                okHalt = g_pBoard->GetPPU()->IsHaltMode();
+                word = g_pBoard->GetPPUMemoryController()->GetWordView(address, okHalt, false, &addrtype);
+                okValid = (addrtype != ADDRTYPE_IO) && (addrtype != ADDRTYPE_DENY);
+                if (address < 0100000)
+                    wChanged = Emulator_GetChangeRamStatus(ADDRTYPE_RAM0, address);
+                else
+                    wChanged = 0;
+                break;
             }
 
             if (okValid)

@@ -15,19 +15,19 @@ bool AssertFailedLine(const char * lpszFileName, int nLine)
     char buffer[360];
     _snprintf(buffer, 360,
             QT_TRANSLATE_NOOP("Common",
-                "ASSERTION FAILED\n\nFile: %s\nLine: %d\n\n"
-                "Press Abort to stop the program, Retry to break to the debugger, or Ignore to continue execution."),
+                    "ASSERTION FAILED\n\nFile: %s\nLine: %d\n\n"
+                    "Press Abort to stop the program, Retry to break to the debugger, or Ignore to continue execution."),
             lpszFileName, nLine);
     int result = QMessageBox::question(NULL, QT_TRANSLATE_NOOP("Common", "UKNC Back to Life"),
             buffer, QMessageBox::Abort, QMessageBox::Retry, QMessageBox::Ignore);
     switch (result)
     {
-        case QMessageBox::Retry:
-            return true;
-        case QMessageBox::Ignore:
-            return false;
-        case QMessageBox::Abort:
-            QCoreApplication::exit(255);
+    case QMessageBox::Retry:
+        return true;
+    case QMessageBox::Ignore:
+        return false;
+    case QMessageBox::Abort:
+        QCoreApplication::exit(255);
     }
     return false;
 }
@@ -138,7 +138,8 @@ void Common_Cleanup()
 // buffer size at least 7 characters
 void PrintOctalValue(char* buffer, quint16 value)
 {
-    for (int p = 0; p < 6; p++) {
+    for (int p = 0; p < 6; p++)
+    {
         int digit = value & 7;
         buffer[5 - p] = '0' + digit;
         value = (value >> 3);
@@ -149,7 +150,8 @@ void PrintOctalValue(char* buffer, quint16 value)
 // buffer size at least 5 characters
 void PrintHexValue(char* buffer, quint16 value)
 {
-    for (int p = 0; p < 4; p++) {
+    for (int p = 0; p < 4; p++)
+    {
         int digit = value & 15;
         buffer[3 - p] = (digit < 10) ? '0' + (char)digit : 'a' + (char)(digit - 10);
         value = (value >> 4);
@@ -160,7 +162,8 @@ void PrintHexValue(char* buffer, quint16 value)
 // buffer size at least 17 characters
 void PrintBinaryValue(char * buffer, quint16 value)
 {
-    for (int b = 0; b < 16; b++) {
+    for (int b = 0; b < 16; b++)
+    {
         int bit = (value >> b) & 1;
         buffer[15 - b] = bit ? '1' : '0';
     }
@@ -191,7 +194,8 @@ bool ParseOctalValue(const char* text, quint16* pValue)
 {
     quint16 value = 0;
     char* pChar = (char*) text;
-    for (int p = 0; ; p++) {
+    for (int p = 0; ; p++)
+    {
         if (p > 6) return false;
         char ch = *pChar;  pChar++;
         if (ch == 0) break;
@@ -208,7 +212,8 @@ bool ParseOctalValue(const char* text, quint16* pValue)
 bool ParseOctalValue(const QString &text, quint16* pValue)
 {
     quint16 value = 0;
-    for (int p = 0; p < text.length(); p++) {
+    for (int p = 0; p < text.length(); p++)
+    {
         if (p > 6) return false;
         char ch = text.at(p).toLatin1();
         if (ch == 0) break;
@@ -223,7 +228,8 @@ bool ParseOctalValue(const QString &text, quint16* pValue)
 
 
 // KOI8-R (Russian) to Unicode conversion table
-const ushort KOI8R_CODES[] = {
+const ushort KOI8R_CODES[] =
+{
     0x2500, 0x2502, 0x250c, 0x2510, 0x2514, 0x2518, 0x251c, 0x2524, 0x252c, 0x2534, 0x253c, 0x2580, 0x2584, 0x2588, 0x258c, 0x2590,
     0x2591, 0x2592, 0x2593, 0x2320, 0x25a0, 0x2219, 0x221a, 0x2248, 0x2264, 0x2265, 0x00a0, 0x2321, 0x00b0, 0x00b2, 0x00b7, 0x00f7,
     0x2550, 0x2551, 0x2552, 0x0451, 0x2553, 0x2554, 0x2555, 0x2556, 0x2557, 0x2558, 0x2559, 0x255a, 0x255b, 0x255c, 0x255d, 0x255e,

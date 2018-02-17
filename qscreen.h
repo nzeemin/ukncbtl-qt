@@ -3,13 +3,15 @@
 
 #include <QWidget>
 
-enum ScreenViewMode {
+enum ScreenViewMode
+{
     RGBScreen = 1,
     GrayScreen = 2,
     GRBScreen = 3
 };
 
-enum ScreenSizeMode {
+enum ScreenSizeMode
+{
     RegularScreen = 1,
     DoubleScreen = 2,
     UpscaledScreen = 3,

@@ -41,9 +41,9 @@ typedef const char * LPCTSTR;
 //#define HIBYTE(w)           ((quint8)((((quint32)(w)) >> 8) & 0xff))
 
 #ifdef __GNUC__
- #define CALLBACK
+#define CALLBACK
 #else
- #define CALLBACK __stdcall
+#define CALLBACK __stdcall
 #endif
 
 typedef void *HANDLE;

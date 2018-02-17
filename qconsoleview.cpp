@@ -117,7 +117,7 @@ void QConsoleView::printHelp()
             "  s          Step Into; executes one instruction\r\n"
             "  so         Step Over; executes and stops after the current instruction\r\n"
 //            "  u          Save memory dump to file memdumpXPU.bin\r\n"
-        ));
+                  ));
 }
 
 int QConsoleView::printDisassemble(CProcessor* pProc, quint16 address, bool okOneInstr, bool okShort)
@@ -129,7 +129,7 @@ int QConsoleView::printDisassemble(CProcessor* pProc, quint16 address, bool okOn
     quint16 memory[nWindowSize + 2];
     int addrType;
     for (int i = 0; i < nWindowSize + 2; i++)
-        memory[i] = pMemCtl->GetWordView(address + i*2, okHaltMode, true, &addrType);
+        memory[i] = pMemCtl->GetWordView(address + i * 2, okHaltMode, true, &addrType);
 
     char bufaddr[7];
     char bufvalue[7];
@@ -137,7 +137,8 @@ int QConsoleView::printDisassemble(CProcessor* pProc, quint16 address, bool okOn
 
     int lastLength = 0;
     int length = 0;
-    for (int index = 0; index < nWindowSize; index++) {  // Рисуем строки
+    for (int index = 0; index < nWindowSize; index++)    // Рисуем строки
+    {
         PrintOctalValue(bufaddr, address);
         quint16 value = memory[index];
         PrintOctalValue(bufvalue, value);
@@ -201,16 +202,17 @@ void QConsoleView::printMemoryDump(CProcessor *pProc, quint16 address, int lines
     {
         quint16 dump[8];
         for (int i = 0; i < 8; i++)
-            dump[i] = pMemCtl->GetWord(address + i*2, okHaltMode);
+            dump[i] = pMemCtl->GetWord(address + i * 2, okHaltMode);
 
-        char buffer[2+6+2 + 7*8 + 1 + 16 + 1 + 2];
+        char buffer[2 + 6 + 2 + 7 * 8 + 1 + 16 + 1 + 2];
         char* pBuf = buffer;
         *pBuf = ' ';  pBuf++;
         *pBuf = ' ';  pBuf++;
         PrintOctalValue(pBuf, address);  pBuf += 6;
         *pBuf = ' ';  pBuf++;
         *pBuf = ' ';  pBuf++;
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < 8; i++)
+        {
             PrintOctalValue(pBuf, dump[i]);  pBuf += 6;
             *pBuf = ' ';  pBuf++;
         }
@@ -353,7 +355,7 @@ void QConsoleView::execConsoleCommand(const QString &command)
         okUpdateMenu = true;
     }
     else if (command.startsWith("d") ||  // Disassemble
-             command.startsWith("D"))    // Disassemble, short format
+            command.startsWith("D"))    // Disassemble, short format
     {
         bool okShort = (command[0] == 'D');
         if (command.length() == 1)  // "d" - disassemble at current address
