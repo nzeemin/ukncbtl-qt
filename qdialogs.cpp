@@ -3,7 +3,7 @@
 #include <QMessageBox>
 
 QInputOctalDialog::QInputOctalDialog(QWidget *parent, const QString & title, const QString & prompt, quint16 * value)
-    : QDialog(parent, 0)
+    : QDialog(parent, nullptr)
 {
     m_result = value;
 
@@ -30,7 +30,7 @@ void QInputOctalDialog::accept()
     quint16 value;
     if (! ParseOctalValue(m_edit.text().toLatin1().data(), &value))
     {
-        QMessageBox::warning(this, 0, "Please enter correct octal value.");
+        QMessageBox::warning(this, nullptr, "Please enter correct octal value.");
         return;
     }
 

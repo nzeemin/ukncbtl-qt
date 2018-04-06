@@ -89,7 +89,7 @@ HWAVPCMFILE WavPcmFile_Create(LPCTSTR filename, int sampleRate)
     const int blockAlign = channels * bitsPerSample / 8;
 
     FILE* fpFileNew = ::_tfopen(filename, _T("w+b"));
-    if (fpFileNew == NULL)
+    if (fpFileNew == nullptr)
         return (HWAVPCMFILE) INVALID_HANDLE_VALUE;  // Failed to create file
 
     // Prepare and write file header
@@ -120,7 +120,7 @@ HWAVPCMFILE WavPcmFile_Create(LPCTSTR filename, int sampleRate)
     }
 
     WAVPCMFILE* pWavPcm = (WAVPCMFILE*) ::malloc(sizeof(WAVPCMFILE));
-    if (pWavPcm == NULL)
+    if (pWavPcm == nullptr)
     {
         ::fclose(fpFileNew);
         return (HWAVPCMFILE) INVALID_HANDLE_VALUE;  // Failed to allocate memory
@@ -143,7 +143,7 @@ HWAVPCMFILE WavPcmFile_Create(LPCTSTR filename, int sampleRate)
 HWAVPCMFILE WavPcmFile_Open(LPCTSTR filename)
 {
     FILE* fpFileOpen = ::_tfopen(filename, _T("rb"));
-    if (fpFileOpen == NULL)
+    if (fpFileOpen == nullptr)
         return (HWAVPCMFILE) INVALID_HANDLE_VALUE;  // Failed to open file
 
     quint32 offset = 0;
@@ -238,7 +238,7 @@ HWAVPCMFILE WavPcmFile_Open(LPCTSTR filename)
     }
 
     WAVPCMFILE* pWavPcm = (WAVPCMFILE*) ::malloc(sizeof(WAVPCMFILE));
-    if (pWavPcm == NULL)
+    if (pWavPcm == nullptr)
     {
         ::fclose(fpFileOpen);
         return (HWAVPCMFILE) INVALID_HANDLE_VALUE;  // Failed to allocate memory
@@ -278,7 +278,7 @@ void WavPcmFile_Close(HWAVPCMFILE wavpcmfile)
     }
 
     ::fclose(pWavPcm->fpFile);
-    pWavPcm->fpFile = NULL;
+    pWavPcm->fpFile = nullptr;
     ::free(pWavPcm);
 }
 

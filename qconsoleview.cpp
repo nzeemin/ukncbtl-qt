@@ -72,7 +72,7 @@ void QConsoleView::setCurrentProc(bool okProc)
 void QConsoleView::updatePrompt()
 {
     CProcessor* pProc = this->getCurrentProcessor();
-    if (pProc == 0) return;
+    if (pProc == nullptr) return;
     char buffer[15];
     _snprintf(buffer, 15, " %s:%06o> ", pProc->GetName(), pProc->GetPC());
     m_prompt->setText(buffer);

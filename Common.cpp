@@ -18,7 +18,7 @@ bool AssertFailedLine(const char * lpszFileName, int nLine)
                     "ASSERTION FAILED\n\nFile: %s\nLine: %d\n\n"
                     "Press Abort to stop the program, Retry to break to the debugger, or Ignore to continue execution."),
             lpszFileName, nLine);
-    int result = QMessageBox::question(NULL, QT_TRANSLATE_NOOP("Common", "UKNC Back to Life"),
+    int result = QMessageBox::question(nullptr, QT_TRANSLATE_NOOP("Common", "UKNC Back to Life"),
             buffer, QMessageBox::Abort, QMessageBox::Retry, QMessageBox::Ignore);
     switch (result)
     {
@@ -34,13 +34,13 @@ bool AssertFailedLine(const char * lpszFileName, int nLine)
 
 void AlertWarning(const QString &sMessage)
 {
-    QMessageBox::warning(NULL, QT_TRANSLATE_NOOP("Common", "UKNC Back to Life"),
+    QMessageBox::warning(nullptr, QT_TRANSLATE_NOOP("Common", "UKNC Back to Life"),
             sMessage, QMessageBox::Ok);
 }
 
 bool AlertOkCancel(const QString &sMessage)
 {
-    int result = QMessageBox::question(NULL, QT_TRANSLATE_NOOP("Common", "UKNC Back to Life"),
+    int result = QMessageBox::question(nullptr, QT_TRANSLATE_NOOP("Common", "UKNC Back to Life"),
             sMessage, QMessageBox::Ok, QMessageBox::Cancel);
     return (result == QMessageBox::Ok);
 }
@@ -71,11 +71,11 @@ void DebugPrintFormat(const char* pszFormat, ...)
 const char* TRACELOG_FILE_NAME = "trace.log";
 const char* TRACELOG_NEWLINE = "\r\n";
 
-FILE* Common_LogFile = NULL;
+FILE* Common_LogFile = nullptr;
 
 void DebugLog(const char* message)
 {
-    if (Common_LogFile == NULL)
+    if (Common_LogFile == nullptr)
     {
         Common_LogFile = ::fopen(TRACELOG_FILE_NAME, "a+b");
     }
@@ -105,11 +105,11 @@ void DebugLogFormat(const char* pszFormat, ...)
 //////////////////////////////////////////////////////////////////////
 
 
-static QFont* g_MonospacedFont = NULL;
+static QFont* g_MonospacedFont = nullptr;
 
 QFont Common_GetMonospacedFont()
 {
-    if (g_MonospacedFont != NULL)
+    if (g_MonospacedFont != nullptr)
         return *g_MonospacedFont;
 
 #ifdef __APPLE__
@@ -129,7 +129,7 @@ QFont Common_GetMonospacedFont()
 
 void Common_Cleanup()
 {
-    if (g_MonospacedFont != NULL)
+    if (g_MonospacedFont != nullptr)
         delete g_MonospacedFont;
 }
 

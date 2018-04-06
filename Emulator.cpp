@@ -13,8 +13,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
-CMotherboard* g_pBoard = NULL;
-QSoundOut * g_sound = NULL;
+CMotherboard* g_pBoard = nullptr;
+QSoundOut * g_sound = nullptr;
 
 bool g_okEmulatorInitialized = false;
 bool g_okEmulatorRunning = false;
@@ -51,7 +51,7 @@ void CALLBACK Emulator_FeedDAC(unsigned short l, unsigned short r);
 
 bool Emulator_Init()
 {
-    ASSERT(g_pBoard == NULL);
+    ASSERT(g_pBoard == nullptr);
 
     ::memset(g_pEmulatorRam, 0, sizeof(g_pEmulatorRam));
     ::memset(g_pEmulatorChangedRam, 0, sizeof(g_pEmulatorChangedRam));
@@ -105,19 +105,19 @@ bool Emulator_Init()
 
 void Emulator_Done()
 {
-    ASSERT(g_pBoard != NULL);
+    ASSERT(g_pBoard != nullptr);
 
     CProcessor::Done();
 
-    g_pBoard->SetSoundGenCallback(NULL);
+    g_pBoard->SetSoundGenCallback(nullptr);
     if (g_sound)
     {
         delete g_sound;
-        g_sound = NULL;
+        g_sound = nullptr;
     }
 
     delete g_pBoard;
-    g_pBoard = NULL;
+    g_pBoard = nullptr;
 
     // Free memory used for old RAM values
     for (int i = 0; i < 3; i++)
@@ -151,7 +151,7 @@ void Emulator_Stop()
 
 void Emulator_Reset()
 {
-    ASSERT(g_pBoard != NULL);
+    ASSERT(g_pBoard != nullptr);
 
     g_pBoard->Reset();
 
@@ -277,7 +277,7 @@ bool Emulator_LoadROMCartridge(int slot, LPCTSTR sFilePath)
 {
     // Open file
     FILE* fpFile = ::fopen(sFilePath, "rb");
-    if (fpFile == NULL)
+    if (fpFile == nullptr)
     {
         AlertWarning(QT_TRANSLATE_NOOP("Emulator", "Failed to load ROM cartridge image."));
         return false;
@@ -285,7 +285,7 @@ bool Emulator_LoadROMCartridge(int slot, LPCTSTR sFilePath)
 
     // Allocate memory
     quint8* pImage = (quint8*) ::calloc(24 * 1024, 1);
-    if (pImage == NULL)
+    if (pImage == nullptr)
     {
         ::fclose(fpFile);
         return false;
@@ -310,7 +310,7 @@ bool Emulator_LoadROMCartridge(int slot, LPCTSTR sFilePath)
 
 void Emulator_PrepareScreenRGB32(void* pImageBits, const quint32* colors)
 {
-    if (pImageBits == NULL) return;
+    if (pImageBits == nullptr) return;
     if (!g_okEmulatorInitialized) return;
 
     // Tag parsing loop
@@ -498,12 +498,12 @@ void CALLBACK Emulator_FeedDAC(unsigned short l, unsigned short r)
 void Emulator_SetSound(bool enable)
 {
     m_okEmulatorSound = enable;
-    if (g_pBoard != 0)
+    if (g_pBoard != nullptr)
     {
         if (enable)
             g_pBoard->SetSoundGenCallback(Emulator_FeedDAC);
         else
-            g_pBoard->SetSoundGenCallback(0);
+            g_pBoard->SetSoundGenCallback(nullptr);
     }
 }
 
@@ -533,7 +533,7 @@ bool Emulator_SaveImage(const QString& sFilePath)
 
     // Allocate memory
     quint8* pImage = (quint8*) ::calloc(UKNCIMAGE_SIZE, 1);
-    if (pImage == NULL)
+    if (pImage == nullptr)
     {
         file.close();
         return false;
@@ -587,7 +587,7 @@ bool Emulator_LoadImage(const QString &sFilePath)
 
     // Allocate memory
     quint8* pImage = (quint8*) ::malloc(UKNCIMAGE_SIZE);
-    if (pImage == NULL)
+    if (pImage == nullptr)
     {
         file.close();
         return false;

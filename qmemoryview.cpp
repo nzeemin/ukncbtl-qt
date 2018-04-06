@@ -133,7 +133,7 @@ void QMemoryView::contextMenuEvent(QContextMenuEvent *event)
 void QMemoryView::changeMemoryMode()
 {
     QAction * action = qobject_cast<QAction*>(sender());
-    if (action == 0) return;
+    if (action == nullptr) return;
     int mode = action->data().toInt();
     if (mode < 0 || mode > MEMMODE_LAST) return;
 
@@ -186,7 +186,7 @@ void QMemoryView::scrollValueChanged()
 
 void QMemoryView::paintEvent(QPaintEvent * /*event*/)
 {
-    if (g_pBoard == NULL) return;
+    if (g_pBoard == nullptr) return;
 
     QPainter painter(this);
     painter.fillRect(0, 0, this->width(), this->height(), Qt::white);

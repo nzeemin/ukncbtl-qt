@@ -62,7 +62,7 @@ void QDebugView::setCurrentProc(bool okProc)
 void QDebugView::updateData()
 {
     CProcessor* pCPU = g_pBoard->GetCPU();
-    ASSERT(pCPU != NULL);
+    ASSERT(pCPU != nullptr);
 
     // Get new register values and set change flags
     for (int r = 0; r < 8; r++)
@@ -76,7 +76,7 @@ void QDebugView::updateData()
     m_wDebugCpuR[8] = pswCPU;
 
     CProcessor* pPPU = g_pBoard->GetPPU();
-    ASSERT(pPPU != NULL);
+    ASSERT(pPPU != nullptr);
 
     // Get new register values and set change flags
     for (int r = 0; r < 8; r++)
@@ -114,7 +114,7 @@ void QDebugView::switchCpuPpu()
 
 void QDebugView::paintEvent(QPaintEvent * /*event*/)
 {
-    if (g_pBoard == NULL) return;
+    if (g_pBoard == nullptr) return;
 
     QPainter painter(this);
     painter.fillRect(0, 0, this->width(), this->height(), Qt::white);
@@ -126,7 +126,7 @@ void QDebugView::paintEvent(QPaintEvent * /*event*/)
     int cyLine = fontmetrics.height();
 
     CProcessor* pDebugPU = (m_okDebugProcessor) ? g_pBoard->GetCPU() : g_pBoard->GetPPU();
-    ASSERT(pDebugPU != NULL);
+    ASSERT(pDebugPU != nullptr);
     quint16* arrR = (m_okDebugProcessor) ? m_wDebugCpuR : m_wDebugPpuR;
     bool* arrRChanged = (m_okDebugProcessor) ? m_okDebugCpuRChanged : m_okDebugPpuRChanged;
 

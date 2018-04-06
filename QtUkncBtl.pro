@@ -54,3 +54,5 @@ QT += testlib
 QT += multimedia
 DEFINES -= UNICODE
 TRANSLATIONS = ukncbtl_en.ts
+CONFIG += c++11
+QMAKE_CXXFLAGS += -std=c++11

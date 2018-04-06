@@ -129,11 +129,11 @@ static void UpscaleScreen4(void* pImageBits)
 
 
 QEmulatorScreen::QEmulatorScreen(QWidget *parent) :
-    QWidget(parent), m_image(0)
+    QWidget(parent), m_image(nullptr)
 {
     setFocusPolicy(Qt::StrongFocus);
 
-    m_image = 0;
+    m_image = nullptr;
     m_mode = RGBScreen;
     m_sizeMode = RegularScreen;
 
@@ -166,10 +166,10 @@ void QEmulatorScreen::saveScreenshot(QString strFileName)
 
 void QEmulatorScreen::createDisplay()
 {
-    if (m_image != 0)
+    if (m_image != nullptr)
     {
         delete m_image;
-        m_image = 0;
+        m_image = nullptr;
     }
 
     int cxScreenWidth = UKNC_SCREEN_WIDTH;

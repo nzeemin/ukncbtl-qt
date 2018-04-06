@@ -192,7 +192,7 @@ class QScriptWindow : public QDialog
     Q_OBJECT
 
 public:
-    QScriptWindow(QWidget * parent = 0);
+    QScriptWindow(QWidget * parent = nullptr);
     ~QScriptWindow();
 
 public:

@@ -1,5 +1,6 @@
 #include "qsoundout.h"
 #include "QAudioFormat"
+
 QSoundOut::QSoundOut(QObject *parent) :
     QObject(parent)
 {
@@ -7,8 +8,8 @@ QSoundOut::QSoundOut(QObject *parent) :
     rrd = 0;
     rwr = 0;
     fptr = 0;
-    m_audio = NULL;
-    m_dev = NULL;
+    m_audio = nullptr;
+    m_dev = nullptr;
 
     QAudioFormat fmt;
     fmt.setSampleRate(SAMPLERATE);
@@ -19,24 +20,23 @@ QSoundOut::QSoundOut(QObject *parent) :
     fmt.setSampleType(QAudioFormat::SignedInt);
 
     m_audio = new QAudioOutput(fmt, this);
-    if (m_audio == NULL)
+    if (m_audio == nullptr)
         return;
     connect(m_audio, SIGNAL(notify()), this, SLOT(OnNotify()));
     m_audio->setBufferSize(FRAMEBYTES * 2);
     m_audio->setNotifyInterval(40); //1/25 sec = 40mS
     m_dev = m_audio->start();
-    if (m_dev == NULL)
+    if (m_dev == nullptr)
     {
         disconnect(this, SLOT(OnNotify()));
         delete(m_audio);
-        m_audio = NULL;
+        m_audio = nullptr;
         return;
     }
 
     m_kick.setSingleShot(true);
     m_kick.connect(&m_kick, SIGNAL(timeout()), this, SLOT(OnNotify()));
     m_kick.start(40); //kick it first!
-
 }
 
 QSoundOut::~QSoundOut()
@@ -46,7 +46,7 @@ QSoundOut::~QSoundOut()
         m_audio->stop();
         disconnect(this, SLOT(OnNotify()));
         delete(m_audio); //this will delete m_dev too!!!!
-        m_audio = NULL;
+        m_audio = nullptr;
     }
 }
 
@@ -54,7 +54,7 @@ void QSoundOut::OnNotify()
 {
     char dummy[FRAMEBYTES];
 
-    if ((m_dev == NULL) || (m_audio == NULL))
+    if ((m_dev == nullptr) || (m_audio == nullptr))
         return;
 
     m_lock.lock();
@@ -76,7 +76,7 @@ void QSoundOut::OnNotify()
 
 void QSoundOut::FeedDAC(unsigned short left, unsigned short right)
 {
-    if ((m_dev == NULL) || (m_audio == NULL))
+    if ((m_dev == nullptr) || (m_audio == nullptr))
         return;
     switch (SAMPLESIZE)
     {

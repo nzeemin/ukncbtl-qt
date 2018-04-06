@@ -18,7 +18,7 @@ class QSoundOut : public QObject
 {
     Q_OBJECT
 public:
-    explicit QSoundOut(QObject *parent = 0);
+    explicit QSoundOut(QObject *parent = nullptr);
     ~QSoundOut();
 
 signals:

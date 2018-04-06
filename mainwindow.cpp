@@ -222,21 +222,21 @@ void MainWindow::UpdateAllViews()
 {
     Emulator_OnUpdate();
 
-    if (m_debug != NULL)
+    if (m_debug != nullptr)
         m_debug->updateData();
-    if (m_disasm != NULL)
+    if (m_disasm != nullptr)
         m_disasm->updateData();
-    if (m_memory != NULL)
+    if (m_memory != nullptr)
         m_memory->updateData();
-    if (m_console != NULL)
+    if (m_console != nullptr)
         m_console->updatePrompt();
 
     m_screen->repaint();
-    if (m_debug != NULL)
+    if (m_debug != nullptr)
         m_debug->repaint();
-    if (m_disasm != NULL)
+    if (m_disasm != nullptr)
         m_disasm->repaint();
-    if (m_memory != NULL)
+    if (m_memory != nullptr)
         m_memory->repaint();
 
     UpdateMenu();
@@ -244,11 +244,11 @@ void MainWindow::UpdateAllViews()
 
 void MainWindow::setCurrentProc(bool okProc)
 {
-    if (m_debug != NULL)
+    if (m_debug != nullptr)
         m_debug->setCurrentProc(okProc);
-    if (m_disasm != NULL)
+    if (m_disasm != nullptr)
         m_disasm->setCurrentProc(okProc);
-    if (m_console != NULL)
+    if (m_console != nullptr)
         m_console->setCurrentProc(okProc);
 }
 
@@ -488,7 +488,7 @@ void MainWindow::detachCartridge(int slot)
 {
     g_pBoard->UnloadROMCartridge(slot);
 
-    Settings_SetCartridgeFilePath(slot, NULL);
+    Settings_SetCartridgeFilePath(slot, nullptr);
 
     UpdateMenu();
 }
@@ -538,7 +538,7 @@ void MainWindow::detachFloppy(int slot)
 {
     g_pBoard->DetachFloppyImage(slot);
 
-    Settings_SetFloppyFilePath(slot, NULL);
+    Settings_SetFloppyFilePath(slot, nullptr);
 
     UpdateMenu();
 }
@@ -596,7 +596,7 @@ bool MainWindow::attachHardDrive(int slot, const QString & strFileName)
 void MainWindow::detachHardDrive(int slot)
 {
     g_pBoard->DetachHardImage(slot);
-    Settings_SetHardFilePath(slot, NULL);
+    Settings_SetHardFilePath(slot, nullptr);
 }
 
 void MainWindow::debugConsoleView()

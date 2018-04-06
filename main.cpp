@@ -11,9 +11,9 @@
 void RestoreSettings();
 
 
-QApplication *g_Application;
-MainWindow *g_MainWindow;
-QSettings *g_Settings;
+static QApplication *g_Application;
+static MainWindow *g_MainWindow;
+static QSettings *g_Settings;
 
 #if !defined(QT_NO_DEBUG)
 extern void UnitTests_ExecuteAll();  // Defined in UnitTests.cpp
@@ -110,7 +110,7 @@ void RestoreSettings()
         if (path.length() > 0)
         {
             if (! g_pBoard->AttachFloppyImage(slot, qPrintable(path)))
-                Settings_SetFloppyFilePath(slot, NULL);
+                Settings_SetFloppyFilePath(slot, nullptr);
         }
     }
 
@@ -122,7 +122,7 @@ void RestoreSettings()
         {
             Emulator_LoadROMCartridge(slot, qPrintable(path));
             //TODO: If failed to load Then
-            //    Settings_SetCartridgeFilePath(slot, NULL);
+            //    Settings_SetCartridgeFilePath(slot, nullptr);
 
             QString hardpath = Settings_GetHardFilePath(slot);
             if (hardpath.length() > 0)

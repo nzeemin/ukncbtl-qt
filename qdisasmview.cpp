@@ -50,7 +50,7 @@ void QDisasmView::setCurrentProc(bool okProc)
 void QDisasmView::updateData()
 {
     CProcessor* pDisasmPU = (m_okDisasmProcessor) ? g_pBoard->GetCPU() : g_pBoard->GetPPU();
-    ASSERT(pDisasmPU != NULL);
+    ASSERT(pDisasmPU != nullptr);
     m_wDisasmBaseAddr = pDisasmPU->GetPC();
 }
 
@@ -180,7 +180,7 @@ void QDisasmView::parseSubtitles(QTextStream &stream)
 
 void QDisasmView::paintEvent(QPaintEvent * /*event*/)
 {
-    if (g_pBoard == NULL) return;
+    if (g_pBoard == nullptr) return;
 
     QPainter painter(this);
     painter.fillRect(0, 0, this->width(), this->height(), Qt::white);
@@ -191,11 +191,11 @@ void QDisasmView::paintEvent(QPaintEvent * /*event*/)
     int cyLine = fontmetrics.height();
 
     CProcessor* pDisasmPU = (m_okDisasmProcessor) ? g_pBoard->GetCPU() : g_pBoard->GetPPU();
-    ASSERT(pDisasmPU != NULL);
+    ASSERT(pDisasmPU != nullptr);
 
     // Draw disasseble for the current processor
     quint16 prevPC = (m_okDisasmProcessor) ? g_wEmulatorPrevCpuPC : g_wEmulatorPrevPpuPC;
-    int yFocus = DrawDisassemble(painter, pDisasmPU, m_wDisasmBaseAddr, prevPC);
+    int yFocus = drawDisassemble(painter, pDisasmPU, m_wDisasmBaseAddr, prevPC);
 
     // Draw focus rect
     if (hasFocus())
@@ -212,20 +212,20 @@ void QDisasmView::paintEvent(QPaintEvent * /*event*/)
 const DisasmSubtitleItem * QDisasmView::findSubtitle(quint16 address, quint16 typemask)
 {
     if (m_SubtitleItems.isEmpty())
-        return 0;
+        return nullptr;
 
     const DisasmSubtitleItem * item = m_SubtitleItems.constData();
     while (item->type != 0)
     {
         if (item->address > address)
-            return 0;
+            return nullptr;
         if (item->address == address &&
             (item->type & typemask) != 0)
             return item;
         ++item;
     }
 
-    return 0;
+    return nullptr;
 }
 
 bool QDisasmView::checkForJump(const quint16 *memory, int *pDelta)
@@ -479,7 +479,7 @@ bool QDisasmView::getInstructionHint(const quint16 *memory, const CProcessor *pP
     return !buffer.isEmpty();
 }
 
-int QDisasmView::DrawDisassemble(QPainter &painter, CProcessor *pProc, quint16 base, quint16 previous)
+int QDisasmView::drawDisassemble(QPainter &painter, CProcessor *pProc, quint16 base, quint16 previous)
 {
     int result = -1;
 
@@ -522,7 +522,7 @@ int QDisasmView::DrawDisassemble(QPainter &painter, CProcessor *pProc, quint16 b
         if (!m_SubtitleItems.isEmpty())  // Subtitles - комментарий к блоку
         {
             const DisasmSubtitleItem * pSubItem = findSubtitle(address, SUBTYPE_BLOCKCOMMENT);
-            if (pSubItem != NULL && !pSubItem->comment.isEmpty())
+            if (pSubItem != nullptr && !pSubItem->comment.isEmpty())
             {
                 painter.setPen(QColor(COLOR_SUBTITLE));
                 painter.drawText(21 * cxChar, y, pSubItem->comment);
@@ -563,9 +563,9 @@ int QDisasmView::DrawDisassemble(QPainter &painter, CProcessor *pProc, quint16 b
         if (!m_SubtitleItems.isEmpty())  // Show subtitle
         {
             const DisasmSubtitleItem* pSubItem = findSubtitle(address, SUBTYPE_COMMENT | SUBTYPE_DATA);
-            if (pSubItem != NULL && (pSubItem->type & SUBTYPE_DATA) != 0)
+            if (pSubItem != nullptr && (pSubItem->type & SUBTYPE_DATA) != 0)
                 okData = true;
-            if (pSubItem != NULL && (pSubItem->type & SUBTYPE_COMMENT) != 0 && !pSubItem->comment.isEmpty())
+            if (pSubItem != nullptr && (pSubItem->type & SUBTYPE_COMMENT) != 0 && !pSubItem->comment.isEmpty())
             {
                 painter.setPen(QColor(COLOR_SUBTITLE));
                 painter.drawText(52 * cxChar, y, pSubItem->comment);
