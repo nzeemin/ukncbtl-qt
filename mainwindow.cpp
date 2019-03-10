@@ -334,7 +334,7 @@ void MainWindow::helpAbout()
 {
     QMessageBox::about(this, tr("About"), tr(
             "UKNCBTL Qt Version 1.0\n"
-            "Copyright (C) 2007-2018\n\n"
+            "Copyright (C) 2007-2019\n\n"
             "https://github.com/nzeemin/ukncbtl-qt\n\n"
             "Authors:\r\nNikita Zimin\nFelix Lazarev\nAlexey Kisly\n\n"
             "Special thanks to:\nArseny Gordin\n\n"

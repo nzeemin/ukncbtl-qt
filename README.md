@@ -1,6 +1,7 @@
 # ukncbtl-qt
 UKNCBTL emulator, Qt version.
 
+[![Build status](https://ci.appveyor.com/api/projects/status/ipvgt62iivnc6j7f?svg=true)](https://ci.appveyor.com/project/nzeemin/ukncbtl-qt)
 [![Build Status](https://travis-ci.org/nzeemin/ukncbtl-qt.svg?branch=master)](https://travis-ci.org/nzeemin/ukncbtl-qt)
 
 The UKNCBTL project consists of:
