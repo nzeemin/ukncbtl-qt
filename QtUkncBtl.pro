@@ -52,7 +52,7 @@ QT += widgets
 QT += script
 QT += testlib 
 QT += multimedia
-DEFINES -= UNICODE
+DEFINES -= UNICODE _UNICODE
 TRANSLATIONS = ukncbtl_en.ts
 CONFIG += c++11
 QMAKE_CXXFLAGS += -std=c++11
