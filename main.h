@@ -3,8 +3,11 @@
 
 //////////////////////////////////////////////////////////////////////
 
+#include <QtGlobal>
+
 class QApplication;
 class MainWindow;
+class QString;
 class QSettings;
 
 
@@ -29,6 +32,14 @@ void Settings_SetHardFilePath(int slot, const QString &sFilePath);
 QString Settings_GetHardFilePath(int slot);
 void Settings_SetSound(bool flag);
 bool Settings_GetSound();
+bool Settings_GetDebugCpuPpu();
+void Settings_SetDebugCpuPpu(bool flag);
+void Settings_SetDebugMemoryMode(quint16 mode);
+quint16 Settings_GetDebugMemoryMode();
+void Settings_SetDebugMemoryAddress(quint16 address);
+quint16 Settings_GetDebugMemoryAddress();
+bool Settings_GetDebugMemoryByte();
+void Settings_SetDebugMemoryByte(bool flag);
 
 
 //////////////////////////////////////////////////////////////////////

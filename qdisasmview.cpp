@@ -18,7 +18,7 @@
 
 QDisasmView::QDisasmView()
 {
-    m_okDisasmProcessor = false;
+    m_okDisasmProcessor = Settings_GetDebugCpuPpu();
     m_wDisasmBaseAddr = 0;
     m_wDisasmNextBaseAddr = 0;
 

@@ -16,7 +16,7 @@
 QDebugView::QDebugView(QWidget *mainWindow) :
     QWidget()
 {
-    m_okDebugProcessor = false;
+    m_okDebugProcessor = Settings_GetDebugCpuPpu();
 
     QFont font = Common_GetMonospacedFont();
     QFontMetrics fontmetrics(font);
@@ -57,6 +57,8 @@ void QDebugView::setCurrentProc(bool okProc)
     m_okDebugProcessor = okProc;
     this->updateData();
     updateWindowText();
+
+    Settings_SetDebugCpuPpu(m_okDebugProcessor);
 }
 
 void QDebugView::updateData()

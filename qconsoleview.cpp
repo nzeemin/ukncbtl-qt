@@ -17,7 +17,7 @@ QConsoleView::QConsoleView()
     MESSAGE_UNKNOWN_COMMAND = QConsoleView::tr("  Unknown command.\r\n");
     MESSAGE_WRONG_VALUE = QConsoleView::tr("  Wrong value.\r\n");
 
-    m_okCurrentProc = false;
+    m_okCurrentProc = Settings_GetDebugCpuPpu();
 
     setMinimumSize(320, 120);
 
@@ -68,6 +68,8 @@ void QConsoleView::clear()
 void QConsoleView::setCurrentProc(bool okProc)
 {
     m_okCurrentProc = okProc;
+
+    Settings_SetDebugCpuPpu(m_okCurrentProc);
 }
 
 void QConsoleView::updatePrompt()
@@ -428,5 +430,4 @@ void QConsoleView::execConsoleCommand(const QString &command)
         Global_UpdateAllViews();
     else if (okUpdateMenu)
         Global_UpdateMenu();
-
 }
