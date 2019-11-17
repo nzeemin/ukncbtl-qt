@@ -1,4 +1,4 @@
-#include "stdafx.h"
+п»ї#include "stdafx.h"
 #include <QtGui>
 #include <QFileDialog>
 #include <QMenu>
@@ -127,7 +127,7 @@ void QDisasmView::parseSubtitles(QTextStream &stream)
         if (lineLength == 0) continue;  // Skip empty lines
 
         QChar firstChar = line.at(0);
-        if (firstChar.isDigit())  // Цифра -- считаем что это адрес
+        if (firstChar.isDigit())  // Г–ГЁГґГ°Г  -- Г±Г·ГЁГІГ ГҐГ¬ Г·ГІГ® ГЅГІГ® Г Г¤Г°ГҐГ±
         {
             // Parse address
             int addrlen = 1;
@@ -136,7 +136,7 @@ void QDisasmView::parseSubtitles(QTextStream &stream)
             if (!ParseOctalValue(line.left(addrlen), &address))
                 continue;
 
-            if (!blockComment.isEmpty())  // На предыдущей строке был комментарий к блоку
+            if (!blockComment.isEmpty())  // ГЌГ  ГЇГ°ГҐГ¤Г»Г¤ГіГ№ГҐГ© Г±ГІГ°Г®ГЄГҐ ГЎГ»Г« ГЄГ®Г¬Г¬ГҐГ­ГІГ Г°ГЁГ© ГЄ ГЎГ«Г®ГЄГі
             {
                 addSubtitle(address, SUBTYPE_BLOCKCOMMENT, blockComment);
                 blockComment.clear();
@@ -173,7 +173,7 @@ void QDisasmView::parseSubtitles(QTextStream &stream)
         else if (firstChar == ';')
         {
             blockComment = line.trimmed();
-            //TODO: Собирать многострочные комментарии над блоком
+            //TODO: Г‘Г®ГЎГЁГ°Г ГІГј Г¬Г­Г®ГЈГ®Г±ГІГ°Г®Г·Г­Г»ГҐ ГЄГ®Г¬Г¬ГҐГ­ГІГ Г°ГЁГЁ Г­Г Г¤ ГЎГ«Г®ГЄГ®Г¬
         }
     }
 }
@@ -300,8 +300,8 @@ bool QDisasmView::getJumpConditionHint(const quint16 *memory, const CProcessor *
     if (instr >= 0101000 && instr <= 0101777)  // BHI, BLOS
     {
         buffer.sprintf("C=%c, Z=%c", (psw & PSW_C) ? '1' : '0', (psw & PSW_Z) ? '1' : '0');
-        // BHI:  IF ((С or Z) == 0)
-        // BLOS: IF ((С or Z) == 1)
+        // BHI:  IF ((Г‘ or Z) == 0)
+        // BLOS: IF ((Г‘ or Z) == 1)
         bool value = (((psw & PSW_C) != 0) || ((psw & PSW_Z) != 0));
         return ((instr & 0400) == 0) ? !value : value;
     }
@@ -499,7 +499,7 @@ int QDisasmView::drawDisassemble(QPainter &painter, CProcessor *pProc, quint16 b
         painter.fillRect(0, yCurrent, 1000, cyLine, COLOR_CURRENT);
     }
 
-    // Читаем из памяти процессора в буфер
+    // Г—ГЁГІГ ГҐГ¬ ГЁГ§ ГЇГ Г¬ГїГІГЁ ГЇГ°Г®Г¶ГҐГ±Г±Г®Г°Г  Гў ГЎГіГґГҐГ°
     const int nWindowSize = 30; //this->height() / cyLine;
     quint16 memory[nWindowSize + 2];
     int addrtype[nWindowSize + 2];
@@ -517,9 +517,9 @@ int QDisasmView::drawDisassemble(QPainter &painter, CProcessor *pProc, quint16 b
     int length = 0;
     quint16 wNextBaseAddr = 0;
     int y = cyLine;
-    for (int index = 0; index < nWindowSize; index++)  // Рисуем строки
+    for (int index = 0; index < nWindowSize; index++)  // ГђГЁГ±ГіГҐГ¬ Г±ГІГ°Г®ГЄГЁ
     {
-        if (!m_SubtitleItems.isEmpty())  // Subtitles - комментарий к блоку
+        if (!m_SubtitleItems.isEmpty())  // Subtitles - ГЄГ®Г¬Г¬ГҐГ­ГІГ Г°ГЁГ© ГЄ ГЎГ«Г®ГЄГі
         {
             const DisasmSubtitleItem * pSubItem = findSubtitle(address, SUBTYPE_BLOCKCOMMENT);
             if (pSubItem != nullptr && !pSubItem->comment.isEmpty())
@@ -571,7 +571,7 @@ int QDisasmView::drawDisassemble(QPainter &painter, CProcessor *pProc, quint16 b
                 painter.drawText(52 * cxChar, y, pSubItem->comment);
                 painter.setPen(colorText);
 
-                // Строку с субтитром мы можем использовать как опорную для дизассемблера
+                // Г‘ГІГ°Г®ГЄГі Г± Г±ГіГЎГІГЁГІГ°Г®Г¬ Г¬Г» Г¬Г®Г¦ГҐГ¬ ГЁГ±ГЇГ®Г«ГјГ§Г®ГўГ ГІГј ГЄГ ГЄ Г®ГЇГ®Г°Г­ГіГѕ Г¤Г«Гї Г¤ГЁГ§Г Г±Г±ГҐГ¬ГЎГ«ГҐГ°Г 
                 if (disasmfrom > address)
                     disasmfrom = address;
             }
@@ -581,7 +581,7 @@ int QDisasmView::drawDisassemble(QPainter &painter, CProcessor *pProc, quint16 b
         {
             char strInstr[8];
             char strArg[32];
-            if (okData)  // По этому адресу лежат данные -- нет смысла дизассемблировать
+            if (okData)  // ГЏГ® ГЅГІГ®Г¬Гі Г Г¤Г°ГҐГ±Гі Г«ГҐГ¦Г ГІ Г¤Г Г­Г­Г»ГҐ -- Г­ГҐГІ Г±Г¬Г»Г±Г«Г  Г¤ГЁГ§Г Г±Г±ГҐГ¬ГЎГ«ГЁГ°Г®ГўГ ГІГј
             {
                 strcpy(strInstr, "data");
                 PrintOctalValue(strArg, *(memory + index));

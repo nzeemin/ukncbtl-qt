@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include <QApplication>
 #include <QCloseEvent>
 #include "main.h"

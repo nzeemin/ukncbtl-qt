@@ -1,4 +1,4 @@
-/*  This file is part of UKNCBTL.
+п»ї/*  This file is part of UKNCBTL.
     UKNCBTL is free software: you can redistribute it and/or modify it under the terms
 of the GNU Lesser General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
@@ -119,7 +119,7 @@ uint16_t SOB_TIMING = 0x002D;
 uint16_t SOB_LAST_TIMING = 0x0019; //last iteration of SOB
 uint16_t BR_TIMING = 0x0025;
 uint16_t MARK_TIMING = 0x0041;
-uint16_t RESET_TIMING = 105 + 968;  // ТО КМ1801ВМ2 стр. 134
+uint16_t RESET_TIMING = 105 + 968;  // Г’ГЋ ГЉГЊ1801Г‚ГЊ2 Г±ГІГ°. 134
 
 
 //////////////////////////////////////////////////////////////////////
@@ -138,7 +138,7 @@ void CProcessor::Init()
     ASSERT(m_pExecuteMethodMap == nullptr);
     m_pExecuteMethodMap = static_cast<CProcessor::ExecuteMethodRef*>(::calloc(65536, sizeof(CProcessor::ExecuteMethodRef)));
 
-    // Сначала заполняем таблицу ссылками на метод ExecuteUNKNOWN, выполняющий TRAP 10
+    // Г‘Г­Г Г·Г Г«Г  Г§Г ГЇГ®Г«Г­ГїГҐГ¬ ГІГ ГЎГ«ГЁГ¶Гі Г±Г±Г»Г«ГЄГ Г¬ГЁ Г­Г  Г¬ГҐГІГ®Г¤ ExecuteUNKNOWN, ГўГ»ГЇГ®Г«Г­ГїГѕГ№ГЁГ© TRAP 10
     RegisterMethodRef( 0000000, 0177777, &CProcessor::ExecuteUNKNOWN );
 
     RegisterMethodRef( 0000000, 0000000, &CProcessor::ExecuteHALT );
@@ -343,7 +343,7 @@ bool CProcessor::InterruptProcessing ()
             intrVector = 0010;  intrMode = true;
             m_FIS_rq = false;
         }
-        else if (m_RPLYrq)  // Зависание, priority 1
+        else if (m_RPLYrq)  // Г‡Г ГўГЁГ±Г Г­ГЁГҐ, priority 1
         {
             if (m_buserror)
             {
@@ -537,7 +537,7 @@ void CProcessor::MemoryError()
 
 void CProcessor::FetchInstruction()
 {
-    // Считываем очередную инструкцию
+    // Г‘Г·ГЁГІГ»ГўГ ГҐГ¬ Г®Г·ГҐГ°ГҐГ¤Г­ГіГѕ ГЁГ­Г±ГІГ°ГіГЄГ¶ГЁГѕ
     uint16_t pc = GetPC();
     ASSERT((pc & 1) == 0); // it have to be word aligned
 
@@ -558,7 +558,7 @@ void CProcessor::TranslateInstruction ()
     (this->*methodref)();  // Call command implementation method
 }
 
-void CProcessor::ExecuteUNKNOWN ()  // Нет такой инструкции - просто вызывается TRAP 10
+void CProcessor::ExecuteUNKNOWN ()  // ГЌГҐГІ ГІГ ГЄГ®Г© ГЁГ­Г±ГІГ°ГіГЄГ¶ГЁГЁ - ГЇГ°Г®Г±ГІГ® ГўГ»Г§Г»ГўГ ГҐГІГ±Гї TRAP 10
 {
 //#if !defined(PRODUCT)
 //    DebugPrintFormat(_T(">>Invalid OPCODE = %06o @ %06o\r\n"), m_instruction, GetPC()-2);
@@ -575,21 +575,21 @@ void CProcessor::ExecuteWAIT ()  // WAIT - Wait for an interrupt
     m_waitmode = true;
 }
 
-void CProcessor::ExecuteSTEP()  // ШАГ
+void CProcessor::ExecuteSTEP()  // ГГЂГѓ
 {
-    if ((m_psw & PSW_HALT) == 0)  // Эта команда выполняется только в режиме HALT
+    if ((m_psw & PSW_HALT) == 0)  // ГќГІГ  ГЄГ®Г¬Г Г­Г¤Г  ГўГ»ГЇГ®Г«Г­ГїГҐГІГ±Гї ГІГ®Г«ГјГЄГ® Гў Г°ГҐГ¦ГЁГ¬ГҐ HALT
         m_RSVDrq = true;
     else
     {
-        SetPC(m_savepc);        // СК <- КРСК
-        SetPSW(m_savepsw);      // РСП(8:0) <- КРСП(8:0)
+        SetPC(m_savepc);        // Г‘ГЉ <- ГЉГђГ‘ГЉ
+        SetPSW(m_savepsw);      // ГђГ‘ГЏ(8:0) <- ГЉГђГ‘ГЏ(8:0)
         m_stepmode = true;
     }
 }
 
-void CProcessor::ExecuteRSEL()  // RSEL / ЧПТ - Чтение безадресного регистра
+void CProcessor::ExecuteRSEL()  // RSEL / Г—ГЏГ’ - Г—ГІГҐГ­ГЁГҐ ГЎГҐГ§Г Г¤Г°ГҐГ±Г­Г®ГЈГ® Г°ГҐГЈГЁГ±ГІГ°Г 
 {
-    if ((m_psw & PSW_HALT) == 0)  // Эта команда выполняется только в режиме HALT
+    if ((m_psw & PSW_HALT) == 0)  // ГќГІГ  ГЄГ®Г¬Г Г­Г¤Г  ГўГ»ГЇГ®Г«Г­ГїГҐГІГ±Гї ГІГ®Г«ГјГЄГ® Гў Г°ГҐГ¦ГЁГ¬ГҐ HALT
         m_RSVDrq = true;
     else
     {
@@ -599,24 +599,24 @@ void CProcessor::ExecuteRSEL()  // RSEL / ЧПТ - Чтение безадресного регистра
 
 void CProcessor::Execute000030()  // Unknown command
 {
-    if ((m_psw & PSW_HALT) == 0)  // Эта команда выполняется только в режиме HALT
+    if ((m_psw & PSW_HALT) == 0)  // ГќГІГ  ГЄГ®Г¬Г Г­Г¤Г  ГўГ»ГЇГ®Г«Г­ГїГҐГІГ±Гї ГІГ®Г«ГјГЄГ® Гў Г°ГҐГ¦ГЁГ¬ГҐ HALT
     {
         m_RSVDrq = true;
         return;
     }
 
-    // Описание: По этой команде сперва очищается регистр R0. Далее исполняется цикл, окончанием которого
-    //           является установка в разряде 07 R0 или R2 единицы. В цикле над регистрами проводятся
-    //           следующие действия: регистры с R1 по R3 сдвигаются влево, при этом в R1 в младший разряд
-    //           вдвигается ноль, а в R2 и R3 – содержимое разряда C, при этом старшая часть R2 расширяется
-    //           знаковым разрядом младшей части, R0 инкрементируется. Так как останов исполнения команды
-    //           производится при наличии единицы в разряде 7 в R0 или R2, то после исполнения команды R0
-    //           может принимать значения от 0 до 108 или 2008. Значение 2008 получается в том случае,
-    //           если до исполнения операции младшая часть R2 была равна нулю и был сброшен бит С.
-    // Признаки: N – очищается,
-    //           Z – устанавливается, если значение в R0 равно нулю, в противном случае очищается,
-    //           V – очищается,
-    //           C – очищается.
+    // ГЋГЇГЁГ±Г Г­ГЁГҐ: ГЏГ® ГЅГІГ®Г© ГЄГ®Г¬Г Г­Г¤ГҐ Г±ГЇГҐГ°ГўГ  Г®Г·ГЁГ№Г ГҐГІГ±Гї Г°ГҐГЈГЁГ±ГІГ° R0. Г„Г Г«ГҐГҐ ГЁГ±ГЇГ®Г«Г­ГїГҐГІГ±Гї Г¶ГЁГЄГ«, Г®ГЄГ®Г­Г·Г Г­ГЁГҐГ¬ ГЄГ®ГІГ®Г°Г®ГЈГ®
+    //           ГїГўГ«ГїГҐГІГ±Гї ГіГ±ГІГ Г­Г®ГўГЄГ  Гў Г°Г Г§Г°ГїГ¤ГҐ 07 R0 ГЁГ«ГЁ R2 ГҐГ¤ГЁГ­ГЁГ¶Г». Г‚ Г¶ГЁГЄГ«ГҐ Г­Г Г¤ Г°ГҐГЈГЁГ±ГІГ°Г Г¬ГЁ ГЇГ°Г®ГўГ®Г¤ГїГІГ±Гї
+    //           Г±Г«ГҐГ¤ГіГѕГ№ГЁГҐ Г¤ГҐГ©Г±ГІГўГЁГї: Г°ГҐГЈГЁГ±ГІГ°Г» Г± R1 ГЇГ® R3 Г±Г¤ГўГЁГЈГ ГѕГІГ±Гї ГўГ«ГҐГўГ®, ГЇГ°ГЁ ГЅГІГ®Г¬ Гў R1 Гў Г¬Г«Г Г¤ГёГЁГ© Г°Г Г§Г°ГїГ¤
+    //           ГўГ¤ГўГЁГЈГ ГҐГІГ±Гї Г­Г®Г«Гј, Г  Гў R2 ГЁ R3 вЂ“ Г±Г®Г¤ГҐГ°Г¦ГЁГ¬Г®ГҐ Г°Г Г§Г°ГїГ¤Г  C, ГЇГ°ГЁ ГЅГІГ®Г¬ Г±ГІГ Г°ГёГ Гї Г·Г Г±ГІГј R2 Г°Г Г±ГёГЁГ°ГїГҐГІГ±Гї
+    //           Г§Г­Г ГЄГ®ГўГ»Г¬ Г°Г Г§Г°ГїГ¤Г®Г¬ Г¬Г«Г Г¤ГёГҐГ© Г·Г Г±ГІГЁ, R0 ГЁГ­ГЄГ°ГҐГ¬ГҐГ­ГІГЁГ°ГіГҐГІГ±Гї. Г’Г ГЄ ГЄГ ГЄ Г®Г±ГІГ Г­Г®Гў ГЁГ±ГЇГ®Г«Г­ГҐГ­ГЁГї ГЄГ®Г¬Г Г­Г¤Г»
+    //           ГЇГ°Г®ГЁГ§ГўГ®Г¤ГЁГІГ±Гї ГЇГ°ГЁ Г­Г Г«ГЁГ·ГЁГЁ ГҐГ¤ГЁГ­ГЁГ¶Г» Гў Г°Г Г§Г°ГїГ¤ГҐ 7 Гў R0 ГЁГ«ГЁ R2, ГІГ® ГЇГ®Г±Г«ГҐ ГЁГ±ГЇГ®Г«Г­ГҐГ­ГЁГї ГЄГ®Г¬Г Г­Г¤Г» R0
+    //           Г¬Г®Г¦ГҐГІ ГЇГ°ГЁГ­ГЁГ¬Г ГІГј Г§Г­Г Г·ГҐГ­ГЁГї Г®ГІ 0 Г¤Г® 108 ГЁГ«ГЁ 2008. Г‡Г­Г Г·ГҐГ­ГЁГҐ 2008 ГЇГ®Г«ГіГ·Г ГҐГІГ±Гї Гў ГІГ®Г¬ Г±Г«ГіГ·Г ГҐ,
+    //           ГҐГ±Г«ГЁ Г¤Г® ГЁГ±ГЇГ®Г«Г­ГҐГ­ГЁГї Г®ГЇГҐГ°Г Г¶ГЁГЁ Г¬Г«Г Г¤ГёГ Гї Г·Г Г±ГІГј R2 ГЎГ»Г«Г  Г°Г ГўГ­Г  Г­ГіГ«Гѕ ГЁ ГЎГ»Г« Г±ГЎГ°Г®ГёГҐГ­ ГЎГЁГІ Г‘.
+    // ГЏГ°ГЁГ§Г­Г ГЄГЁ: N вЂ“ Г®Г·ГЁГ№Г ГҐГІГ±Гї,
+    //           Z вЂ“ ГіГ±ГІГ Г­Г ГўГ«ГЁГўГ ГҐГІГ±Гї, ГҐГ±Г«ГЁ Г§Г­Г Г·ГҐГ­ГЁГҐ Гў R0 Г°Г ГўГ­Г® Г­ГіГ«Гѕ, Гў ГЇГ°Г®ГІГЁГўГ­Г®Г¬ Г±Г«ГіГ·Г ГҐ Г®Г·ГЁГ№Г ГҐГІГ±Гї,
+    //           V вЂ“ Г®Г·ГЁГ№Г ГҐГІГ±Гї,
+    //           C вЂ“ Г®Г·ГЁГ№Г ГҐГІГ±Гї.
 
     SetReg(0, 0);
     while ((GetReg(0) & 0200) == 0 && (GetReg(2) & 0200) == 0)
@@ -636,71 +636,71 @@ void CProcessor::Execute000030()  // Unknown command
 void CProcessor::ExecuteFIS()  // Floating point instruction set: FADD, FSUB, FMUL, FDIV
 {
     if (GetMemoryController()->GetSelRegister() & 0200)  // bit 7 set?
-        m_RSVDrq = true;  // Программа эмуляции FIS отсутствует, прерывание по резервному коду
+        m_RSVDrq = true;  // ГЏГ°Г®ГЈГ°Г Г¬Г¬Г  ГЅГ¬ГіГ«ГїГ¶ГЁГЁ FIS Г®ГІГ±ГіГІГ±ГІГўГіГҐГІ, ГЇГ°ГҐГ°Г»ГўГ Г­ГЁГҐ ГЇГ® Г°ГҐГ§ГҐГ°ГўГ­Г®Г¬Гі ГЄГ®Г¤Гі
     else
-        m_FIS_rq = true;  // Прерывание обработки FIS
+        m_FIS_rq = true;  // ГЏГ°ГҐГ°Г»ГўГ Г­ГЁГҐ Г®ГЎГ°Г ГЎГ®ГІГЄГЁ FIS
 }
 
-void CProcessor::ExecuteRUN()  // ПУСК / START
+void CProcessor::ExecuteRUN()  // ГЏГ“Г‘ГЉ / START
 {
-    if ((m_psw & PSW_HALT) == 0)  // Эта команда выполняется только в режиме HALT
+    if ((m_psw & PSW_HALT) == 0)  // ГќГІГ  ГЄГ®Г¬Г Г­Г¤Г  ГўГ»ГЇГ®Г«Г­ГїГҐГІГ±Гї ГІГ®Г«ГјГЄГ® Гў Г°ГҐГ¦ГЁГ¬ГҐ HALT
         m_RSVDrq = true;
     else
     {
-        SetPC(m_savepc);        // СК <- КРСК
-        SetPSW(m_savepsw);      // РСП(8:0) <- КРСП(8:0)
+        SetPC(m_savepc);        // Г‘ГЉ <- ГЉГђГ‘ГЉ
+        SetPSW(m_savepsw);      // ГђГ‘ГЏ(8:0) <- ГЉГђГ‘ГЏ(8:0)
     }
 }
 
-void CProcessor::ExecuteHALT ()  // HALT - Останов
+void CProcessor::ExecuteHALT ()  // HALT - ГЋГ±ГІГ Г­Г®Гў
 {
     m_HALTrq = true;
 }
 
-void CProcessor::ExecuteRCPC()  // ЧКСК - Чтение регистра копии счётчика команд
+void CProcessor::ExecuteRCPC()  // Г—ГЉГ‘ГЉ - Г—ГІГҐГ­ГЁГҐ Г°ГҐГЈГЁГ±ГІГ°Г  ГЄГ®ГЇГЁГЁ Г±Г·ВёГІГ·ГЁГЄГ  ГЄГ®Г¬Г Г­Г¤
 {
-    if ((m_psw & PSW_HALT) == 0)  // Эта команда выполняется только в режиме HALT
+    if ((m_psw & PSW_HALT) == 0)  // ГќГІГ  ГЄГ®Г¬Г Г­Г¤Г  ГўГ»ГЇГ®Г«Г­ГїГҐГІГ±Гї ГІГ®Г«ГјГЄГ® Гў Г°ГҐГ¦ГЁГ¬ГҐ HALT
         m_RSVDrq = true;
     else
     {
-        SetReg(0, m_savepc);        // R0 <- КРСК
+        SetReg(0, m_savepc);        // R0 <- ГЉГђГ‘ГЉ
         m_internalTick = NOP_TIMING;
     }
 }
-void CProcessor::ExecuteRCPS()  // ЧКСП - Чтение регистра копии слова состояния процессора
+void CProcessor::ExecuteRCPS()  // Г—ГЉГ‘ГЏ - Г—ГІГҐГ­ГЁГҐ Г°ГҐГЈГЁГ±ГІГ°Г  ГЄГ®ГЇГЁГЁ Г±Г«Г®ГўГ  Г±Г®Г±ГІГ®ГїГ­ГЁГї ГЇГ°Г®Г¶ГҐГ±Г±Г®Г°Г 
 {
-    if ((m_psw & PSW_HALT) == 0)  // Эта команда выполняется только в режиме HALT
+    if ((m_psw & PSW_HALT) == 0)  // ГќГІГ  ГЄГ®Г¬Г Г­Г¤Г  ГўГ»ГЇГ®Г«Г­ГїГҐГІГ±Гї ГІГ®Г«ГјГЄГ® Гў Г°ГҐГ¦ГЁГ¬ГҐ HALT
         m_RSVDrq = true;
     else
     {
-        SetReg(0, m_savepsw);       // R0 <- КРСП
+        SetReg(0, m_savepsw);       // R0 <- ГЉГђГ‘ГЏ
         m_internalTick = NOP_TIMING;
     }
 }
-void CProcessor::ExecuteWCPC()  // ЗКСК - Запись регистра копии счётчика команд
+void CProcessor::ExecuteWCPC()  // Г‡ГЉГ‘ГЉ - Г‡Г ГЇГЁГ±Гј Г°ГҐГЈГЁГ±ГІГ°Г  ГЄГ®ГЇГЁГЁ Г±Г·ВёГІГ·ГЁГЄГ  ГЄГ®Г¬Г Г­Г¤
 {
-    if ((m_psw & PSW_HALT) == 0)  // Эта команда выполняется только в режиме HALT
+    if ((m_psw & PSW_HALT) == 0)  // ГќГІГ  ГЄГ®Г¬Г Г­Г¤Г  ГўГ»ГЇГ®Г«Г­ГїГҐГІГ±Гї ГІГ®Г«ГјГЄГ® Гў Г°ГҐГ¦ГЁГ¬ГҐ HALT
         m_RSVDrq = true;
     else
     {
-        m_savepc = GetReg(0);       // КРСК <- R0
+        m_savepc = GetReg(0);       // ГЉГђГ‘ГЉ <- R0
         m_internalTick = NOP_TIMING;
     }
 }
-void CProcessor::ExecuteWCPS()  // ЗКСП - Запись регистра копии слова состояния процессора
+void CProcessor::ExecuteWCPS()  // Г‡ГЉГ‘ГЏ - Г‡Г ГЇГЁГ±Гј Г°ГҐГЈГЁГ±ГІГ°Г  ГЄГ®ГЇГЁГЁ Г±Г«Г®ГўГ  Г±Г®Г±ГІГ®ГїГ­ГЁГї ГЇГ°Г®Г¶ГҐГ±Г±Г®Г°Г 
 {
-    if ((m_psw & PSW_HALT) == 0)  // Эта команда выполняется только в режиме HALT
+    if ((m_psw & PSW_HALT) == 0)  // ГќГІГ  ГЄГ®Г¬Г Г­Г¤Г  ГўГ»ГЇГ®Г«Г­ГїГҐГІГ±Гї ГІГ®Г«ГјГЄГ® Гў Г°ГҐГ¦ГЁГ¬ГҐ HALT
         m_RSVDrq = true;
     else
     {
-        m_savepsw = GetReg(0);      // КРСП <- R0
+        m_savepsw = GetReg(0);      // ГЉГђГ‘ГЏ <- R0
         m_internalTick = NOP_TIMING;
     }
 }
 
-void CProcessor::ExecuteMFUS ()  // ЧЧП, move from user space - Чтение памяти адресного пространства USER
+void CProcessor::ExecuteMFUS ()  // Г—Г—ГЏ, move from user space - Г—ГІГҐГ­ГЁГҐ ГЇГ Г¬ГїГІГЁ Г Г¤Г°ГҐГ±Г­Г®ГЈГ® ГЇГ°Г®Г±ГІГ°Г Г­Г±ГІГўГ  USER
 {
-    if ((m_psw & PSW_HALT) == 0)  // Эта команда выполняется только в режиме HALT
+    if ((m_psw & PSW_HALT) == 0)  // ГќГІГ  ГЄГ®Г¬Г Г­Г¤Г  ГўГ»ГЇГ®Г«Г­ГїГҐГІГ±Гї ГІГ®Г«ГјГЄГ® Гў Г°ГҐГ¦ГЁГ¬ГҐ HALT
     {
         m_RSVDrq = true;
         return;
@@ -717,9 +717,9 @@ void CProcessor::ExecuteMFUS ()  // ЧЧП, move from user space - Чтение памяти ад
     m_internalTick = MOV_TIMING[0][2];
 }
 
-void CProcessor::ExecuteMTUS()  // ЗЧП, move to user space - Запись в память адресного пространства USER
+void CProcessor::ExecuteMTUS()  // Г‡Г—ГЏ, move to user space - Г‡Г ГЇГЁГ±Гј Гў ГЇГ Г¬ГїГІГј Г Г¤Г°ГҐГ±Г­Г®ГЈГ® ГЇГ°Г®Г±ГІГ°Г Г­Г±ГІГўГ  USER
 {
-    if ((m_psw & PSW_HALT) == 0)  // Эта команда выполняется только в режиме HALT
+    if ((m_psw & PSW_HALT) == 0)  // ГќГІГ  ГЄГ®Г¬Г Г­Г¤Г  ГўГ»ГЇГ®Г«Г­ГїГҐГІГ±Гї ГІГ®Г«ГјГЄГ® Гў Г°ГҐГ¦ГЁГ¬ГҐ HALT
     {
         m_RSVDrq = true;
         return;
@@ -734,7 +734,7 @@ void CProcessor::ExecuteMTUS()  // ЗЧП, move to user space - Запись в память адр
     m_internalTick = MOV_TIMING[0][2];
 }
 
-void CProcessor::ExecuteRTI()  // RTI - Return from Interrupt - Возврат из прерывания
+void CProcessor::ExecuteRTI()  // RTI - Return from Interrupt - Г‚Г®Г§ГўГ°Г ГІ ГЁГ§ ГЇГ°ГҐГ°Г»ГўГ Г­ГЁГї
 {
     uint16_t word;
     word = GetWord(GetSP());
@@ -751,7 +751,7 @@ void CProcessor::ExecuteRTI()  // RTI - Return from Interrupt - Возврат из преры
     m_internalTick = RTI_TIMING;
 }
 
-void CProcessor::ExecuteRTT ()  // RTT - Return from Trace Trap -- Возврат из прерывания
+void CProcessor::ExecuteRTT ()  // RTT - Return from Trace Trap -- Г‚Г®Г§ГўГ°Г ГІ ГЁГ§ ГЇГ°ГҐГ°Г»ГўГ Г­ГЁГї
 {
     uint16_t word;
     word = GetWord(GetSP());
@@ -783,7 +783,7 @@ void CProcessor::ExecuteIOT ()  // IOT - I/O trap
     m_internalTick = EMT_TIMING;
 }
 
-void CProcessor::ExecuteRESET ()  // Reset input/output devices -- Сброс внешних устройств
+void CProcessor::ExecuteRESET ()  // Reset input/output devices -- Г‘ГЎГ°Г®Г± ГўГ­ГҐГёГ­ГЁГµ ГіГ±ГІГ°Г®Г©Г±ГІГў
 {
     m_EVNTrq = false;
     m_pMemoryController->ResetDevices();  // INIT signal
@@ -791,7 +791,7 @@ void CProcessor::ExecuteRESET ()  // Reset input/output devices -- Сброс внешних
     m_internalTick = RESET_TIMING;
 }
 
-void CProcessor::ExecuteRTS ()  // RTS - return from subroutine - Возврат из процедуры
+void CProcessor::ExecuteRTS ()  // RTS - return from subroutine - Г‚Г®Г§ГўГ°Г ГІ ГЁГ§ ГЇГ°Г®Г¶ГҐГ¤ГіГ°Г»
 {
     uint16_t word;
     SetPC(GetReg(m_regdest));
@@ -815,7 +815,7 @@ void CProcessor::ExecuteSCC ()
 
 void CProcessor::ExecuteJMP ()  // JMP - jump: PC = &d (a-mode > 0)
 {
-    if (m_methdest == 0)  // Неправильный метод адресации
+    if (m_methdest == 0)  // ГЌГҐГЇГ°Г ГўГЁГ«ГјГ­Г»Г© Г¬ГҐГІГ®Г¤ Г Г¤Г°ГҐГ±Г Г¶ГЁГЁ
     {
         m_ILLGrq = true;
         m_internalTick = EMT_TIMING;
@@ -960,7 +960,7 @@ void CProcessor::ExecuteCOMB ()  // COM
     m_internalTick = CLR_TIMING[m_methdest];
 }
 
-void CProcessor::ExecuteINC ()  // INC - Инкремент
+void CProcessor::ExecuteINC ()  // INC - Г€Г­ГЄГ°ГҐГ¬ГҐГ­ГІ
 {
     uint16_t ea = 0;
     uint8_t new_psw = GetLPSW() & 0xF1;
@@ -990,7 +990,7 @@ void CProcessor::ExecuteINC ()  // INC - Инкремент
     SetLPSW(new_psw);
     m_internalTick = CLR_TIMING[m_methdest];
 }
-void CProcessor::ExecuteINCB ()  // INCB - Инкремент
+void CProcessor::ExecuteINCB ()  // INCB - Г€Г­ГЄГ°ГҐГ¬ГҐГ­ГІ
 {
     uint16_t ea = 0;
     uint8_t new_psw = GetLPSW() & 0xF1;
@@ -1021,7 +1021,7 @@ void CProcessor::ExecuteINCB ()  // INCB - Инкремент
     m_internalTick = CLR_TIMING[m_methdest];
 }
 
-void CProcessor::ExecuteDEC ()  // DEC - Декремент
+void CProcessor::ExecuteDEC ()  // DEC - Г„ГҐГЄГ°ГҐГ¬ГҐГ­ГІ
 {
     uint16_t ea = 0;
     uint8_t new_psw = GetLPSW() & 0xF1;
@@ -1051,7 +1051,7 @@ void CProcessor::ExecuteDEC ()  // DEC - Декремент
     SetLPSW(new_psw);
     m_internalTick = CLR_TIMING[m_methdest];
 }
-void CProcessor::ExecuteDECB ()  // DEC - Декремент
+void CProcessor::ExecuteDECB ()  // DEC - Г„ГҐГЄГ°ГҐГ¬ГҐГ­ГІ
 {
     uint16_t ea = 0;
     uint8_t new_psw = GetLPSW() & 0xF1;
@@ -1855,13 +1855,13 @@ void CProcessor::ExecuteDIV ()  // DIV
 
     if (src2 == 0)
     {
-        new_psw |= (PSW_V | PSW_C); //если делят на 0 -- то устанавливаем V и C
+        new_psw |= (PSW_V | PSW_C); //ГҐГ±Г«ГЁ Г¤ГҐГ«ГїГІ Г­Г  0 -- ГІГ® ГіГ±ГІГ Г­Г ГўГ«ГЁГўГ ГҐГ¬ V ГЁ C
         SetLPSW(new_psw);
         return;
     }
     if ((longsrc == (int32_t)020000000000) && (src2 == -1))
     {
-        new_psw |= PSW_V; // переполняемся, товарищи
+        new_psw |= PSW_V; // ГЇГҐГ°ГҐГЇГ®Г«Г­ГїГҐГ¬Г±Гї, ГІГ®ГўГ Г°ГЁГ№ГЁ
         SetLPSW(new_psw);
         return;
     }
@@ -1871,7 +1871,7 @@ void CProcessor::ExecuteDIV ()  // DIV
 
     if ((res > 32767) || (res < -32768))
     {
-        new_psw |= PSW_V; // переполняемся, товарищи
+        new_psw |= PSW_V; // ГЇГҐГ°ГҐГЇГ®Г«Г­ГїГҐГ¬Г±Гї, ГІГ®ГўГ Г°ГЁГ№ГЁ
         SetLPSW(new_psw);
         return;
     }
@@ -2475,7 +2475,7 @@ void CProcessor::ExecuteJSR ()  // JSR - Jump subroutine: *--SP = R; R = PC; PC 
 {
     if (m_methdest == 0)
     {
-        // Неправильный метод адресации
+        // ГЌГҐГЇГ°Г ГўГЁГ«ГјГ­Г»Г© Г¬ГҐГІГ®Г¤ Г Г¤Г°ГҐГ±Г Г¶ГЁГЁ
         m_ILLGrq = true;
         m_internalTick = EMT_TIMING;
     }

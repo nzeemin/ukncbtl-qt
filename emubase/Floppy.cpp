@@ -1,4 +1,4 @@
-/*  This file is part of UKNCBTL.
+п»ї/*  This file is part of UKNCBTL.
     UKNCBTL is free software: you can redistribute it and/or modify it under the terms
 of the GNU Lesser General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
@@ -14,13 +14,13 @@ UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
 
 #include "stdafx.h"
 #include <sys/stat.h>
-#include <share.h>
+//#include <share.h>
 #include "Emubase.h"
 
 
 //////////////////////////////////////////////////////////////////////
 
-// Маска флагов, сохраняемых в m_flags
+// ГЊГ Г±ГЄГ  ГґГ«Г ГЈГ®Гў, Г±Г®ГµГ°Г Г­ГїГҐГ¬Г»Гµ Гў m_flags
 const uint16_t FLOPPY_CMD_MASKSTORED =
     FLOPPY_CMD_CORRECTION250 | FLOPPY_CMD_CORRECTION500 | FLOPPY_CMD_SIDEUP | FLOPPY_CMD_DIR | FLOPPY_CMD_SKIPSYNC |
     FLOPPY_CMD_ENGINESTART;
@@ -99,7 +99,7 @@ bool CFloppyController::AttachImage(int drive, LPCTSTR sFileName)
     if (m_drivedata[drive].fpFile != nullptr)
         DetachImage(drive);
 
-    // Определяем, это .dsk-образ или .rtd-образ - по расширению файла
+    // ГЋГЇГ°ГҐГ¤ГҐГ«ГїГҐГ¬, ГЅГІГ® .dsk-Г®ГЎГ°Г Г§ ГЁГ«ГЁ .rtd-Г®ГЎГ°Г Г§ - ГЇГ® Г°Г Г±ГёГЁГ°ГҐГ­ГЁГѕ ГґГ Г©Г«Г 
     m_drivedata[drive].okNetRT11Image = false;
     LPCTSTR sFileNameExt = _tcsrchr(sFileName, _T('.'));
     if (sFileNameExt != nullptr && _tcsicmp(sFileNameExt, _T(".rtd")) == 0)
@@ -178,9 +178,9 @@ void CFloppyController::SetCommand(uint16_t cmd)
     if (m_okTrace) DebugLogFormat(_T("Floppy COMMAND %06o\r\n"), cmd);
 #endif
 
-    bool okPrepareTrack = false;  // Нужно ли считывать дорожку в буфер
+    bool okPrepareTrack = false;  // ГЌГіГ¦Г­Г® Г«ГЁ Г±Г·ГЁГІГ»ГўГ ГІГј Г¤Г®Г°Г®Г¦ГЄГі Гў ГЎГіГґГҐГ°
 
-    // Проверить, не сменился ли текущий привод
+    // ГЏГ°Г®ГўГҐГ°ГЁГІГј, Г­ГҐ Г±Г¬ГҐГ­ГЁГ«Г±Гї Г«ГЁ ГІГҐГЄГіГ№ГЁГ© ГЇГ°ГЁГўГ®Г¤
     uint16_t newdrive = (cmd & 3) ^ 3;
     if (m_drive != newdrive)
     {
@@ -194,13 +194,13 @@ void CFloppyController::SetCommand(uint16_t cmd)
         m_pDrive = m_drivedata + m_drive;
         okPrepareTrack = true;
     }
-    cmd &= ~3;  // Убираем из команды информацию о текущем приводе
+    cmd &= ~3;  // Г“ГЎГЁГ°Г ГҐГ¬ ГЁГ§ ГЄГ®Г¬Г Г­Г¤Г» ГЁГ­ГґГ®Г°Г¬Г Г¶ГЁГѕ Г® ГІГҐГЄГіГ№ГҐГ¬ ГЇГ°ГЁГўГ®Г¤ГҐ
 
     // Copy new flags to m_flags
     m_flags &= ~FLOPPY_CMD_MASKSTORED;
     m_flags |= cmd & FLOPPY_CMD_MASKSTORED;
 
-    // Проверяем, не сменилась ли сторона
+    // ГЏГ°Г®ГўГҐГ°ГїГҐГ¬, Г­ГҐ Г±Г¬ГҐГ­ГЁГ«Г Г±Гј Г«ГЁ Г±ГІГ®Г°Г®Г­Г 
     if (m_flags & FLOPPY_CMD_SIDEUP)  // Side selection: 0 - down, 1 - up
     {
         if (m_side == 0) { m_side = 1;  okPrepareTrack = true; }
@@ -246,7 +246,7 @@ void CFloppyController::SetCommand(uint16_t cmd)
         m_status &= ~FLOPPY_STATUS_CHECKSUMOK;
     }
 
-    if (m_writing && (cmd & FLOPPY_CMD_SKIPSYNC))  // Запись маркера
+    if (m_writing && (cmd & FLOPPY_CMD_SKIPSYNC))  // Г‡Г ГЇГЁГ±Гј Г¬Г Г°ГЄГҐГ°Г 
     {
 //#if !defined(PRODUCT)
 //        DebugLog(_T("Floppy MARKER\r\n"));  //DEBUG
@@ -306,9 +306,9 @@ void CFloppyController::WriteData(uint16_t data)
 
 void CFloppyController::Periodic()
 {
-    //if (!IsEngineOn()) return;  // Вращаем дискеты только если включен мотор
+    //if (!IsEngineOn()) return;  // Г‚Г°Г Г№Г ГҐГ¬ Г¤ГЁГ±ГЄГҐГІГ» ГІГ®Г«ГјГЄГ® ГҐГ±Г«ГЁ ГўГЄГ«ГѕГ·ГҐГ­ Г¬Г®ГІГ®Г°
 
-    // Вращаем дискеты во всех драйвах сразу
+    // Г‚Г°Г Г№Г ГҐГ¬ Г¤ГЁГ±ГЄГҐГІГ» ГўГ® ГўГ±ГҐГµ Г¤Г°Г Г©ГўГ Гµ Г±Г°Г Г§Гі
     for (int drive = 0; drive < 4; drive++)
     {
         m_drivedata[drive].dataptr += 2;
@@ -316,7 +316,7 @@ void CFloppyController::Periodic()
             m_drivedata[drive].dataptr = 0;
     }
 
-    // Далее обрабатываем чтение/запись на текущем драйве
+    // Г„Г Г«ГҐГҐ Г®ГЎГ°Г ГЎГ ГІГ»ГўГ ГҐГ¬ Г·ГІГҐГ­ГЁГҐ/Г§Г ГЇГЁГ±Гј Г­Г  ГІГҐГЄГіГ№ГҐГ¬ Г¤Г°Г Г©ГўГҐ
     if (!IsAttached(m_drive)) return;
 
     if (!m_writing)  // Read mode
@@ -422,7 +422,7 @@ void CFloppyController::PrepareTrack()
     {
         ::fseek(m_pDrive->fpFile, foffset, SEEK_SET);
         size_t count = ::fread(&data, 1, 5120, m_pDrive->fpFile);
-        //TODO: Контроль ошибок чтения
+        //TODO: ГЉГ®Г­ГІГ°Г®Г«Гј Г®ГёГЁГЎГ®ГЄ Г·ГІГҐГ­ГЁГї
     }
 
     // Fill m_data array and m_marker array with marked data
@@ -470,14 +470,14 @@ void CFloppyController::FlushChanges()
             uint32_t bytesToWrite = ((uint32_t)(foffset + 5120) - currentFileSize) % 512;
             if (bytesToWrite == 0) bytesToWrite = 512;
             ::fwrite(datafill, 1, bytesToWrite, m_pDrive->fpFile);
-            //TODO: Проверка на ошибки записи
+            //TODO: ГЏГ°Г®ГўГҐГ°ГЄГ  Г­Г  Г®ГёГЁГЎГЄГЁ Г§Г ГЇГЁГ±ГЁ
             currentFileSize += bytesToWrite;
         }
 
         // Save data into the file
         ::fseek(m_pDrive->fpFile, foffset, SEEK_SET);
         size_t dwBytesWritten = ::fwrite(&data, 1, 5120, m_pDrive->fpFile);
-        //TODO: Проверка на ошибки записи
+        //TODO: ГЏГ°Г®ГўГҐГ°ГЄГ  Г­Г  Г®ГёГЁГЎГЄГЁ Г§Г ГЇГЁГ±ГЁ
     }
     else
     {

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include <QtGui>
 #include <QMenu>
 #include <QStyleFactory>
@@ -224,7 +224,7 @@ void QDebugView::drawMemoryForRegister(QPainter &painter, int reg, CProcessor *p
     quint16 current = pProc->GetReg(reg);
     bool okExec = (reg == 7);
 
-    // ×èòàåì èç ïàìÿòè ïðîöåññîðà â áóôåð
+    // Ã—Ã¨Ã²Ã Ã¥Ã¬ Ã¨Ã§ Ã¯Ã Ã¬Ã¿Ã²Ã¨ Ã¯Ã°Ã®Ã¶Ã¥Ã±Ã±Ã®Ã°Ã  Ã¢ Ã¡Ã³Ã´Ã¥Ã°
     quint16 memory[16];
     int addrtype[16];
     CMemoryController* pMemCtl = pProc->GetMemoryController();
@@ -235,19 +235,19 @@ void QDebugView::drawMemoryForRegister(QPainter &painter, int reg, CProcessor *p
     }
 
     quint16 address = current - 16;
-    for (int index = 0; index < 16; index++)    // Ðèñóåì ñòðîêè
+    for (int index = 0; index < 16; index++)    // ÃÃ¨Ã±Ã³Ã¥Ã¬ Ã±Ã²Ã°Ã®ÃªÃ¨
     {
-        // Àäðåñ
+        // Ã€Ã¤Ã°Ã¥Ã±
         DrawOctalValue(painter, x + 3 * cxChar, y, address);
 
-        // Çíà÷åíèå ïî àäðåñó
+        // Ã‡Ã­Ã Ã·Ã¥Ã­Ã¨Ã¥ Ã¯Ã® Ã Ã¤Ã°Ã¥Ã±Ã³
         quint16 value = memory[index];
         quint16 wChanged = Emulator_GetChangeRamStatus(addrtype[index], address);
         painter.setPen(wChanged != 0 ? Qt::red : colorText);
         DrawOctalValue(painter, x + 10 * cxChar, y, value);
         painter.setPen(colorText);
 
-        // Òåêóùàÿ ïîçèöèÿ
+        // Ã’Ã¥ÃªÃ³Ã¹Ã Ã¿ Ã¯Ã®Ã§Ã¨Ã¶Ã¨Ã¿
         if (address == current)
         {
             painter.drawText(x + 2 * cxChar, y, ">");

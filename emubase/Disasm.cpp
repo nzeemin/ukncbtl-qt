@@ -1,4 +1,4 @@
-/*  This file is part of UKNCBTL.
+п»ї/*  This file is part of UKNCBTL.
     UKNCBTL is free software: you can redistribute it and/or modify it under the terms
 of the GNU Lesser General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
@@ -16,12 +16,12 @@ UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
 #include "Defines.h"
 
 
-// Формат отображения режимов адресации
+// Г”Г®Г°Г¬Г ГІ Г®ГІГ®ГЎГ°Г Г¦ГҐГ­ГЁГї Г°ГҐГ¦ГЁГ¬Г®Гў Г Г¤Г°ГҐГ±Г Г¶ГЁГЁ
 const LPCTSTR ADDRESS_MODE_FORMAT[] =
 {
     _T("%s"), _T("(%s)"), _T("(%s)+"), _T("@(%s)+"), _T("-(%s)"), _T("@-(%s)"), _T("%06o(%s)"), _T("@%06o(%s)")
 };
-// Формат отображения режимов адресации для регистра PC
+// Г”Г®Г°Г¬Г ГІ Г®ГІГ®ГЎГ°Г Г¦ГҐГ­ГЁГї Г°ГҐГ¦ГЁГ¬Г®Гў Г Г¤Г°ГҐГ±Г Г¶ГЁГЁ Г¤Г«Гї Г°ГҐГЈГЁГ±ГІГ°Г  PC
 const LPCTSTR ADDRESS_MODE_PC_FORMAT[] =
 {
     _T("PC"), _T("(PC)"), _T("#%06o"), _T("@#%06o"), _T("-(PC)"), _T("@-(PC)"), _T("%06o"), _T("@%06o")
@@ -173,7 +173,7 @@ uint16_t DisassembleInstruction(uint16_t* pMemory, uint16_t addr, TCHAR* strInst
     case PI_SENZV:  _tcscpy(strInstr, _T("SENZV"));  return 1;
     case PI_SCC:    _tcscpy(strInstr, _T("SCC"));    return 1;
 
-        // Спецкоманды режима HALT ВМ2
+        // Г‘ГЇГҐГ¶ГЄГ®Г¬Г Г­Г¤Г» Г°ГҐГ¦ГЁГ¬Г  HALT Г‚ГЊ2
     case PI_START:  _tcscpy(strInstr, _T("START"));  return 1;
     case PI_STEP:   _tcscpy(strInstr, _T("STEP"));   return 1;
     case PI_RSEL:   _tcscpy(strInstr, _T("RSEL"));   return 1;

@@ -1,4 +1,4 @@
-#ifndef QSCRIPTING_H
+﻿#ifndef QSCRIPTING_H
 #define QSCRIPTING_H
 
 /// \file qscripting.h  Scripting support for Qt version of the emulator

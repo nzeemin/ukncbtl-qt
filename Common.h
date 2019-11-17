@@ -1,4 +1,4 @@
-// Common.h
+﻿// Common.h
 
 #pragma once
 

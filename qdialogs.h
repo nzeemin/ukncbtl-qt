@@ -1,4 +1,4 @@
-#ifndef QDIALOGS_H
+﻿#ifndef QDIALOGS_H
 #define QDIALOGS_H
 
 #include <QWidget>

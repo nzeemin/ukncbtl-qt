@@ -1,4 +1,4 @@
-// Emulator.cpp
+﻿// Emulator.cpp
 
 #include "stdafx.h"
 #include "main.h"

@@ -1,4 +1,4 @@
-#ifndef UNITTESTS_H
+﻿#ifndef UNITTESTS_H
 #define UNITTESTS_H
 
 #if !defined(QT_NO_DEBUG)
