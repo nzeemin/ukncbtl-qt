@@ -15,7 +15,6 @@ class QString;
 #ifndef _TCHAR_DEFINED
 typedef char TCHAR;
 #define _tfopen     fopen
-#define _tfsopen    _fsopen
 #define _tcscpy     strcpy
 #define _tstat      _stat
 #define _tcsrchr    strrchr

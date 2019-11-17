@@ -106,11 +106,11 @@ bool CFloppyController::AttachImage(int drive, LPCTSTR sFileName)
 
     // Open file
     m_drivedata[drive].okReadOnly = false;
-    m_drivedata[drive].fpFile = ::_tfsopen(sFileName, _T("r+b"), 0x40/*_SH_DENYNO*/);
+    m_drivedata[drive].fpFile = ::_tfopen(sFileName, _T("r+b"));
     if (m_drivedata[drive].fpFile == nullptr)
     {
         m_drivedata[drive].okReadOnly = true;
-        m_drivedata[drive].fpFile = ::_tfsopen(sFileName, _T("rb"), 0x40/*_SH_DENYNO*/);
+        m_drivedata[drive].fpFile = ::_tfopen(sFileName, _T("rb"));
     }
     if (m_drivedata[drive].fpFile == nullptr)
         return false;
@@ -462,7 +462,7 @@ void CFloppyController::FlushChanges()
 
         // Check file length
         ::fseek(m_pDrive->fpFile, 0, SEEK_END);
-        uint32_t currentFileSize = ::ftell(m_pDrive->fpFile);
+        uint32_t currentFileSize = (uint32_t)::ftell(m_pDrive->fpFile);
         while (currentFileSize < (uint32_t)(foffset + 5120))
         {
             uint8_t datafill[512];  ::memset(datafill, 0, 512);
@@ -475,7 +475,7 @@ void CFloppyController::FlushChanges()
 
         // Save data into the file
         ::fseek(m_pDrive->fpFile, foffset, SEEK_SET);
-        size_t dwBytesWritten = ::fwrite(&data, 1, 5120, m_pDrive->fpFile);
+        ::fwrite(&data, 1, 5120, m_pDrive->fpFile);
         //TODO: Check for writing error
     }
     else
