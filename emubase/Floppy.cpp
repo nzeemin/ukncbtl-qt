@@ -14,6 +14,7 @@ UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
 
 #include "stdafx.h"
 #include <sys/stat.h>
+#include <share.h>
 #include "Emubase.h"
 
 
@@ -106,11 +107,11 @@ bool CFloppyController::AttachImage(int drive, LPCTSTR sFileName)
 
     // Open file
     m_drivedata[drive].okReadOnly = false;
-    m_drivedata[drive].fpFile = ::_tfopen(sFileName, _T("r+b"));
+    m_drivedata[drive].fpFile = ::_tfsopen(sFileName, _T("r+b"), _SH_DENYNO);
     if (m_drivedata[drive].fpFile == nullptr)
     {
         m_drivedata[drive].okReadOnly = true;
-        m_drivedata[drive].fpFile = ::_tfopen(sFileName, _T("rb"));
+        m_drivedata[drive].fpFile = ::_tfsopen(sFileName, _T("rb"), _SH_DENYNO);
     }
     if (m_drivedata[drive].fpFile == nullptr)
         return false;
@@ -388,7 +389,6 @@ void CFloppyController::Periodic()
                     m_status |= FLOPPY_STATUS_CHECKSUMOK;
                 }
             }
-
         }
     }
 }
@@ -402,7 +402,6 @@ void CFloppyController::PrepareTrack()
 #endif
 
     //TCHAR buffer[512];
-    size_t count;
 
     m_trackchanged = false;
     m_status |= FLOPPY_STATUS_MOREDATA;
@@ -422,7 +421,7 @@ void CFloppyController::PrepareTrack()
     if (m_pDrive->fpFile != nullptr)
     {
         ::fseek(m_pDrive->fpFile, foffset, SEEK_SET);
-        count = ::fread(&data, 1, 5120, m_pDrive->fpFile);
+        size_t count = ::fread(&data, 1, 5120, m_pDrive->fpFile);
         //TODO: Контроль ошибок чтения
     }
 

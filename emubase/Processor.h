@@ -23,7 +23,6 @@ class CMemoryController;
 /// \brief KM1801VM2 processor
 class CProcessor
 {
-
 public:  // Constructor / initialization
     CProcessor(LPCTSTR name);
     /// \brief Link the processor and memory controller
@@ -135,6 +134,7 @@ public:  // Processor control
     bool        InterruptProcessing();
     /// \brief Execute next command and process interrupts
     void        CommandExecution();
+    int         GetInternalTick() const { return m_internalTick; }
 
 public:  // Saving/loading emulator status (pImage addresses up to 32 bytes)
     void        SaveToImage(uint8_t* pImage) const;
@@ -145,9 +145,9 @@ protected:  // Implementation
     void        TranslateInstruction();  ///< Execute the instruction
 protected:  // Implementation - memory access
     /// \brief Read word from the bus for execution
-    uint16_t    GetWordExec(uint16_t address) { return m_pMemoryController->GetWordExec(address, IsHaltMode()); }
+    uint16_t    GetWordExec(uint16_t address) { return m_pMemoryController->GetWord(address, IsHaltMode(), true); }
     /// \brief Read word from the bus
-    uint16_t    GetWord(uint16_t address) { return m_pMemoryController->GetWord(address, IsHaltMode()); }
+    uint16_t    GetWord(uint16_t address) { return m_pMemoryController->GetWord(address, IsHaltMode(), false); }
     void        SetWord(uint16_t address, uint16_t word) { m_pMemoryController->SetWord(address, IsHaltMode(), word); }
     uint8_t     GetByte(uint16_t address) { return m_pMemoryController->GetByte(address, IsHaltMode()); }
     void        SetByte(uint16_t address, uint8_t byte) { m_pMemoryController->SetByte(address, IsHaltMode(), byte); }
@@ -271,7 +271,6 @@ protected:  // Implementation - instruction execution
 
     void        ExecuteADD ();
     void        ExecuteSUB ();
-
 };
 
 inline void CProcessor::SetPSW(uint16_t word)

@@ -1256,7 +1256,6 @@ void CMotherboard::ChanRxStateSetPPU(uint8_t state)
         m_chanppurx[2].rdwr = 0;
         m_pPPU->InterruptVIRQ(9, 0340);
     }
-
 }
 void CMotherboard::ChanTxStateSetPPU(uint8_t state)
 {
@@ -1454,7 +1453,6 @@ void CMotherboard::DoSound(void)
         freq_out[0] = 0;
 
     freq_out[1] = (m_timer >> 6) & 1; //1000
-
     freq_out[2] = (m_timer >> 7) & 1; //500
     freq_out[3] = (m_timer >> 8) & 1; //250
     freq_out[4] = (m_timer >> 10) & 1; //60
@@ -1468,13 +1466,12 @@ void CMotherboard::DoSound(void)
             global = 1;
     }
 
-    if (m_SoundGenCallback != nullptr)
-    {
-        if (global)
-            (*m_SoundGenCallback)(0x7fff, 0x7fff);
-        else
-            (*m_SoundGenCallback)(0x0000, 0x0000);
-    }
+    if (m_SoundGenCallback == nullptr)
+        return;
+
+    uint8_t value = global ? 0xff : 0;
+    uint16_t value16 = value << 7;
+    (*m_SoundGenCallback)(value16, value16);
 }
 
 void CMotherboard::SetSound(uint16_t val)
@@ -1599,6 +1596,38 @@ void CMotherboard::SetNetworkCallbacks(NETWORKINCALLBACK incallback, NETWORKOUTC
         //TODO: Set port value to indicate we are ready to translate
     }
 }
+
+
+//////////////////////////////////////////////////////////////////////
+
+#if !defined(PRODUCT)
+
+void TraceInstruction(CProcessor* pProc, CMotherboard* /*pBoard*/)
+{
+    uint16_t address = pProc->GetPC();
+    bool okHaltMode = pProc->IsHaltMode();
+    CMemoryController* pMemCtl = pProc->GetMemoryController();
+
+    uint16_t memory[4];
+    int addrtype = 0;
+    memory[0] = pMemCtl->GetWordView(address + 0 * 2, okHaltMode, true, &addrtype);
+    memory[1] = pMemCtl->GetWordView(address + 1 * 2, okHaltMode, true, &addrtype);
+    memory[2] = pMemCtl->GetWordView(address + 2 * 2, okHaltMode, true, &addrtype);
+    memory[3] = pMemCtl->GetWordView(address + 3 * 2, okHaltMode, true, &addrtype);
+
+    TCHAR bufaddr[7];
+    PrintOctalValue(bufaddr, address);
+
+    TCHAR instr[8];
+    TCHAR args[32];
+    DisassembleInstruction(memory, address, instr, args);
+    TCHAR buffer[64];
+    _sntprintf(buffer, 64, _T("%s\t%s\t%s\r\n"), bufaddr, instr, args);
+
+    DebugLog(buffer);
+}
+
+#endif
 
 
 //////////////////////////////////////////////////////////////////////

@@ -9,13 +9,14 @@
 #include "Emulator.h"
 #include "emubase/Emubase.h"
 
-
-const QString MESSAGE_UNKNOWN_COMMAND = QConsoleView::tr("  Unknown command.\r\n");
-const QString MESSAGE_WRONG_VALUE = QConsoleView::tr("  Wrong value.\r\n");
-
+QString QConsoleView::MESSAGE_UNKNOWN_COMMAND;
+QString QConsoleView::MESSAGE_WRONG_VALUE;
 
 QConsoleView::QConsoleView()
 {
+    MESSAGE_UNKNOWN_COMMAND = QConsoleView::tr("  Unknown command.\r\n");
+    MESSAGE_WRONG_VALUE = QConsoleView::tr("  Wrong value.\r\n");
+
     m_okCurrentProc = false;
 
     setMinimumSize(320, 120);
@@ -202,7 +203,7 @@ void QConsoleView::printMemoryDump(CProcessor *pProc, quint16 address, int lines
     {
         quint16 dump[8];
         for (int i = 0; i < 8; i++)
-            dump[i] = pMemCtl->GetWord(address + i * 2, okHaltMode);
+            dump[i] = pMemCtl->GetWord(address + i * 2, okHaltMode, false);
 
         char buffer[2 + 6 + 2 + 7 * 8 + 1 + 16 + 1 + 2];
         char* pBuf = buffer;

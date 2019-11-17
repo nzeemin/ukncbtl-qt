@@ -3,6 +3,7 @@
 #include <QtCore/QThread>
 #include <QtCore/QTimer>
 #include <QSettings>
+#include <QTranslator>
 #include "main.h"
 #include "mainwindow.h"
 #include "Emulator.h"
@@ -31,6 +32,10 @@ int main(int argc, char *argv[])
 
     QApplication application(argc, argv);
     g_Application = &application;
+
+//    QTranslator translator;
+//    translator.load("ukncbtl_en.tr");
+//    application.installTranslator(&translator);
 
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "Back to Life", "UKNCBTL");
     g_Settings = &settings;

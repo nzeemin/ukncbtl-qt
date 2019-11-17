@@ -291,7 +291,7 @@ void MainWindow::saveStateImage()
 }
 void MainWindow::saveStateImage(const QString& strFileName)
 {
-    LPCTSTR sFileName = qPrintable(strFileName);
+    const char * sFileName = qPrintable(strFileName);
     Emulator_SaveImage(sFileName);
 }
 void MainWindow::loadStateImage()
@@ -307,7 +307,7 @@ void MainWindow::loadStateImage()
 }
 void MainWindow::loadStateImage(const QString& strFileName)
 {
-    LPCTSTR sFileName = qPrintable(strFileName);
+    const char * sFileName = qPrintable(strFileName);
     Emulator_LoadImage(sFileName);
 
     UpdateAllViews();
@@ -445,7 +445,7 @@ void MainWindow::emulatorReset()
 void MainWindow::soundEnabled()
 {
     bool sound = ui->actionSoundEnabled->isChecked();
-    Emulator_SetSound(sound ? true : false);
+    Emulator_SetSound(sound);
     Settings_SetSound(sound);
 }
 
