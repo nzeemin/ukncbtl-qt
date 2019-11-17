@@ -14,13 +14,12 @@ UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
 
 #include "stdafx.h"
 #include <sys/stat.h>
-//#include <share.h>
 #include "Emubase.h"
 
 
 //////////////////////////////////////////////////////////////////////
 
-// Ìàñêà ôëàãîâ, ñîõðàíÿåìûõ â m_flags
+// Mask of all flags stored in m_flags
 const uint16_t FLOPPY_CMD_MASKSTORED =
     FLOPPY_CMD_CORRECTION250 | FLOPPY_CMD_CORRECTION500 | FLOPPY_CMD_SIDEUP | FLOPPY_CMD_DIR | FLOPPY_CMD_SKIPSYNC |
     FLOPPY_CMD_ENGINESTART;
@@ -99,7 +98,7 @@ bool CFloppyController::AttachImage(int drive, LPCTSTR sFileName)
     if (m_drivedata[drive].fpFile != nullptr)
         DetachImage(drive);
 
-    // Îïðåäåëÿåì, ýòî .dsk-îáðàç èëè .rtd-îáðàç - ïî ðàñøèðåíèþ ôàéëà
+    // Detect if this is a .dsk image or .rtd image, using the file extension
     m_drivedata[drive].okNetRT11Image = false;
     LPCTSTR sFileNameExt = _tcsrchr(sFileName, _T('.'));
     if (sFileNameExt != nullptr && _tcsicmp(sFileNameExt, _T(".rtd")) == 0)
@@ -107,11 +106,11 @@ bool CFloppyController::AttachImage(int drive, LPCTSTR sFileName)
 
     // Open file
     m_drivedata[drive].okReadOnly = false;
-    m_drivedata[drive].fpFile = ::_tfsopen(sFileName, _T("r+b"), _SH_DENYNO);
+    m_drivedata[drive].fpFile = ::_tfsopen(sFileName, _T("r+b"), 0x40/*_SH_DENYNO*/);
     if (m_drivedata[drive].fpFile == nullptr)
     {
         m_drivedata[drive].okReadOnly = true;
-        m_drivedata[drive].fpFile = ::_tfsopen(sFileName, _T("rb"), _SH_DENYNO);
+        m_drivedata[drive].fpFile = ::_tfsopen(sFileName, _T("rb"), 0x40/*_SH_DENYNO*/);
     }
     if (m_drivedata[drive].fpFile == nullptr)
         return false;
@@ -178,9 +177,9 @@ void CFloppyController::SetCommand(uint16_t cmd)
     if (m_okTrace) DebugLogFormat(_T("Floppy COMMAND %06o\r\n"), cmd);
 #endif
 
-    bool okPrepareTrack = false;  // Íóæíî ëè ñ÷èòûâàòü äîðîæêó â áóôåð
+    bool okPrepareTrack = false;  // Is it needed to load the track into the buffer
 
-    // Ïðîâåðèòü, íå ñìåíèëñÿ ëè òåêóùèé ïðèâîä
+    // Check if the current drive was changed or not
     uint16_t newdrive = (cmd & 3) ^ 3;
     if (m_drive != newdrive)
     {
@@ -194,13 +193,13 @@ void CFloppyController::SetCommand(uint16_t cmd)
         m_pDrive = m_drivedata + m_drive;
         okPrepareTrack = true;
     }
-    cmd &= ~3;  // Óáèðàåì èç êîìàíäû èíôîðìàöèþ î òåêóùåì ïðèâîäå
+    cmd &= ~3;  // Remove the info about the current drive
 
     // Copy new flags to m_flags
     m_flags &= ~FLOPPY_CMD_MASKSTORED;
     m_flags |= cmd & FLOPPY_CMD_MASKSTORED;
 
-    // Ïðîâåðÿåì, íå ñìåíèëàñü ëè ñòîðîíà
+    // Check if the side was changed
     if (m_flags & FLOPPY_CMD_SIDEUP)  // Side selection: 0 - down, 1 - up
     {
         if (m_side == 0) { m_side = 1;  okPrepareTrack = true; }
@@ -308,7 +307,7 @@ void CFloppyController::Periodic()
 {
     //if (!IsEngineOn()) return;  // Âðàùàåì äèñêåòû òîëüêî åñëè âêëþ÷åí ìîòîð
 
-    // Âðàùàåì äèñêåòû âî âñåõ äðàéâàõ ñðàçó
+    // Rotating all the disks at once
     for (int drive = 0; drive < 4; drive++)
     {
         m_drivedata[drive].dataptr += 2;
@@ -316,7 +315,7 @@ void CFloppyController::Periodic()
             m_drivedata[drive].dataptr = 0;
     }
 
-    // Äàëåå îáðàáàòûâàåì ÷òåíèå/çàïèñü íà òåêóùåì äðàéâå
+    // Then process reading/writing on the current drive
     if (!IsAttached(m_drive)) return;
 
     if (!m_writing)  // Read mode
@@ -422,7 +421,7 @@ void CFloppyController::PrepareTrack()
     {
         ::fseek(m_pDrive->fpFile, foffset, SEEK_SET);
         size_t count = ::fread(&data, 1, 5120, m_pDrive->fpFile);
-        //TODO: Êîíòðîëü îøèáîê ÷òåíèÿ
+        //TODO: Check for reading error
     }
 
     // Fill m_data array and m_marker array with marked data
@@ -470,14 +469,14 @@ void CFloppyController::FlushChanges()
             uint32_t bytesToWrite = ((uint32_t)(foffset + 5120) - currentFileSize) % 512;
             if (bytesToWrite == 0) bytesToWrite = 512;
             ::fwrite(datafill, 1, bytesToWrite, m_pDrive->fpFile);
-            //TODO: Ïðîâåðêà íà îøèáêè çàïèñè
+            //TODO: Check for writing error
             currentFileSize += bytesToWrite;
         }
 
         // Save data into the file
         ::fseek(m_pDrive->fpFile, foffset, SEEK_SET);
         size_t dwBytesWritten = ::fwrite(&data, 1, 5120, m_pDrive->fpFile);
-        //TODO: Ïðîâåðêà íà îøèáêè çàïèñè
+        //TODO: Check for writing error
     }
     else
     {
