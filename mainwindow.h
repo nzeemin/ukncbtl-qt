@@ -71,6 +71,7 @@ public slots:
     void viewGrayscaleScreen();
     void viewSizeRegular();
     void viewSizeUpscaled();
+    void viewSizeDoubleInterlaced();
     void viewSizeDouble();
     void viewSizeUpscaled3();
     void viewSizeUpscaled4();

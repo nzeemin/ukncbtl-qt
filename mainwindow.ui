@@ -92,6 +92,7 @@
     <addaction name="separator"/>
     <addaction name="actionViewSizeRegular"/>
     <addaction name="actionViewSizeUpscaled"/>
+    <addaction name="actionViewSizeDoubleInterlaced"/>
     <addaction name="actionViewSizeDouble"/>
     <addaction name="actionViewSizeUpscaled3"/>
     <addaction name="actionViewSizeUpscaled4"/>
@@ -393,7 +394,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Regular Screen</string>
+    <string>640 x 288 Standard</string>
    </property>
   </action>
   <action name="actionViewSizeUpscaled">
@@ -401,7 +402,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Upscaled to 1 x 1.5</string>
+    <string>640 x 432 Upscaled to 1.5</string>
    </property>
   </action>
   <action name="actionViewSizeDouble">
@@ -409,7 +410,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Double Interlaced</string>
+    <string>640 x 576 Doubled</string>
    </property>
   </action>
   <action name="actionSoundEnabled">
@@ -440,7 +441,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Upscaled to 1.5 x 2</string>
+    <string>960 x 576 Interlaced</string>
    </property>
   </action>
   <action name="actionViewSizeUpscaled4">
@@ -448,7 +449,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Upscaled to 2 x 3</string>
+    <string>1280 x 864 Interlaced</string>
    </property>
   </action>
   <action name="actionSaveStateImage">
@@ -483,6 +484,14 @@
    </property>
    <property name="text">
     <string>GRB Screen</string>
+   </property>
+  </action>
+  <action name="actionViewSizeDoubleInterlaced">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>640 x 576 Interlaced</string>
    </property>
   </action>
  </widget>

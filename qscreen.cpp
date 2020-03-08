@@ -32,10 +32,11 @@ const quint32 ScreenView_GrayColors[16] =
 // Upscale screen from height 288 to 432
 static void UpscaleScreen(void* pImageBits)
 {
+    quint32* pbits = static_cast<quint32*>(pImageBits);
     int ukncline = 287;
     for (int line = 431; line > 0; line--)
     {
-        quint32* pdest = ((quint32*)pImageBits) + line * UKNC_SCREEN_WIDTH;
+        quint32* pdest = pbits + line * UKNC_SCREEN_WIDTH;
         if (line % 3 == 1)
         {
             quint8* psrc1 = ((quint8*)pImageBits) + ukncline * UKNC_SCREEN_WIDTH * 4;
@@ -52,7 +53,7 @@ static void UpscaleScreen(void* pImageBits)
         }
         else
         {
-            quint32* psrc = ((quint32*)pImageBits) + ukncline * UKNC_SCREEN_WIDTH;
+            quint32* psrc = pbits + ukncline * UKNC_SCREEN_WIDTH;
             memcpy(pdest, psrc, UKNC_SCREEN_WIDTH * 4);
             ukncline--;
         }
@@ -62,10 +63,11 @@ static void UpscaleScreen(void* pImageBits)
 // Upscale screen from height 288 to 576 with "interlaced" effect
 static void UpscaleScreen2(void* pImageBits)
 {
+    quint32* pbits = static_cast<quint32*>(pImageBits);
     for (int ukncline = 287; ukncline >= 0; ukncline--)
     {
-        quint32* psrc = ((quint32*)pImageBits) + ukncline * UKNC_SCREEN_WIDTH;
-        quint32* pdest = ((quint32*)pImageBits) + (ukncline * 2) * UKNC_SCREEN_WIDTH;
+        quint32* psrc = pbits + ukncline * UKNC_SCREEN_WIDTH;
+        quint32* pdest = pbits + (ukncline * 2) * UKNC_SCREEN_WIDTH;
         memcpy(pdest, psrc, UKNC_SCREEN_WIDTH * 4);
 
         pdest += UKNC_SCREEN_WIDTH;
@@ -73,14 +75,30 @@ static void UpscaleScreen2(void* pImageBits)
     }
 }
 
+// Upscale screen from height 288 to 576
+static void UpscaleScreen2d(void* pImageBits)
+{
+    quint32* pbits = static_cast<quint32*>(pImageBits);
+    for (int ukncline = 287; ukncline >= 0; ukncline--)
+    {
+        quint32* psrc = pbits + ukncline * UKNC_SCREEN_WIDTH;
+        quint32* pdest = pbits + (ukncline * 2) * UKNC_SCREEN_WIDTH;
+        memcpy(pdest, psrc, UKNC_SCREEN_WIDTH * 4);
+
+        pdest += UKNC_SCREEN_WIDTH;
+        memcpy(pdest, psrc, UKNC_SCREEN_WIDTH * 4);
+    }
+}
+
 // Upscale screen width 640->960, height 288->576 with "interlaced" effect
 static void UpscaleScreen3(void* pImageBits)
 {
+    quint32* pbits = static_cast<quint32*>(pImageBits);
     for (int ukncline = 287; ukncline >= 0; ukncline--)
     {
-        quint32* psrc = ((quint32*)pImageBits) + ukncline * UKNC_SCREEN_WIDTH;
+        quint32* psrc = pbits + ukncline * UKNC_SCREEN_WIDTH;
         psrc += UKNC_SCREEN_WIDTH - 1;
-        quint32* pdest = ((quint32*)pImageBits) + (ukncline * 2) * 960;
+        quint32* pdest = pbits + (ukncline * 2) * 960;
         pdest += 960 - 1;
         for (int i = 0; i < UKNC_SCREEN_WIDTH / 2; i++)
         {
@@ -103,10 +121,11 @@ static void UpscaleScreen3(void* pImageBits)
 // Upscale screen width 640->1280, height 288->864 with "interlaced" effect
 static void UpscaleScreen4(void* pImageBits)
 {
+    quint32* pbits = static_cast<quint32*>(pImageBits);
     for (int ukncline = 287; ukncline >= 0; ukncline--)
     {
-        quint32* psrc = ((quint32*)pImageBits) + ukncline * UKNC_SCREEN_WIDTH;
-        quint32* pdest = ((quint32*)pImageBits) + (ukncline * 3) * 1280;
+        quint32* psrc = pbits + ukncline * UKNC_SCREEN_WIDTH;
+        quint32* pdest = pbits + (ukncline * 3) * 1280;
         psrc += UKNC_SCREEN_WIDTH - 1;
         pdest += 1280 - 1;
         quint32* pdest2 = pdest + 1280;
@@ -174,7 +193,7 @@ void QEmulatorScreen::createDisplay()
 
     int cxScreenWidth = UKNC_SCREEN_WIDTH;
     int cyScreenHeight = UKNC_SCREEN_HEIGHT;
-    if (m_sizeMode == DoubleScreen)
+    if (m_sizeMode == DoubleInterlacedScreen || m_sizeMode == DoubleScreen)
         cyScreenHeight = UKNC_SCREEN_HEIGHT * 2;
     else if (m_sizeMode == UpscaledScreen)
         cyScreenHeight = 432;
@@ -207,8 +226,10 @@ void QEmulatorScreen::paintEvent(QPaintEvent * /*event*/)
     }
 
     Emulator_PrepareScreenRGB32(m_image->bits(), colors);
-    if (m_sizeMode == DoubleScreen)
+    if (m_sizeMode == DoubleInterlacedScreen)
         UpscaleScreen2(m_image->bits());
+    else if (m_sizeMode == DoubleScreen)
+        UpscaleScreen2d(m_image->bits());
     else if (m_sizeMode == UpscaledScreen)
         UpscaleScreen(m_image->bits());
     else if (m_sizeMode == UpscaledScreen3)
