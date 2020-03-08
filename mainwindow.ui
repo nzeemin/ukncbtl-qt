@@ -95,7 +95,8 @@
     <addaction name="actionViewSizeDoubleInterlaced"/>
     <addaction name="actionViewSizeDouble"/>
     <addaction name="actionViewSizeUpscaled3"/>
-    <addaction name="actionViewSizeUpscaled4"/>
+    <addaction name="actionViewSizeUpscaled175"/>
+    <addaction name="actionViewSizeUpscaled5"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -444,7 +445,7 @@
     <string>960 x 576 Interlaced</string>
    </property>
   </action>
-  <action name="actionViewSizeUpscaled4">
+  <action name="actionViewSizeUpscaled5">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -492,6 +493,14 @@
    </property>
    <property name="text">
     <string>640 x 576 Interlaced</string>
+   </property>
+  </action>
+  <action name="actionViewSizeUpscaled175">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>1120 x 864 Interlaced</string>
    </property>
   </action>
  </widget>
