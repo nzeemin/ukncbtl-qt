@@ -16,5 +16,10 @@
         <file>images/iconCpuPpu.png</file>
         <file>images/iconWordByte.png</file>
         <file>images/iconEditAddress.png</file>
+        <file>images/iconMemoryCpu.png</file>
+        <file>images/iconMemoryPpu.png</file>
+        <file>images/iconMemoryRam.png</file>
+        <file>images/iconMemoryRom.png</file>
+        <file>images/iconScreenshot.png</file>
     </qresource>
 </RCC>

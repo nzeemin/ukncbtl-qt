@@ -20,7 +20,7 @@
      <x>0</x>
      <y>0</y>
      <width>662</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -141,6 +141,7 @@
    <addaction name="actionDrivesHard2"/>
    <addaction name="separator"/>
    <addaction name="actionSoundEnabled"/>
+   <addaction name="actionFileScreenshot"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionFileExit">
@@ -304,7 +305,14 @@
    </property>
   </action>
   <action name="actionFileScreenshot">
+   <property name="icon">
+    <iconset resource="QtUkncBtl.qrc">
+     <normaloff>:/images/iconScreenshot.png</normaloff>:/images/iconScreenshot.png</iconset>
+   </property>
    <property name="text">
+    <string>Screenshot</string>
+   </property>
+   <property name="iconText">
     <string>Screenshot</string>
    </property>
   </action>
