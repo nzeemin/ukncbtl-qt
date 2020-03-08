@@ -20,7 +20,7 @@
      <x>0</x>
      <y>0</y>
      <width>662</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -31,6 +31,7 @@
     <addaction name="actionLoadStateImage"/>
     <addaction name="separator"/>
     <addaction name="actionFileScreenshot"/>
+    <addaction name="actionFileScreenshotAs"/>
     <addaction name="separator"/>
     <addaction name="actionScriptRun"/>
     <addaction name="separator"/>
@@ -460,6 +461,11 @@
    </property>
    <property name="text">
     <string>Keyboard</string>
+   </property>
+  </action>
+  <action name="actionFileScreenshotAs">
+   <property name="text">
+    <string>Save Screenshot as...</string>
    </property>
   </action>
  </widget>

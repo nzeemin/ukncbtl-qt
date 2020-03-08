@@ -46,6 +46,7 @@ public slots:
     void saveStateImage();
     void loadStateImage();
     void saveScreenshot();
+    void saveScreenshotAs();
     void helpAbout();
     void emulatorFrame();
     void emulatorRun();

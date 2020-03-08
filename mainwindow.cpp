@@ -1,11 +1,12 @@
 ﻿#include "stdafx.h"
-#include <QMessageBox>
-#include <QFileDialog>
 #include <QAction>
+#include <QDateTime>
+#include <QDockWidget>
+#include <QFileDialog>
+#include <QLabel>
+#include <QMessageBox>
 #include <QSettings>
 #include <QVBoxLayout>
-#include <QDockWidget>
-#include <QLabel>
 #include "main.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -30,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionSaveStateImage, SIGNAL(triggered()), this, SLOT(saveStateImage()));
     QObject::connect(ui->actionLoadStateImage, SIGNAL(triggered()), this, SLOT(loadStateImage()));
     QObject::connect(ui->actionFileScreenshot, SIGNAL(triggered()), this, SLOT(saveScreenshot()));
+    QObject::connect(ui->actionFileScreenshotAs, SIGNAL(triggered()), this, SLOT(saveScreenshotAs()));
     QObject::connect(ui->actionScriptRun, SIGNAL(triggered()), this, SLOT(scriptRun()));
     QObject::connect(ui->actionFileExit, SIGNAL(triggered()), this, SLOT(close()));
     QObject::connect(ui->actionEmulatorRun, SIGNAL(triggered()), this, SLOT(emulatorRun()));
@@ -315,6 +317,12 @@ void MainWindow::loadStateImage(const QString& strFileName)
 
 void MainWindow::saveScreenshot()
 {
+    QString strFileName = QString("%1.png").arg(QDateTime::currentDateTime().toString("yyyyMMddhhmmsszzz"));
+
+    saveScreenshot(strFileName);
+}
+void MainWindow::saveScreenshotAs()
+{
     QFileDialog dlg;
     dlg.setAcceptMode(QFileDialog::AcceptSave);
     dlg.setNameFilter(tr("PNG images (*.png)"));
@@ -334,7 +342,7 @@ void MainWindow::helpAbout()
 {
     QMessageBox::about(this, tr("About"), tr(
             "UKNCBTL Qt Version 1.0\n"
-            "Copyright (C) 2007-2019\n\n"
+            "Copyright (C) 2007-2020\n\n"
             "https://github.com/nzeemin/ukncbtl-qt\n\n"
             "Authors:\r\nNikita Zimin\nFelix Lazarev\nAlexey Kisly\n\n"
             "Special thanks to:\nArseny Gordin\n\n"
