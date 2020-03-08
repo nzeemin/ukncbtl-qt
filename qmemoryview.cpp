@@ -248,7 +248,10 @@ void QMemoryView::paintEvent(QPaintEvent * /*event*/)
                 if (address < 0100000)
                     okValid = false;
                 else
+                {
+                    addrtype = ADDRTYPE_ROM;
                     word = g_pBoard->GetROMWord(address - 0100000);
+                }
                 break;
             case MEMMODE_CPU:
                 okHalt = g_pBoard->GetCPU()->IsHaltMode();
@@ -269,7 +272,10 @@ void QMemoryView::paintEvent(QPaintEvent * /*event*/)
 
             if (okValid)
             {
-                painter.setPen(wChanged != 0 ? Qt::red : colorText);
+                if (addrtype == ADDRTYPE_ROM)
+                    painter.setPen(Qt::blue);
+                else
+                    painter.setPen(wChanged != 0 ? Qt::red : colorText);
                 if (m_ByteMode)
                 {
                     PrintOctalValue(buffer, (word & 0xff));
