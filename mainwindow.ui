@@ -87,6 +87,7 @@
     <addaction name="actionViewKeyboard"/>
     <addaction name="separator"/>
     <addaction name="actionViewRgbScreen"/>
+    <addaction name="actionViewGrbScreen"/>
     <addaction name="actionViewGrayscaleScreen"/>
     <addaction name="separator"/>
     <addaction name="actionViewSizeRegular"/>
@@ -474,6 +475,14 @@
   <action name="actionFileScreenshotAs">
    <property name="text">
     <string>Save Screenshot as...</string>
+   </property>
+  </action>
+  <action name="actionViewGrbScreen">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>GRB Screen</string>
    </property>
   </action>
  </widget>

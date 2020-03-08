@@ -134,7 +134,7 @@ void QDebugView::paintEvent(QPaintEvent * /*event*/)
     ASSERT(pDebugPU != nullptr);
     quint16* arrR = (m_okDebugProcessor) ? m_wDebugCpuR : m_wDebugPpuR;
     bool* arrRChanged = (m_okDebugProcessor) ? m_okDebugCpuRChanged : m_okDebugPpuRChanged;
-    WORD oldSP = (m_okDebugProcessor) ? m_wDebugCpuR6Old : m_wDebugPpuR6Old;
+    quint16 oldSP = (m_okDebugProcessor) ? m_wDebugCpuR6Old : m_wDebugPpuR6Old;
 
     drawProcessor(painter, pDebugPU, 30 + cxChar * 2, 1 * cyLine, arrR, arrRChanged);
 

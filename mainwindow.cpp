@@ -53,6 +53,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionHelpAbout, SIGNAL(triggered()), this, SLOT(helpAbout()));
     QObject::connect(ui->actionViewKeyboard, SIGNAL(triggered()), this, SLOT(viewKeyboard()));
     QObject::connect(ui->actionViewRgbScreen, SIGNAL(triggered()), this, SLOT(viewRgbScreen()));
+    QObject::connect(ui->actionViewGrbScreen, SIGNAL(triggered()), this, SLOT(viewGrbScreen()));
     QObject::connect(ui->actionViewGrayscaleScreen, SIGNAL(triggered()), this, SLOT(viewGrayscaleScreen()));
     QObject::connect(ui->actionViewSizeRegular, SIGNAL(triggered()), this, SLOT(viewSizeRegular()));
     QObject::connect(ui->actionViewSizeDouble, SIGNAL(triggered()), this, SLOT(viewSizeDouble()));
@@ -157,7 +158,7 @@ void MainWindow::closeEvent(QCloseEvent *)
 void MainWindow::restoreSettings()
 {
     ScreenViewMode scrViewMode = (ScreenViewMode)Global_getSettings()->value("MainWindow/ScreenViewMode").toInt();
-    if (scrViewMode == 0) scrViewMode = RGBScreen;
+    if (scrViewMode == 0) scrViewMode = GRBScreen;
     m_screen->setMode(scrViewMode);
     ScreenSizeMode scrSizeMode = (ScreenSizeMode)Global_getSettings()->value("MainWindow/ScreenSizeMode").toInt();
     if (scrSizeMode == 0) scrSizeMode = RegularScreen;
@@ -186,6 +187,7 @@ void MainWindow::UpdateMenu()
 {
     ui->actionEmulatorRun->setChecked(g_okEmulatorRunning);
     ui->actionViewRgbScreen->setChecked(m_screen->mode() == RGBScreen);
+    ui->actionViewGrbScreen->setChecked(m_screen->mode() == GRBScreen);
     ui->actionViewGrayscaleScreen->setChecked(m_screen->mode() == GrayScreen);
     ui->actionViewSizeRegular->setChecked(m_screen->sizeMode() == RegularScreen);
     ui->actionViewSizeUpscaled->setChecked(m_screen->sizeMode() == UpscaledScreen);
@@ -360,6 +362,11 @@ void MainWindow::viewKeyboard()
 void MainWindow::viewRgbScreen()
 {
     m_screen->setMode(RGBScreen);
+    UpdateMenu();
+}
+void MainWindow::viewGrbScreen()
+{
+    m_screen->setMode(GRBScreen);
     UpdateMenu();
 }
 void MainWindow::viewGrayscaleScreen()

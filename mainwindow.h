@@ -67,6 +67,7 @@ public slots:
     void debugStepOver();
     void viewKeyboard();
     void viewRgbScreen();
+    void viewGrbScreen();
     void viewGrayscaleScreen();
     void viewSizeRegular();
     void viewSizeUpscaled();
