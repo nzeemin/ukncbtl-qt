@@ -35,10 +35,12 @@ private:
     unsigned short m_wDebugPpuR[9];  // Old register values - R0..R7, PSW
     bool m_okDebugCpuRChanged[9];   // Register change flags
     bool m_okDebugPpuRChanged[9];   // Register change flags
+    quint16 m_wDebugCpuR6Old;  // SP value on previous step
+    quint16 m_wDebugPpuR6Old;  // SP value on previous step
 
 private:
     void drawProcessor(QPainter &painter, const CProcessor *pProc, int x, int y, quint16 *arrR, bool *arrRChanged);
-    void drawMemoryForRegister(QPainter &painter, int reg, CProcessor *pProc, int x, int y);
+    void drawMemoryForRegister(QPainter &painter, int reg, CProcessor *pProc, int x, int y, quint16 oldValue);
     void drawPorts(QPainter &painter, bool okProcessor, CMemoryController* pMemCtl, CMotherboard* pBoard, int x, int y);
     void drawCPUMemoryMap(QPainter &painter, int x, int y, bool okHalt);
     void drawPPUMemoryMap(QPainter &painter, int x, int y, const CMemoryController* pMemCtl);

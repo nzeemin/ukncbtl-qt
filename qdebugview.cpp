@@ -61,12 +61,14 @@ void QDebugView::setCurrentProc(bool okProc)
     Settings_SetDebugCpuPpu(m_okDebugProcessor);
 }
 
+// Update after Run or Step
 void QDebugView::updateData()
 {
     CProcessor* pCPU = g_pBoard->GetCPU();
     ASSERT(pCPU != nullptr);
 
     // Get new register values and set change flags
+    m_wDebugCpuR6Old = m_wDebugCpuR[6];
     for (int r = 0; r < 8; r++)
     {
         quint16 value = pCPU->GetReg(r);
@@ -81,6 +83,7 @@ void QDebugView::updateData()
     ASSERT(pPPU != nullptr);
 
     // Get new register values and set change flags
+    m_wDebugPpuR6Old = m_wDebugPpuR[6];
     for (int r = 0; r < 8; r++)
     {
         quint16 value = pPPU->GetReg(r);
@@ -131,11 +134,12 @@ void QDebugView::paintEvent(QPaintEvent * /*event*/)
     ASSERT(pDebugPU != nullptr);
     quint16* arrR = (m_okDebugProcessor) ? m_wDebugCpuR : m_wDebugPpuR;
     bool* arrRChanged = (m_okDebugProcessor) ? m_okDebugCpuRChanged : m_okDebugPpuRChanged;
+    WORD oldSP = (m_okDebugProcessor) ? m_wDebugCpuR6Old : m_wDebugPpuR6Old;
 
     drawProcessor(painter, pDebugPU, 30 + cxChar * 2, 1 * cyLine, arrR, arrRChanged);
 
     // Draw stack
-    drawMemoryForRegister(painter, 6, pDebugPU, 30 + 35 * cxChar, 1 * cyLine);
+    drawMemoryForRegister(painter, 6, pDebugPU, 30 + 35 * cxChar, 1 * cyLine, oldSP);
 
     CMemoryController* pDebugMemCtl = pDebugPU->GetMemoryController();
     drawPorts(painter, m_okDebugProcessor, pDebugMemCtl, g_pBoard, 30 + 54 * cxChar, 1 * cyLine);
@@ -187,6 +191,7 @@ void QDebugView::drawProcessor(QPainter &painter, const CProcessor *pProc, int x
     painter.drawText(x, y + 9 * cyLine, "PC'");
     quint16 cpc = pProc->GetCPC();
     DrawOctalValue(painter, x + cxChar * 3, y + 9 * cyLine, cpc);
+    DrawHexValue(painter, x + cxChar * 10, y + 9 * cyLine, cpc);
     DrawBinaryValue(painter, x + cxChar * 15, y + 9 * cyLine, cpc);
 
     // PSW value
@@ -194,7 +199,7 @@ void QDebugView::drawProcessor(QPainter &painter, const CProcessor *pProc, int x
     painter.drawText(x, y + 11 * cyLine, "PS");
     quint16 psw = arrR[8]; // pProc->GetPSW();
     DrawOctalValue(painter, x + cxChar * 3, y + 11 * cyLine, psw);
-    DrawHexValue(painter, x + cxChar * 10, y + 11 * cyLine, psw);
+    //DrawHexValue(painter, x + cxChar * 10, y + 11 * cyLine, psw);
     painter.drawText(x + cxChar * 15, y + 10 * cyLine, "       HP  TNZVC");
     DrawBinaryValue(painter, x + cxChar * 15, y + 11 * cyLine, psw);
 
@@ -216,7 +221,7 @@ void QDebugView::drawProcessor(QPainter &painter, const CProcessor *pProc, int x
         painter.drawText(x + 6 * cxChar, y + 14 * cyLine, "STOP");
 }
 
-void QDebugView::drawMemoryForRegister(QPainter &painter, int reg, CProcessor *pProc, int x, int y)
+void QDebugView::drawMemoryForRegister(QPainter &painter, int reg, CProcessor *pProc, int x, int y, quint16 oldValue)
 {
     QFontMetrics fontmetrics(painter.font());
     int cxChar = fontmetrics.averageCharWidth();
@@ -224,9 +229,10 @@ void QDebugView::drawMemoryForRegister(QPainter &painter, int reg, CProcessor *p
     QColor colorText = painter.pen().color();
 
     quint16 current = pProc->GetReg(reg);
+    quint16 previous = oldValue;
     bool okExec = (reg == 7);
 
-    // ×èòàåì èç ïàìÿòè ïðîöåññîðà â áóôåð
+    // Reading from memory into the buffer
     quint16 memory[16];
     int addrtype[16];
     CMemoryController* pMemCtl = pProc->GetMemoryController();
@@ -237,30 +243,37 @@ void QDebugView::drawMemoryForRegister(QPainter &painter, int reg, CProcessor *p
     }
 
     quint16 address = current - 16;
-    for (int index = 0; index < 16; index++)    // Ðèñóåì ñòðîêè
+    for (int index = 0; index < 16; index++)    // Draw strings
     {
-        // Àäðåñ
+        // Address
+        painter.setPen(colorText);
         DrawOctalValue(painter, x + 3 * cxChar, y, address);
 
-        // Çíà÷åíèå ïî àäðåñó
+        // Value at the address
         quint16 value = memory[index];
         quint16 wChanged = Emulator_GetChangeRamStatus(addrtype[index], address);
         painter.setPen(wChanged != 0 ? Qt::red : colorText);
         DrawOctalValue(painter, x + 10 * cxChar, y, value);
-        painter.setPen(colorText);
 
-        // Òåêóùàÿ ïîçèöèÿ
+        // Current position
         if (address == current)
         {
-            painter.drawText(x + 2 * cxChar, y, ">");
-            painter.setPen(m_okDebugCpuRChanged[reg] != 0 ? Qt::red : colorText);
-            painter.drawText(x, y, REGISTER_NAME[reg]);
             painter.setPen(colorText);
+            painter.drawText(x + 2 * cxChar, y, ">");
+            painter.setPen(current != previous ? Qt::red : colorText);
+            painter.drawText(x, y, REGISTER_NAME[reg]);
+        }
+        else if (address == previous)
+        {
+            painter.setPen(Qt::blue);
+            painter.drawText(x + 2 * cxChar, y, ">");
         }
 
         address += 2;
         y += cyLine;
     }
+
+    painter.setPen(colorText);
 }
 
 void QDebugView::drawPorts(QPainter &painter, bool okProcessor, CMemoryController* pMemCtl, CMotherboard* pBoard, int x, int y)
