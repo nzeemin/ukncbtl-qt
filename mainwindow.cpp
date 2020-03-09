@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include <QAction>
+#include <QClipboard>
 #include <QDateTime>
 #include <QDockWidget>
 #include <QFileDialog>
@@ -32,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionLoadStateImage, SIGNAL(triggered()), this, SLOT(loadStateImage()));
     QObject::connect(ui->actionFileScreenshot, SIGNAL(triggered()), this, SLOT(saveScreenshot()));
     QObject::connect(ui->actionFileScreenshotAs, SIGNAL(triggered()), this, SLOT(saveScreenshotAs()));
+    QObject::connect(ui->actionFileScreenshotToClipboard, SIGNAL(triggered()), this, SLOT(screenshotToClipboard()));
     QObject::connect(ui->actionScriptRun, SIGNAL(triggered()), this, SLOT(scriptRun()));
     QObject::connect(ui->actionFileExit, SIGNAL(triggered()), this, SLOT(close()));
     QObject::connect(ui->actionEmulatorRun, SIGNAL(triggered()), this, SLOT(emulatorRun()));
@@ -343,7 +345,17 @@ void MainWindow::saveScreenshotAs()
 }
 void MainWindow::saveScreenshot(const QString& strFileName)
 {
-    m_screen->saveScreenshot(strFileName);
+    QImage image = m_screen->getScreenshot();
+    image.save(strFileName, "PNG", -1);
+}
+
+void MainWindow::screenshotToClipboard()
+{
+    QImage image = m_screen->getScreenshot();
+
+    QClipboard *clipboard = QGuiApplication::clipboard();
+    clipboard->clear();
+    clipboard->setImage(image);
 }
 
 void MainWindow::helpAbout()

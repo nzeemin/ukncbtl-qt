@@ -32,6 +32,7 @@
     <addaction name="separator"/>
     <addaction name="actionFileScreenshot"/>
     <addaction name="actionFileScreenshotAs"/>
+    <addaction name="actionFileScreenshotToClipboard"/>
     <addaction name="separator"/>
     <addaction name="actionScriptRun"/>
     <addaction name="separator"/>
@@ -510,6 +511,11 @@
    </property>
    <property name="text">
     <string>960 x 720 4:3</string>
+   </property>
+  </action>
+  <action name="actionFileScreenshotToClipboard">
+   <property name="text">
+    <string>Screenshot to Clipboard</string>
    </property>
   </action>
  </widget>

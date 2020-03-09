@@ -30,7 +30,7 @@ public:
     ~QEmulatorScreen();
 
 public:
-    void saveScreenshot(QString strFileName);
+    QImage getScreenshot();
     void setMode(ScreenViewMode mode);
     ScreenViewMode mode() const { return m_mode; }
     void setSizeMode(ScreenSizeMode mode);

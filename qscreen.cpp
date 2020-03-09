@@ -163,10 +163,10 @@ static void UpscaleScreen175(void* pImageBits)
         quint32* pdest3 = pdest2 + 1120;
         for (int i = 0; i < UKNC_SCREEN_WIDTH / 4; i++)
         {
-            DWORD c1 = *(psrc++);
-            DWORD c2 = *(psrc++);
-            DWORD c3 = *(psrc++);
-            DWORD c4 = *(psrc++);
+            quint32 c1 = *(psrc++);
+            quint32 c2 = *(psrc++);
+            quint32 c3 = *(psrc++);
+            quint32 c4 = *(psrc++);
 
             *(pdest1++) = *(pdest2++) = c1;
             *(pdest1++) = *(pdest2++) = AVERAGERGB(c1, c2);
@@ -241,9 +241,10 @@ void QEmulatorScreen::setSizeMode(ScreenSizeMode mode)
     createDisplay();
 }
 
-void QEmulatorScreen::saveScreenshot(QString strFileName)
+QImage QEmulatorScreen::getScreenshot()
 {
-    m_image->save(strFileName, "PNG", -1);
+    QImage image(*m_image);
+    return image;
 }
 
 void QEmulatorScreen::createDisplay()
