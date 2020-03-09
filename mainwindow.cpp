@@ -60,6 +60,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionViewSizeDouble, SIGNAL(triggered()), this, SLOT(viewSizeDouble()));
     QObject::connect(ui->actionViewSizeUpscaled, SIGNAL(triggered()), this, SLOT(viewSizeUpscaled()));
     QObject::connect(ui->actionViewSizeUpscaled3, SIGNAL(triggered()), this, SLOT(viewSizeUpscaled3()));
+    QObject::connect(ui->actionViewSizeUpscaled4, SIGNAL(triggered()), this, SLOT(viewSizeUpscaled4()));
     QObject::connect(ui->actionViewSizeUpscaled175, SIGNAL(triggered()), this, SLOT(viewSizeUpscaled175()));
     QObject::connect(ui->actionViewSizeUpscaled5, SIGNAL(triggered()), this, SLOT(viewSizeUpscaled5()));
     QObject::connect(ui->actionSoundEnabled, SIGNAL(triggered()), this, SLOT(soundEnabled()));
@@ -196,6 +197,7 @@ void MainWindow::UpdateMenu()
     ui->actionViewSizeDoubleInterlaced->setChecked(m_screen->sizeMode() == DoubleInterlacedScreen);
     ui->actionViewSizeDouble->setChecked(m_screen->sizeMode() == DoubleScreen);
     ui->actionViewSizeUpscaled3->setChecked(m_screen->sizeMode() == UpscaledScreen3);
+    ui->actionViewSizeUpscaled4->setChecked(m_screen->sizeMode() == UpscaledScreen4);
     ui->actionViewSizeUpscaled175->setChecked(m_screen->sizeMode() == UpscaledScreen175);
     ui->actionViewSizeUpscaled5->setChecked(m_screen->sizeMode() == UpscaledScreen5);
 
@@ -418,6 +420,15 @@ void MainWindow::viewSizeDouble()
 void MainWindow::viewSizeUpscaled3()
 {
     m_screen->setSizeMode(UpscaledScreen3);
+    UpdateMenu();
+
+    //Update centralWidget size
+    ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
+    ui->centralWidget->setMaximumWidth(m_screen->maximumWidth());
+}
+void MainWindow::viewSizeUpscaled4()
+{
+    m_screen->setSizeMode(UpscaledScreen4);
     UpdateMenu();
 
     //Update centralWidget size

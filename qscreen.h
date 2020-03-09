@@ -17,8 +17,9 @@ enum ScreenSizeMode
     DoubleScreen = 3,
     UpscaledScreen = 4,
     UpscaledScreen3 = 5,
-    UpscaledScreen175 = 6,
-    UpscaledScreen5 = 7
+    UpscaledScreen4 = 6,
+    UpscaledScreen175 = 7,
+    UpscaledScreen5 = 8
 };
 
 class QEmulatorScreen : public QWidget
