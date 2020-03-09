@@ -34,21 +34,22 @@ const quint32 ScreenView_GrayColors[16] =
 static void UpscaleScreen(void* pImageBits)
 {
     quint32* pbits = static_cast<quint32*>(pImageBits);
+    quint8* pbits8 = static_cast<quint8*>(pImageBits);
     int ukncline = 287;
     for (int line = 431; line > 0; line--)
     {
         quint32* pdest = pbits + line * UKNC_SCREEN_WIDTH;
         if (line % 3 == 1)
         {
-            quint8* psrc1 = ((quint8*)pImageBits) + ukncline * UKNC_SCREEN_WIDTH * 4;
-            quint8* psrc2 = ((quint8*)pImageBits) + (ukncline + 1) * UKNC_SCREEN_WIDTH * 4;
-            quint8* pdst1 = (quint8*)pdest;
+            quint8* psrc1 = pbits8 + ukncline * UKNC_SCREEN_WIDTH * 4;
+            quint8* psrc2 = pbits8 + (ukncline + 1) * UKNC_SCREEN_WIDTH * 4;
+            quint8* pdst1 = reinterpret_cast<quint8*>(pdest);
             for (int i = 0; i < UKNC_SCREEN_WIDTH * 4; i++)
             {
                 if (i % 4 == 3)
                     *pdst1 = 0;
                 else
-                    *pdst1 = (quint8)((((quint16) * psrc1) + ((quint16) * psrc2)) / 2);
+                    *pdst1 = (quint8)((((quint16) *psrc1) + ((quint16) *psrc2)) / 2);
                 psrc1++;  psrc2++;  pdst1++;
             }
         }
@@ -291,10 +292,12 @@ void QEmulatorScreen::paintEvent(QPaintEvent * /*event*/)
     const quint32* colors;
     switch (m_mode)
     {
-    case RGBScreen:   colors = ScreenView_StandardRGBColors; break;
-    case GrayScreen:  colors = ScreenView_GrayColors; break;
-    case GRBScreen:   colors = ScreenView_StandardGRBColors; break;
-    default:          colors = ScreenView_StandardRGBColors; break;
+    case RGBScreen:
+        colors = ScreenView_StandardRGBColors; break;
+    case GrayScreen:
+        colors = ScreenView_GrayColors; break;
+    default:
+        colors = ScreenView_StandardGRBColors; break;
     }
 
     Emulator_PrepareScreenRGB32(m_image->bits(), colors);

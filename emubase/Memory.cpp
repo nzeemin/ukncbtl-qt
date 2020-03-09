@@ -266,12 +266,12 @@ void CMemoryController::SetByte(uint16_t address, bool okHaltMode, uint8_t byte)
 //
 // 174000-177777 I/O - USER - read/write
 // 160000-173777     - USER - access denied
-// 000000-157777 ÎÇÓ - USER - read/write/execute
+// 000000-157777 RAM - USER - read/write/execute
 //
 // 174000-177777 I/O - HALT - read/write
-// 174000-177777 ÎÇÓ - HALT - execute
-// 160000-173777 ÎÇÓ - HALT - read/write/execute
-// 000000-157777 ÎÇÓ - HALT - read/write/execute
+// 174000-177777 RAM - HALT - execute
+// 160000-173777 RAM - HALT - read/write/execute
+// 000000-157777 RAM - HALT - read/write/execute
 //
 // For RAM access, bytes at even addresses (low byte of word) belongs to plane 1,
 // and bytes at odd addresses (high byte of word) - belongs to plane 2.
@@ -282,7 +282,7 @@ CFirstMemoryController::CFirstMemoryController() : CMemoryController()
     m_Port176642 = 0;
     m_Port176644 = 0;
     m_Port176646 = 0;
-    m_Port176560 = m_Port176562 = m_Port176566 = 0;  // Network ÑÀ
+    m_Port176560 = m_Port176562 = m_Port176566 = 0;  // Network adapter
     m_Port176564 = 0200;
     m_Port176570 = m_Port176572 = m_Port176576 = 0;  // RS-232 ports
     m_Port176574 = 0200;
@@ -395,30 +395,30 @@ uint16_t CFirstMemoryController::GetPortWord(uint16_t address)
         return 0;
 
     case 0176560: //network
-    case 0176561: // ÑÀ: Ðåãèñòð ñîñòîÿíèÿ ïðèåìíèêà
+    case 0176561: // СА: Регистр состояния приемника
         return (m_Port176560 + m_NetStation);
-    case 0176562: // ÑÀ: Ðåãèñòð äàííûõ ïðèåìíèêà
-    case 0176563: // íèæíèå 8 áèò äîñòóïíû ïî ÷òåíèþ
+    case 0176562: // СА: Регистр данных приемника
+    case 0176563: // нижние 8 бит доступны по чтению
         m_Port176560 &= ~010200;  // Reset bit 12 and bit 7
         return (m_Port176562 + m_NetStation);
-    case 0176564: // ÑÀ: Ðåãèñòð ñîñòîÿíèÿ èñòî÷íèêà
+    case 0176564: // СА: Регистр состояния источника
     case 0176565:
         return (m_Port176564 + m_NetStation);
-    case 0176566: // ÑÀ: Ðåãèñòð äàííûõ èñòî÷íèêà
+    case 0176566: // СА: Регистр данных источника
     case 0176567:
         return (0360 + m_NetStation);
 
-    case 0176570:  // Ñòûê Ñ2: Ðåãèñòð ñîñòîÿíèÿ ïðèåìíèêà
+    case 0176570:  // Стык С2: Регистр состояния приемника
     case 0176571:
         return m_Port176570;
-    case 0176572:  // Ñòûê Ñ2: Ðåãèñòð äàííûõ ïðèåìíèêà
-    case 0176573:  // íèæíèå 8 áèò äîñòóïíû ïî ÷òåíèþ
+    case 0176572:  // Стык С2: Регистр данных приемника
+    case 0176573:  // нижние 8 бит доступны по чтению
         m_Port176570 &= ~010200;  // Reset bit 12 and bit 7
         return m_Port176572;
-    case 0176574:  // Ñòûê Ñ2: Ðåãèñòð ñîñòîÿíèÿ èñòî÷íèêà
+    case 0176574:  // Стык С2: Регистр состояния источника
     case 0176575:
         return m_Port176574;
-    case 0176576:  // Ñòûê Ñ2: Ðåãèñòð äàííûõ èñòî÷íèêà
+    case 0176576:  // Стык С2: Регистр данных источника
     case 0176577:
         return 0370;
 
@@ -536,35 +536,35 @@ void CFirstMemoryController::SetPortByte(uint16_t address, uint8_t byte)
         break;
 
     case 0176560: //network
-    case 0176561: //ÑÀ: Ðåãèñòð ñîñòîÿíèÿ ïðèåìíèêà
+    case 0176561: //СА: Регистр состояния приемника
         m_Port176560 = (m_Port176560 & ~0104) | (word & 0104);  // Bits 2,6 only
         break;
-    case 0176562: // ÑÀ: Ðåãèñòð äàííûõ ïðèåìíèêà
-    case 0176563: // íåäîñòóïåí ïî çàïèñè
+    case 0176562: // СА: Регистр данных приемника
+    case 0176563: // недоступен по записи
         return ;
-    case 0176564: // ÑÀ: Ðåãèñòð ñîñòîÿíèÿ èñòî÷íèêà
+    case 0176564: // СА: Регистр состояния источника
     case 0176565:
         m_Port176564 = (m_Port176564 & ~0105) | (word & 0105);  // Bits 0,2,6
         break;
-    case 0176566: // ÑÀ: Ðåãèñòð äàííûõ èñòî÷íèêà
-    case 0176567: // íèæíèå 8 áèò äîñòóïíû ïî çàïèñè
+    case 0176566: // СА: Регистр данных источника
+    case 0176567: // нижние 8 бит доступны по записи
         m_Port176566 = word & 0xff;
         m_Port176564 &= ~0200;  // Reset bit 7 (Ready)
         break;
 
-    case 0176570:  // Ñòûê Ñ2: Ðåãèñòð ñîñòîÿíèÿ ïðèåìíèêà
+    case 0176570:  // Стык С2: Регистр состояния приемника
     case 0176571:
         m_Port176570 = (m_Port176570 & ~0100) | (word & 0100);  // Bit 6 only
         break;
-    case 0176572:  // Ñòûê Ñ2: Ðåãèñòð äàííûõ ïðèåìíèêà
-    case 0176573:  // íåäîñòóïåí ïî çàïèñè
+    case 0176572:  // Стык С2: Регистр данных приемника
+    case 0176573:  // недоступен по записи
         return ;
-    case 0176574:  // Ñòûê Ñ2: Ðåãèñòð ñîñòîÿíèÿ èñòî÷íèêà
+    case 0176574:  // Стык С2: Регистр состояния источника
     case 0176575:
         m_Port176574 = (m_Port176574 & ~0105) | (word & 0105);  // Bits 0,2,6
         break;
-    case 0176576:  // Ñòûê Ñ2: Ðåãèñòð äàííûõ èñòî÷íèêà
-    case 0176577:  // íèæíèå 8 áèò äîñòóïíû ïî çàïèñè
+    case 0176576:  // Стык С2: Регистр данных источника
+    case 0176577:  // нижние 8 бит доступны по записи
         m_Port176576 = word & 0xff;
         m_Port176574 &= ~0200;  // Reset bit 7 (Ready)
         break;
@@ -657,41 +657,41 @@ void CFirstMemoryController::SetPortWord(uint16_t address, uint16_t word)
         break;
 
     case 0176560: //network
-    case 0176561: // ÑÀ: Ðåãèñòð ñîñòîÿíèÿ ïðèåìíèêà
+    case 0176561: // СА: Регистр состояния приемника
         if (((m_Port176560 & 0300) == 0200) && (word & 0100))
             m_pProcessor->InterruptVIRQ(9, 0360);
         m_Port176560 = (m_Port176560 & ~0104) | (word & 0104);  // Bits 2,6 only
         break;
-    case 0176562:  // ÑÀ: Ðåãèñòð äàííûõ ïðèåìíèêà
-    case 0176563:  // íåäîñòóïåí ïî çàïèñè
+    case 0176562:  // СА: Регистр данных приемника
+    case 0176563:  // недоступен по записи
         return ;
-    case 0176564:  // ÑÀ: Ðåãèñòð ñîñòîÿíèÿ èñòî÷íèêà
+    case 0176564:  // СА: Регистр состояния источника
     case 0176565:
         if (((m_Port176564 & 0300) == 0200) && (word & 0100))
             m_pProcessor->InterruptVIRQ(10, 0364);
         m_Port176564 = (m_Port176564 & ~0105) | (word & 0105);  // Bits 0,2,6
         break;
-    case 0176566:  // ÑÀ: Ðåãèñòð äàííûõ èñòî÷íèêà
-    case 0176567:  // íèæíèå 8 áèò äîñòóïíû ïî çàïèñè
+    case 0176566:  // СА: Регистр данных источника
+    case 0176567:  // нижние 8 бит доступны по записи
         m_Port176566 = word & 0xff;
         m_Port176564 &= ~0200;  // Reset bit 7 (Ready)
         break;
 
-    case 0176570:  // Ñòûê Ñ2: Ðåãèñòð ñîñòîÿíèÿ ïðèåìíèêà
+    case 0176570:  // Стык С2: Регистр состояния приемника
     case 0176571:
         m_Port176570 = (m_Port176570 & ~0100) | (word & 0100);  // Bit 6 only
         break;
-    case 0176572:  // Ñòûê Ñ2: Ðåãèñòð äàííûõ ïðèåìíèêà
-    case 0176573:  // íåäîñòóïåí ïî çàïèñè
+    case 0176572:  // Стык С2: Регистр данных приемника
+    case 0176573:  // недоступен по записи
         return ;
-    case 0176574:  // Ñòûê Ñ2: Ðåãèñòð ñîñòîÿíèÿ èñòî÷íèêà
+    case 0176574:  // Стык С2: Регистр состояния источника
     case 0176575:
         if (((m_Port176574 & 0300) == 0200) && (word & 0100))
             m_pProcessor->InterruptVIRQ(8, 0374);
         m_Port176574 = (m_Port176574 & ~0105) | (word & 0105);  // Bits 0,2,6
         break;
-    case 0176576:  // Ñòûê Ñ2: Ðåãèñòð äàííûõ èñòî÷íèêà
-    case 0176577:  // íèæíèå 8 áèò äîñòóïíû ïî çàïèñè
+    case 0176576:  // Стык С2: Регистр данных источника
+    case 0176577:  // нижние 8 бит доступны по записи
         m_Port176576 = word & 0xff;
         m_Port176574 &= ~128;  // Reset bit 7 (Ready)
         break;

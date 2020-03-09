@@ -387,7 +387,7 @@ void Emulator_PrepareScreenRGB32(void* pImageBits, const quint32* colors)
 
         int xr = 640;
         int y = yy - 19;
-        quint32* pBits = ((quint32*)pImageBits) + y * 640;
+        quint32* pBits = (static_cast<quint32*>(pImageBits)) + y * 640;
         int pos = 0;
         for (;;)
         {

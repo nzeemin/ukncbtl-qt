@@ -16,12 +16,12 @@ UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
 #include "Defines.h"
 
 
-// Ôîðìàò îòîáðàæåíèÿ ðåæèìîâ àäðåñàöèè
+// Формат отображения режимов адресации
 const LPCTSTR ADDRESS_MODE_FORMAT[] =
 {
     _T("%s"), _T("(%s)"), _T("(%s)+"), _T("@(%s)+"), _T("-(%s)"), _T("@-(%s)"), _T("%06o(%s)"), _T("@%06o(%s)")
 };
-// Ôîðìàò îòîáðàæåíèÿ ðåæèìîâ àäðåñàöèè äëÿ ðåãèñòðà PC
+// Формат отображения режимов адресации для регистра PC
 const LPCTSTR ADDRESS_MODE_PC_FORMAT[] =
 {
     _T("PC"), _T("(PC)"), _T("#%06o"), _T("@#%06o"), _T("-(PC)"), _T("@-(PC)"), _T("%06o"), _T("@%06o")
@@ -173,7 +173,7 @@ uint16_t DisassembleInstruction(uint16_t* pMemory, uint16_t addr, TCHAR* strInst
     case PI_SENZV:  _tcscpy(strInstr, _T("SENZV"));  return 1;
     case PI_SCC:    _tcscpy(strInstr, _T("SCC"));    return 1;
 
-        // Ñïåöêîìàíäû ðåæèìà HALT ÂÌ2
+        // Спецкоманды режима HALT ВМ2
     case PI_START:  _tcscpy(strInstr, _T("START"));  return 1;
     case PI_STEP:   _tcscpy(strInstr, _T("STEP"));   return 1;
     case PI_RSEL:   _tcscpy(strInstr, _T("RSEL"));   return 1;

@@ -245,7 +245,7 @@ void CFloppyController::SetCommand(uint16_t cmd)
         m_status &= ~FLOPPY_STATUS_CHECKSUMOK;
     }
 
-    if (m_writing && (cmd & FLOPPY_CMD_SKIPSYNC))  // Çàïèñü ìàðêåðà
+    if (m_writing && (cmd & FLOPPY_CMD_SKIPSYNC))  // Writing marker
     {
 //#if !defined(PRODUCT)
 //        DebugLog(_T("Floppy MARKER\r\n"));  //DEBUG
@@ -305,7 +305,7 @@ void CFloppyController::WriteData(uint16_t data)
 
 void CFloppyController::Periodic()
 {
-    //if (!IsEngineOn()) return;  // Âðàùàåì äèñêåòû òîëüêî åñëè âêëþ÷åí ìîòîð
+    //if (!IsEngineOn()) return;  // Rotate diskettes only if the motor is on
 
     // Rotating all the disks at once
     for (int drive = 0; drive < 4; drive++)

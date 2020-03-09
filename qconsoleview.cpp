@@ -103,80 +103,6 @@ void QConsoleView::printConsolePrompt()
     this->print(buffer);
 }
 
-void QConsoleView::printHelp()
-{
-    this->print(tr("Console command list:\r\n"
-            "  c          Clear console log\r\n"
-            "  dXXXXXX    Disassemble from address XXXXXX\r\n"
-            "  g          Go; free run\r\n"
-            "  gXXXXXX    Go; run processor until breakpoint at address XXXXXX\r\n"
-            "  m          Memory dump at current address\r\n"
-            "  mXXXXXX    Memory dump at address XXXXXX\r\n"
-            "  mrN        Memory dump at address from register N; N=0..7\r\n"
-            "  p          Switch to other processor\r\n"
-            "  r          Show register values\r\n"
-            "  rN         Show value of register N; N=0..7,ps\r\n"
-            "  rN XXXXXX  Set register N to value XXXXXX; N=0..7,ps\r\n"
-            "  s          Step Into; executes one instruction\r\n"
-            "  so         Step Over; executes and stops after the current instruction\r\n"
-//            "  u          Save memory dump to file memdumpXPU.bin\r\n"
-                  ));
-}
-
-int QConsoleView::printDisassemble(CProcessor* pProc, quint16 address, bool okOneInstr, bool okShort)
-{
-    CMemoryController* pMemCtl = pProc->GetMemoryController();
-    bool okHaltMode = pProc->IsHaltMode();
-
-    const int nWindowSize = 30;
-    quint16 memory[nWindowSize + 2];
-    int addrType;
-    for (int i = 0; i < nWindowSize + 2; i++)
-        memory[i] = pMemCtl->GetWordView(address + i * 2, okHaltMode, true, &addrType);
-
-    char bufaddr[7];
-    char bufvalue[7];
-    char buffer[64];
-
-    int lastLength = 0;
-    int length = 0;
-    for (int index = 0; index < nWindowSize; index++)    // Ðèñóåì ñòðîêè
-    {
-        PrintOctalValue(bufaddr, address);
-        quint16 value = memory[index];
-        PrintOctalValue(bufvalue, value);
-
-        if (length > 0)
-        {
-            if (!okShort)
-            {
-                _snprintf(buffer, 64, "  %s  %s\r\n", bufaddr, bufvalue);
-                this->print(buffer);
-            }
-        }
-        else
-        {
-            if (okOneInstr && index > 0)
-                break;
-            char instr[8];
-            char args[32];
-            length = DisassembleInstruction(memory + index, address, instr, args);
-            lastLength = length;
-            if (index + length > nWindowSize)
-                break;
-            if (okShort)
-                _snprintf(buffer, 64, "  %s  %-7s %s\r\n", bufaddr, instr, args);
-            else
-                _snprintf(buffer, 64, "  %s  %s  %-7s %s\r\n", bufaddr, bufvalue, instr, args);
-            this->print(buffer);
-        }
-        length--;
-        address += 2;
-    }
-
-    return lastLength;
-}
-
 void QConsoleView::printRegister(LPCTSTR strName, quint16 value)
 {
     char buffer[31];
@@ -194,12 +120,13 @@ void QConsoleView::printRegister(LPCTSTR strName, quint16 value)
     this->print(buffer);
 }
 
+// Print memory dump
 void QConsoleView::printMemoryDump(CProcessor *pProc, quint16 address, int lines)
 {
     address &= ~1;  // Line up to even address
 
-    bool okHaltMode = pProc->IsHaltMode();
     CMemoryController* pMemCtl = pProc->GetMemoryController();
+    bool okHaltMode = pProc->IsHaltMode();
 
     for (int line = 0; line < lines; line++)
     {
@@ -239,6 +166,84 @@ void QConsoleView::printMemoryDump(CProcessor *pProc, quint16 address, int lines
 
         address += 16;
     }
+}
+
+// Print disassembled instructions
+// Return value: number of words disassembled
+int QConsoleView::printDisassemble(CProcessor* pProc, quint16 address, bool okOneInstr, bool okShort)
+{
+    CMemoryController* pMemCtl = pProc->GetMemoryController();
+    bool okHaltMode = pProc->IsHaltMode();
+
+    const int nWindowSize = 30;
+    quint16 memory[nWindowSize + 2];
+    int addrtype;
+    for (int i = 0; i < nWindowSize + 2; i++)
+        memory[i] = pMemCtl->GetWordView(address + i * 2, okHaltMode, true, &addrtype);
+
+    char bufaddr[7];
+    char bufvalue[7];
+    char buffer[64];
+
+    int totalLength = 0;
+    int lastLength = 0;
+    int length = 0;
+    for (int index = 0; index < nWindowSize; index++)    // Draw strings
+    {
+        PrintOctalValue(bufaddr, address);
+        quint16 value = memory[index];
+        PrintOctalValue(bufvalue, value);
+
+        if (length > 0)
+        {
+            if (!okShort)
+            {
+                _snprintf(buffer, 64, "  %s  %s\r\n", bufaddr, bufvalue);
+                this->print(buffer);
+            }
+        }
+        else
+        {
+            if (okOneInstr && index > 0)
+                break;
+            char instr[8];
+            char args[32];
+            length = DisassembleInstruction(memory + index, address, instr, args);
+            lastLength = length;
+            if (index + length > nWindowSize)
+                break;
+            if (okShort)
+                _snprintf(buffer, 64, "  %s  %-7s %s\r\n", bufaddr, instr, args);
+            else
+                _snprintf(buffer, 64, "  %s  %s  %-7s %s\r\n", bufaddr, bufvalue, instr, args);
+            this->print(buffer);
+        }
+        length--;
+        address += 2;
+        totalLength++;
+    }
+
+    return totalLength;
+}
+
+void QConsoleView::printHelp()
+{
+    this->print(tr("Console command list:\r\n"
+            "  c          Clear console log\r\n"
+            "  dXXXXXX    Disassemble from address XXXXXX\r\n"
+            "  g          Go; free run\r\n"
+            "  gXXXXXX    Go; run processor until breakpoint at address XXXXXX\r\n"
+            "  m          Memory dump at current address\r\n"
+            "  mXXXXXX    Memory dump at address XXXXXX\r\n"
+            "  mrN        Memory dump at address from register N; N=0..7\r\n"
+            "  p          Switch to other processor\r\n"
+            "  r          Show register values\r\n"
+            "  rN         Show value of register N; N=0..7,ps\r\n"
+            "  rN XXXXXX  Set register N to value XXXXXX; N=0..7,ps\r\n"
+            "  s          Step Into; executes one instruction\r\n"
+            "  so         Step Over; executes and stops after the current instruction\r\n"
+//            "  u          Save memory dump to file memdumpXPU.bin\r\n"
+                  ));
 }
 
 void QConsoleView::execConsoleCommand()
@@ -310,9 +315,9 @@ void QConsoleView::execConsoleCommand(const QString &command)
             else
                 this->print(MESSAGE_UNKNOWN_COMMAND);
         }
-        else if (command.length() >= 2 && command[1].toLatin1() == 'p' && command[2].toLatin1() == 's')  // "rps"
+        else if (command.startsWith("rps"))  // "rps"
         {
-            if (command.length() == 2)  // "rps" - show PSW
+            if (command.length() == 3)  // "rps" - show PSW
             {
                 quint16 value = pProc->GetPSW();
                 this->printRegister("PS", value);
@@ -361,18 +366,32 @@ void QConsoleView::execConsoleCommand(const QString &command)
             command.startsWith("D"))    // Disassemble, short format
     {
         bool okShort = (command[0] == 'D');
+        quint16 address = 0;
+        bool okValidAddress = false;
         if (command.length() == 1)  // "d" - disassemble at current address
-            this->printDisassemble(pProc, pProc->GetPC(), false, okShort);
+        {
+            address = pProc->GetPC();
+            okValidAddress = true;
+        }
         else if (command[1].toLatin1() >= '0' && command[1].toLatin1() <= '7')  // "dXXXXXX" - disassemble at address XXXXXX
         {
-            quint16 value;
-            if (! ParseOctalValue(command.mid(1), &value))
+            if (! ParseOctalValue(command.mid(1), &address))
                 this->print(MESSAGE_WRONG_VALUE);
             else
-                this->printDisassemble(pProc, value, false, okShort);
+                okValidAddress = true;
         }
         else
+        {
             this->print(MESSAGE_UNKNOWN_COMMAND);
+        }
+
+        if (okValidAddress)
+        {
+            int length = this->printDisassemble(pProc, address, false, okShort);
+            address += length * 2;
+            QString prompt;  prompt.sprintf("%c%06o", command[0], address);
+            m_edit->setText(prompt);
+        }
     }
     else if (command.startsWith("m"))
     {
