@@ -419,7 +419,7 @@ unsigned char QEmulatorScreen::TranslateQtKeyToUkncKey(int qtkey)
     return 0;
 }
 
-static BYTE RecognizeCharacter(const uint8_t* fontcur, const uint8_t* fontstd, const QImage& image, int startx, int starty)
+static uint8_t RecognizeCharacter(const uint8_t* fontcur, const uint8_t* fontstd, const QImage& image, int startx, int starty)
 {
     int16_t bestmatch = -32767;
     uint8_t bestchar = 0;
@@ -476,10 +476,10 @@ bool QEmulatorScreen::getScreenText(uint8_t* buffer)
     int addrtype = 0;
     for (uint8_t charidx = 0; charidx < 16 * 14; charidx++)
     {
-        uint16_t charaddr = pPpuMemCtl->GetWordView(fontaddr + charidx * 2, FALSE, FALSE, &addrtype);
+        uint16_t charaddr = pPpuMemCtl->GetWordView(fontaddr + charidx * 2, false, false, &addrtype);
         for (int16_t y = 0; y < 11; y++)
         {
-            uint16_t fontdata = pPpuMemCtl->GetWordView((charaddr + y) & ~1, FALSE, FALSE, &addrtype);
+            uint16_t fontdata = pPpuMemCtl->GetWordView((charaddr + y) & ~1, false, false, &addrtype);
             if (((charaddr + y) & 1) == 1) fontdata >>= 8;
             fontcur[charidx * 11 + y] = (uint8_t)(fontdata & 0xff);
         }
@@ -489,7 +489,7 @@ bool QEmulatorScreen::getScreenText(uint8_t* buffer)
     uint16_t charstdaddr = 0120170;
     for (uint16_t idx = 0; idx < 16 * 14 * 11; idx++)
     {
-        uint16_t fontdata = pPpuMemCtl->GetWordView(charstdaddr & ~1, FALSE, FALSE, &addrtype);
+        uint16_t fontdata = pPpuMemCtl->GetWordView(charstdaddr & ~1, false, false, &addrtype);
         if ((charstdaddr & 1) == 1) fontdata >>= 8;
         fontstd[idx] = (uint8_t)(fontdata & 0xff);
         charstdaddr++;
