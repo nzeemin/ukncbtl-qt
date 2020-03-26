@@ -33,6 +33,7 @@
     <addaction name="actionFileScreenshot"/>
     <addaction name="actionFileScreenshotAs"/>
     <addaction name="actionFileScreenshotToClipboard"/>
+    <addaction name="actionFileScreenToClipboard"/>
     <addaction name="separator"/>
     <addaction name="actionScriptRun"/>
     <addaction name="separator"/>
@@ -516,6 +517,11 @@
   <action name="actionFileScreenshotToClipboard">
    <property name="text">
     <string>Screenshot to Clipboard</string>
+   </property>
+  </action>
+  <action name="actionFileScreenToClipboard">
+   <property name="text">
+    <string>Screen Text to Clipboard</string>
    </property>
   </action>
  </widget>

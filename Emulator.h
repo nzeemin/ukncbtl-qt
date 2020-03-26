@@ -34,6 +34,7 @@ int Emulator_SystemFrame();
 float Emulator_GetUptime();  // UKNC uptime, in seconds
 
 void Emulator_PrepareScreenRGB32(void* pBits, const quint32* colors);
+void Emulator_PrepareScreenToText(void* pBits, const quint32* colors);
 
 void Emulator_KeyEvent(quint8 keyPressed, bool pressed);
 quint16 Emulator_GetKeyEventFromQueue();

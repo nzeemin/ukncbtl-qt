@@ -34,6 +34,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionFileScreenshot, SIGNAL(triggered()), this, SLOT(saveScreenshot()));
     QObject::connect(ui->actionFileScreenshotAs, SIGNAL(triggered()), this, SLOT(saveScreenshotAs()));
     QObject::connect(ui->actionFileScreenshotToClipboard, SIGNAL(triggered()), this, SLOT(screenshotToClipboard()));
+    QObject::connect(ui->actionFileScreenToClipboard, SIGNAL(triggered()), this, SLOT(screenTextToClipboard()));
     QObject::connect(ui->actionScriptRun, SIGNAL(triggered()), this, SLOT(scriptRun()));
     QObject::connect(ui->actionFileExit, SIGNAL(triggered()), this, SLOT(close()));
     QObject::connect(ui->actionEmulatorRun, SIGNAL(triggered()), this, SLOT(emulatorRun()));
@@ -356,6 +357,29 @@ void MainWindow::screenshotToClipboard()
     QClipboard *clipboard = QGuiApplication::clipboard();
     clipboard->clear();
     clipboard->setImage(image);
+}
+
+void MainWindow::screenTextToClipboard()
+{
+    uint8_t buffer[81 * 26 + 1];
+    memset(buffer, 0, sizeof(buffer));
+
+    if (!m_screen->getScreenText(buffer))
+    {
+        AlertWarning("Failed to prepare text clipboard from screen.");
+        return;
+    }
+
+    // Prepare Unicode text
+    QString text;
+    for (size_t i = 0; i < sizeof(buffer) - 1; i++)
+    {
+        text.append(Translate_KOI8R(buffer[i]));
+    }
+
+    QClipboard *clipboard = QGuiApplication::clipboard();
+    clipboard->clear();
+    clipboard->setText(text);
 }
 
 void MainWindow::helpAbout()

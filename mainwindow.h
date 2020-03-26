@@ -48,6 +48,7 @@ public slots:
     void saveScreenshot();
     void saveScreenshotAs();
     void screenshotToClipboard();
+    void screenTextToClipboard();
     void helpAbout();
     void emulatorFrame();
     void emulatorRun();

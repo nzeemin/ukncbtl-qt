@@ -31,6 +31,7 @@ public:
 
 public:
     QImage getScreenshot();
+    bool getScreenText(uint8_t* buffer);
     void setMode(ScreenViewMode mode);
     ScreenViewMode mode() const { return m_mode; }
     void setSizeMode(ScreenSizeMode mode);
