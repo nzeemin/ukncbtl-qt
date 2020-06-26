@@ -199,8 +199,10 @@ void QMemoryView::paintEvent(QPaintEvent * /*event*/)
 {
     if (g_pBoard == nullptr) return;
 
+    QColor colorBackground = palette().color(QPalette::Base);
+
     QPainter painter(this);
-    painter.fillRect(0, 0, this->width(), this->height(), Qt::white);
+    painter.fillRect(0, 0, this->width(), this->height(), colorBackground);
 
     QFont font = Common_GetMonospacedFont();
     painter.setFont(font);
@@ -208,7 +210,7 @@ void QMemoryView::paintEvent(QPaintEvent * /*event*/)
     int cxChar = fontmetrics.averageCharWidth();
     int cyLine = fontmetrics.height();
 
-    QColor colorText = painter.pen().color();
+    QColor colorText = palette().color(QPalette::Text);
 
     m_cyLineMemory = cyLine;
 

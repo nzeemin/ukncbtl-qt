@@ -121,8 +121,10 @@ void QDebugView::paintEvent(QPaintEvent * /*event*/)
 {
     if (g_pBoard == nullptr) return;
 
+    QColor colorBackground = palette().color(QPalette::Base);
+
     QPainter painter(this);
-    painter.fillRect(0, 0, this->width(), this->height(), Qt::white);
+    painter.fillRect(0, 0, this->width(), this->height(), colorBackground);
 
     QFont font = Common_GetMonospacedFont();
     painter.setFont(font);
@@ -167,7 +169,7 @@ void QDebugView::drawProcessor(QPainter &painter, const CProcessor *pProc, int x
     QFontMetrics fontmetrics(painter.font());
     int cxChar = fontmetrics.averageCharWidth();
     int cyLine = fontmetrics.height();
-    QColor colorText = painter.pen().color();
+    QColor colorText = palette().color(QPalette::Text);
 
     painter.setPen(QColor(Qt::gray));
     painter.drawRect(x - cxChar, y - cyLine / 2, 33 * cxChar, cyLine * 15 + cyLine / 2);
@@ -226,7 +228,7 @@ void QDebugView::drawMemoryForRegister(QPainter &painter, int reg, CProcessor *p
     QFontMetrics fontmetrics(painter.font());
     int cxChar = fontmetrics.averageCharWidth();
     int cyLine = fontmetrics.height();
-    QColor colorText = painter.pen().color();
+    QColor colorText = palette().color(QPalette::Text);
 
     quint16 current = pProc->GetReg(reg);
     quint16 previous = oldValue;
