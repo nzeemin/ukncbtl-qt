@@ -59,7 +59,7 @@ private:
 
     bool checkForJump(const quint16* memory, int* pDelta);
     bool getJumpConditionHint(const quint16* memory, const CProcessor * pProc, const CMemoryController * pMemCtl, QString &buffer);
-    void drawJump(QPainter& painter, int yFrom, int delta, int x, int cyLine, QRgb color);
+    void drawJump(QPainter& painter, int yFrom, int delta, int x, int cyLine, QColor color);
     void registerHint(const CProcessor *pProc, const CMemoryController *pMemCtl,
         QString &hint1, QString& hint2,
         int regnum, int regmod, bool byteword, quint16 indexval);

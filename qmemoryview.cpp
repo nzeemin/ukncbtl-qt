@@ -200,7 +200,6 @@ void QMemoryView::paintEvent(QPaintEvent * /*event*/)
     if (g_pBoard == nullptr) return;
 
     QColor colorBackground = palette().color(QPalette::Base);
-
     QPainter painter(this);
     painter.fillRect(0, 0, this->width(), this->height(), colorBackground);
 
@@ -211,6 +210,8 @@ void QMemoryView::paintEvent(QPaintEvent * /*event*/)
     int cyLine = fontmetrics.height();
 
     QColor colorText = palette().color(QPalette::Text);
+    QColor colorRed = Common_GetColorShifted(palette(), COLOR_RED);
+    QColor colorBlue = Common_GetColorShifted(palette(), COLOR_BLUE);
 
     m_cyLineMemory = cyLine;
 
@@ -275,9 +276,9 @@ void QMemoryView::paintEvent(QPaintEvent * /*event*/)
             if (okValid)
             {
                 if (addrtype == ADDRTYPE_ROM)
-                    painter.setPen(Qt::blue);
+                    painter.setPen(colorBlue);
                 else
-                    painter.setPen(wChanged != 0 ? Qt::red : colorText);
+                    painter.setPen(wChanged != 0 ? colorRed : colorText);
                 if (m_ByteMode)
                 {
                     PrintOctalValue(buffer, (word & 0xff));
