@@ -159,6 +159,7 @@ void QDebugView::paintEvent(QPaintEvent * /*event*/)
         option.backgroundColor = QColor(Qt::gray);
         option.rect = this->rect();
         option.rect.setLeft(option.rect.left() + 30);
+        option.rect.setRight(30 + 92 * cxChar);
         style()->drawPrimitive(QStyle::PE_FrameFocusRect, &option, &painter, this);
     }
 }

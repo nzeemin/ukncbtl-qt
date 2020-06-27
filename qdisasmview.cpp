@@ -197,7 +197,7 @@ void QDisasmView::paintEvent(QPaintEvent * /*event*/)
         option.initFrom(this);
         option.state |= QStyle::State_KeyboardFocusChange;
         option.backgroundColor = QColor(Qt::gray);
-        option.rect = QRect(0, yFocus - cyLine + 1, 1000, cyLine);
+        option.rect = QRect(0, yFocus - cyLine + fontmetrics.descent(), this->width(), cyLine);
         style()->drawPrimitive(QStyle::PE_FrameFocusRect, &option, &painter, this);
     }
 }
@@ -645,8 +645,8 @@ int QDisasmView::drawDisassemble(QPainter &painter, CProcessor *pProc, quint16 b
     if (m_SubtitleItems.isEmpty())  //NOTE: Subtitles can move lines down
     {
         QColor colorCurrent = palette().color(QPalette::Window);
-        int yCurrent = (proccurrent - (current - 5) + 1) * cyLine + fontmetrics.descent();
-        painter.fillRect(0, yCurrent, 1000, -cyLine, colorCurrent);
+        int yCurrent = (proccurrent - (current - 5)) * cyLine + fontmetrics.descent();
+        painter.fillRect(0, yCurrent, this->width(), cyLine, colorCurrent);
     }
 
     // ×èòàåì èç ïàìÿòè ïðîöåññîðà â áóôåð
