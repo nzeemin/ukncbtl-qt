@@ -98,8 +98,8 @@ const LPCTSTR REGISTER_NAME[] = { "R0", "R1", "R2", "R3", "R4", "R5", "SP", "PC"
 const int UKNC_SCREEN_WIDTH = 640;
 const int UKNC_SCREEN_HEIGHT = 288;
 
-#define COLOR_RED       qRgb(255,40,40)
-#define COLOR_BLUE      qRgb(40,40,255)
+#define COLOR_RED       qRgb(255,128,128)
+#define COLOR_BLUE      qRgb(128,128,255)
 #define COLOR_SUBTITLE  qRgb(0,128,0)
 #define COLOR_VALUE     qRgb(128,128,128)
 #define COLOR_VALUEROM  qRgb(128,128,192)

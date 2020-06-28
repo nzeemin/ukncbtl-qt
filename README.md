@@ -1,9 +1,10 @@
 # ukncbtl-qt
-UKNCBTL emulator, Qt version.
-
+[![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 [![Build status](https://ci.appveyor.com/api/projects/status/ipvgt62iivnc6j7f?svg=true)](https://ci.appveyor.com/project/nzeemin/ukncbtl-qt)
 [![Build Status](https://travis-ci.org/nzeemin/ukncbtl-qt.svg?branch=master)](https://travis-ci.org/nzeemin/ukncbtl-qt)
 [![CodeFactor](https://www.codefactor.io/repository/github/nzeemin/ukncbtl-qt/badge)](https://www.codefactor.io/repository/github/nzeemin/ukncbtl-qt)
+
+UKNCBTL emulator, Qt version.
 
 The UKNCBTL project consists of:
 * [ukncbtl](https://github.com/nzeemin/ukncbtl/) written for Win32 and works under Windows 2000/2003/2008/XP/Vista/7/8/10.

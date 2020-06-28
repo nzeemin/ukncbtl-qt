@@ -374,8 +374,8 @@ bool QDisasmView::getJumpConditionHint(const quint16 *memory, const CProcessor *
 }
 
 void QDisasmView::registerHint(const CProcessor *pProc, const CMemoryController *pMemCtl,
-    QString &hint1, QString& hint2,
-    int regnum, int regmod, bool byteword, quint16 indexval)
+        QString &hint1, QString& hint2,
+        int regnum, int regmod, bool byteword, quint16 indexval)
 {
     int addrtype = 0;
     quint16 regval = pProc->GetReg(regnum);
@@ -445,8 +445,8 @@ void QDisasmView::registerHint(const CProcessor *pProc, const CMemoryController 
 }
 
 void QDisasmView::registerHintPC(const CProcessor *pProc, const CMemoryController *pMemCtl,
-    QString &hint1, QString& /*hint2*/,
-    int regmod, bool /*byteword*/, quint16 value, quint16 /*indexval*/)
+        QString &hint1, QString& /*hint2*/,
+        int regmod, bool byteword, quint16 curaddr, quint16 value)
 {
     int addrtype = 0;
     quint16 srcval2 = 0;
@@ -454,37 +454,55 @@ void QDisasmView::registerHintPC(const CProcessor *pProc, const CMemoryControlle
     //TODO: else if (regmod == 2)
     if (regmod == 3)
     {
-        //TODO: if (byteword)
         srcval2 = pMemCtl->GetWordView(value, pProc->IsHaltMode(), false, &addrtype);
-        hint1.sprintf("(%06o)=%06o", value, srcval2);  // "(NNNNNN)=XXXXXX"
+        if (byteword)
+        {
+            srcval2 = (value & 1) ? (srcval2 >> 8) : (srcval2 & 0xff);
+            hint1.sprintf("(%06o)=%03o", value, srcval2);  // "(NNNNNN)=XXX"
+        }
+        else
+        {
+            hint1.sprintf("(%06o)=%06o", value, srcval2);  // "(NNNNNN)=XXXXXX"
+        }
     }
-    //TODO: else if (regmod == 6)
+    else if (regmod == 6)
+    {
+        quint16 addr2 = curaddr + value;
+        srcval2 = pMemCtl->GetWordView(addr2, pProc->IsHaltMode(), false, &addrtype);
+        if (byteword)
+        {
+            srcval2 = (addr2 & 1) ? (srcval2 >> 8) : (srcval2 & 0xff);
+            hint1.sprintf("(%06o)=%03o", addr2, srcval2);  // "(NNNNNN)=XXX"
+        }
+        else
+        {
+            hint1.sprintf("(%06o)=%06o", addr2, srcval2);  // "(NNNNNN)=XXXXXX"
+        }
+    }
     //TODO: else if (regmod == 7)
 }
 
 void QDisasmView::instructionHint(const quint16 *memory, const CProcessor *pProc, const CMemoryController *pMemCtl,
-    QString& buffer, QString& buffer2,
-    int srcreg, int srcmod, int dstreg, int dstmod)
+        QString& buffer, QString& buffer2,
+        int srcreg, int srcmod, int dstreg, int dstmod)
 {
     QString srchint1, dsthint1;
     QString srchint2, dsthint2;
     bool byteword = ((*memory) & 0100000) != 0;  // Byte mode (true) or Word mode (false)
     const quint16* curmemory = memory + 1;
+    quint16 curaddr = pProc->GetPC() + 2;
     quint16 indexval = 0;
 
     if (srcreg >= 0)
     {
         if (srcreg == 7)
         {
-            quint16 value = *(curmemory++);
-            if (srcmod == 6 || srcmod == 7)
-                indexval = *(curmemory++);
-            registerHintPC(pProc, pMemCtl, srchint1, srchint2, srcmod, byteword, value, indexval);
+            quint16 value = *(curmemory++);  curaddr += 2;
+            registerHintPC(pProc, pMemCtl, srchint1, srchint2, srcmod, byteword, curaddr, value);
         }
         else
         {
-            if (srcmod == 6 || srcmod == 7)
-                indexval = *(curmemory++);
+            if (srcmod == 6 || srcmod == 7) { indexval = *(curmemory++);  curaddr += 2; }
             registerHint(pProc, pMemCtl, srchint1, srchint2, srcreg, srcmod, byteword, indexval);
         }
     }
@@ -492,15 +510,12 @@ void QDisasmView::instructionHint(const quint16 *memory, const CProcessor *pProc
     {
         if (dstreg == 7)
         {
-            quint16 value = *(curmemory++);
-            if (dstmod == 6 || dstmod == 7)
-                indexval = *(curmemory++);
-            registerHintPC(pProc, pMemCtl, dsthint1, dsthint2, dstmod, byteword, value, indexval);
+            quint16 value = *(curmemory++);  curaddr += 2;
+            registerHintPC(pProc, pMemCtl, dsthint1, dsthint2, dstmod, byteword, curaddr, value);
         }
         else
         {
-            if (dstmod == 6 || dstmod == 7)
-                indexval = *(curmemory++);
+            if (dstmod == 6 || dstmod == 7) { indexval = *(curmemory++);  curaddr += 2; }
             registerHint(pProc, pMemCtl, dsthint1, dsthint2, dstreg, dstmod, byteword, indexval);
         }
     }
@@ -533,7 +548,7 @@ void QDisasmView::instructionHint(const quint16 *memory, const CProcessor *pProc
 // Prepare "Instruction Hint" for a regular instruction (not a branch/jump one)
 // Returns: number of hint lines; 0 = no hints
 int QDisasmView::getInstructionHint(const quint16 *memory, const CProcessor *pProc, const CMemoryController *pMemCtl,
-    QString &buffer, QString &buffer2)
+        QString &buffer, QString &buffer2)
 {
     buffer.clear();  buffer2.clear();
     quint16 instr = *memory;
@@ -566,7 +581,6 @@ int QDisasmView::getInstructionHint(const quint16 *memory, const CProcessor *pPr
         (instr & ~(uint16_t)0100077) == PI_INC || (instr & ~(uint16_t)0100077) == PI_DEC || (instr & ~(uint16_t)0100077) == PI_NEG ||
         (instr & ~(uint16_t)0100077) == PI_TST ||
         (instr & ~(uint16_t)0100077) == PI_ASR || (instr & ~(uint16_t)0100077) == PI_ASL ||
-        (instr & ~(uint16_t)077) == PI_JMP ||
         (instr & ~(uint16_t)077) == PI_SWAB || (instr & ~(uint16_t)077) == PI_SXT ||
         (instr & ~(uint16_t)077) == PI_MTPS || (instr & ~(uint16_t)077) == PI_MFPS)
     {
@@ -598,6 +612,15 @@ int QDisasmView::getInstructionHint(const quint16 *memory, const CProcessor *pPr
                 (psw & PSW_C) ? '1' : '0', (psw & PSW_V) ? '1' : '0', (psw & PSW_Z) ? '1' : '0', (psw & PSW_N) ? '1' : '0');
     }
 
+    // JSR, JMP -- show non-trivial cases only
+    if ((instr & ~(uint16_t)0777) == PI_JSR && (instr & 077) != 067 && (instr & 077) != 037 ||
+        (instr & ~(uint16_t)077) == PI_JMP && (instr & 077) != 067 && (instr & 077) != 037)
+    {
+        int dstreg = instr & 7;
+        int dstmod = (instr >> 3) & 7;
+        instructionHint(memory, pProc, pMemCtl, buffer, buffer2, -1, -1, dstreg, dstmod);
+    }
+
     // HALT mode commands
     if (instr == PI_MFUS)
     {
@@ -608,6 +631,7 @@ int QDisasmView::getInstructionHint(const quint16 *memory, const CProcessor *pPr
         buffer.sprintf("R0=%06o, R5=%06o", pProc->GetReg(0), pProc->GetReg(5));  // "R0=XXXXXX, R5=XXXXXX"
     }
     //TODO: MFPC, MTPC
+
     //TODO: MARK
 
     int result = 0;

@@ -61,16 +61,16 @@ private:
     bool getJumpConditionHint(const quint16* memory, const CProcessor * pProc, const CMemoryController * pMemCtl, QString &buffer);
     void drawJump(QPainter& painter, int yFrom, int delta, int x, int cyLine, QColor color);
     void registerHint(const CProcessor *pProc, const CMemoryController *pMemCtl,
-        QString &hint1, QString& hint2,
-        int regnum, int regmod, bool byteword, quint16 indexval);
+            QString &hint1, QString& hint2,
+            int regnum, int regmod, bool byteword, quint16 indexval);
     void registerHintPC(const CProcessor *pProc, const CMemoryController *pMemCtl,
-        QString &hint1, QString& hint2,
-        int regmod, bool byteword, quint16 value, quint16 indexval);
+            QString &hint1, QString& hint2,
+            int regmod, bool byteword, quint16 curaddr, quint16 value);
     void instructionHint(const quint16 *memory, const CProcessor *pProc, const CMemoryController *pMemCtl,
-        QString& buffer, QString& buffer2,
-        int srcreg, int srcmod, int dstreg, int dstmod);
+            QString& buffer, QString& buffer2,
+            int srcreg, int srcmod, int dstreg, int dstmod);
     int getInstructionHint(const quint16* memory, const CProcessor * pProc, const CMemoryController * pMemCtl,
-        QString &buffer, QString &buffer2);
+            QString &buffer, QString &buffer2);
 };
 
 #endif // QDISASMVIEW_H
