@@ -2,6 +2,7 @@
 #define QEMULATORSCREEN_H
 
 #include <QWidget>
+#include "main.h"
 
 enum ScreenViewMode
 {

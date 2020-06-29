@@ -8,6 +8,10 @@
 #include "Emulator.h"
 #include "emubase/Emubase.h"
 
+
+//////////////////////////////////////////////////////////////////////
+
+
 QDisasmView::QDisasmView()
 {
     m_okDisasmProcessor = Settings_GetDebugCpuPpu();
@@ -119,7 +123,7 @@ void QDisasmView::parseSubtitles(QTextStream &stream)
         if (lineLength == 0) continue;  // Skip empty lines
 
         QChar firstChar = line.at(0);
-        if (firstChar.isDigit())  // Öèôðà -- ñ÷èòàåì ÷òî ýòî àäðåñ
+        if (firstChar.isDigit())  // Цифра -- считаем что это адрес
         {
             // Parse address
             int addrlen = 1;
@@ -128,7 +132,7 @@ void QDisasmView::parseSubtitles(QTextStream &stream)
             if (!ParseOctalValue(line.left(addrlen), &address))
                 continue;
 
-            if (!blockComment.isEmpty())  // Íà ïðåäûäóùåé ñòðîêå áûë êîììåíòàðèé ê áëîêó
+            if (!blockComment.isEmpty())  // На предыдущей строке был комментарий к блоку
             {
                 addSubtitle(address, SUBTYPE_BLOCKCOMMENT, blockComment);
                 blockComment.clear();
@@ -165,7 +169,7 @@ void QDisasmView::parseSubtitles(QTextStream &stream)
         else if (firstChar == ';')
         {
             blockComment = line.trimmed();
-            //TODO: Ñîáèðàòü ìíîãîñòðî÷íûå êîììåíòàðèè íàä áëîêîì
+            //TODO: Собирать многострочные комментарии над блоком
         }
     }
 }
@@ -295,8 +299,8 @@ bool QDisasmView::getJumpConditionHint(const quint16 *memory, const CProcessor *
     if (instr >= 0101000 && instr <= 0101777)  // BHI, BLOS
     {
         buffer.sprintf("C=%c, Z=%c", (psw & PSW_C) ? '1' : '0', (psw & PSW_Z) ? '1' : '0');
-        // BHI:  IF ((Ñ or Z) == 0)
-        // BLOS: IF ((Ñ or Z) == 1)
+        // BHI:  IF ((C or Z) == 0)
+        // BLOS: IF ((C or Z) == 1)
         bool value = (((psw & PSW_C) != 0) || ((psw & PSW_Z) != 0));
         return ((instr & 0400) == 0) ? !value : value;
     }
@@ -673,7 +677,7 @@ int QDisasmView::drawDisassemble(QPainter &painter, CProcessor *pProc, quint16 b
         painter.fillRect(0, yCurrent, this->width(), cyLine, colorCurrent);
     }
 
-    // ×èòàåì èç ïàìÿòè ïðîöåññîðà â áóôåð
+    // Читаем из памяти процессора в буфер
     const int nWindowSize = 30; //this->height() / cyLine;
     quint16 memory[nWindowSize + 2];
     int addrtype[nWindowSize + 2];
@@ -691,9 +695,9 @@ int QDisasmView::drawDisassemble(QPainter &painter, CProcessor *pProc, quint16 b
     int length = 0;
     quint16 wNextBaseAddr = 0;
     int y = cyLine;
-    for (int index = 0; index < nWindowSize; index++)  // Ðèñóåì ñòðîêè
+    for (int index = 0; index < nWindowSize; index++)  // Рисуем строки
     {
-        if (!m_SubtitleItems.isEmpty())  // Subtitles - êîììåíòàðèé ê áëîêó
+        if (!m_SubtitleItems.isEmpty())  // Subtitles - комментарий к блоку
         {
             const DisasmSubtitleItem * pSubItem = findSubtitle(address, SUBTYPE_BLOCKCOMMENT);
             if (pSubItem != nullptr && !pSubItem->comment.isEmpty())
@@ -746,7 +750,7 @@ int QDisasmView::drawDisassemble(QPainter &painter, CProcessor *pProc, quint16 b
                 painter.drawText(52 * cxChar, y, pSubItem->comment);
                 painter.setPen(colorText);
 
-                // Ñòðîêó ñ ñóáòèòðîì ìû ìîæåì èñïîëüçîâàòü êàê îïîðíóþ äëÿ äèçàññåìáëåðà
+                // Строку с субтитром мы можем использовать как опорную для дизассемблера
                 if (disasmfrom > address)
                     disasmfrom = address;
             }
@@ -756,7 +760,7 @@ int QDisasmView::drawDisassemble(QPainter &painter, CProcessor *pProc, quint16 b
         {
             char strInstr[8];
             char strArg[32];
-            if (okData)  // Ïî ýòîìó àäðåñó ëåæàò äàííûå -- íåò ñìûñëà äèçàññåìáëèðîâàòü
+            if (okData)  // По этому адресу лежат данные -- нет смысла дизассемблировать
             {
                 strcpy(strInstr, "data");
                 PrintOctalValue(strArg, *(memory + index));
@@ -844,3 +848,6 @@ void QDisasmView::drawJump(QPainter &painter, int yFrom, int delta, int x, int c
     painter.setPen(color);
     painter.drawPath(path);
 }
+
+
+//////////////////////////////////////////////////////////////////////
