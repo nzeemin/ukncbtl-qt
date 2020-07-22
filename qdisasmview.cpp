@@ -148,7 +148,7 @@ void QDisasmView::parseSubtitles(QTextStream &stream)
                 else
                     break;
             }
-            if (index == lineLength) continue;
+            bool okDirective = index < lineLength && line.at(index) == '.';
 
             // Search for comment start
             while (index < lineLength)
@@ -158,12 +158,12 @@ void QDisasmView::parseSubtitles(QTextStream &stream)
                     break;
                 index++;
             }
-            if (index == lineLength) continue;
 
             QString comment = line.mid(index).trimmed();
-            if (comment.length() > 1)
+            if (comment.length() > 1 || okDirective)
             {
-                addSubtitle(address, SUBTYPE_COMMENT, comment);
+                DisasmSubtitleType type = okDirective ? (DisasmSubtitleType)(SUBTYPE_COMMENT | SUBTYPE_DATA) : SUBTYPE_COMMENT;
+                addSubtitle(address, type, comment);
             }
         }
         else if (firstChar == ';')
