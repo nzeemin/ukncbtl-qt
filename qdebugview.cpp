@@ -170,7 +170,7 @@ void QDebugView::drawProcessor(QPainter &painter, const CProcessor *pProc, int x
     int cxChar = fontmetrics.averageCharWidth();
     int cyLine = fontmetrics.height();
     QColor colorText = palette().color(QPalette::Text);
-    QColor colorRed = Common_GetColorShifted(palette(), COLOR_RED);
+    QColor colorChanged = Common_GetColorShifted(palette(), COLOR_VALUECHANGED);
 
     painter.setPen(QColor(Qt::gray));
     painter.drawRect(x - cxChar, y - cyLine / 2, 33 * cxChar, cyLine * 15 + cyLine / 2);
@@ -178,7 +178,7 @@ void QDebugView::drawProcessor(QPainter &painter, const CProcessor *pProc, int x
     // Registers
     for (int r = 0; r < 8; r++)
     {
-        painter.setPen(QColor(arrRChanged[r] ? colorRed : colorText));
+        painter.setPen(QColor(arrRChanged[r] ? colorChanged : colorText));
 
         LPCTSTR strRegName = REGISTER_NAME[r];
         painter.drawText(x, y + (1 + r) * cyLine, strRegName);
@@ -198,7 +198,7 @@ void QDebugView::drawProcessor(QPainter &painter, const CProcessor *pProc, int x
     DrawBinaryValue(painter, x + cxChar * 15, y + 9 * cyLine, cpc);
 
     // PSW value
-    painter.setPen(QColor(arrRChanged[8] ? colorRed : colorText));
+    painter.setPen(QColor(arrRChanged[8] ? colorChanged : colorText));
     painter.drawText(x, y + 11 * cyLine, "PS");
     quint16 psw = arrR[8]; // pProc->GetPSW();
     DrawOctalValue(painter, x + cxChar * 3, y + 11 * cyLine, psw);
@@ -230,8 +230,8 @@ void QDebugView::drawMemoryForRegister(QPainter &painter, int reg, CProcessor *p
     int cxChar = fontmetrics.averageCharWidth();
     int cyLine = fontmetrics.height();
     QColor colorText = palette().color(QPalette::Text);
-    QColor colorRed = Common_GetColorShifted(palette(), COLOR_RED);
-    QColor colorBlue = Common_GetColorShifted(palette(), COLOR_BLUE);
+    QColor colorChanged = Common_GetColorShifted(palette(), COLOR_VALUECHANGED);
+    QColor colorPrev = Common_GetColorShifted(palette(), COLOR_PREVIOUS);
 
     quint16 current = pProc->GetReg(reg);
     quint16 previous = oldValue;
@@ -257,7 +257,7 @@ void QDebugView::drawMemoryForRegister(QPainter &painter, int reg, CProcessor *p
         // Value at the address
         quint16 value = memory[index];
         quint16 wChanged = Emulator_GetChangeRamStatus(addrtype[index], address);
-        painter.setPen(wChanged != 0 ? colorRed : colorText);
+        painter.setPen(wChanged != 0 ? colorChanged : colorText);
         DrawOctalValue(painter, x + 10 * cxChar, y, value);
 
         // Current position
@@ -265,12 +265,12 @@ void QDebugView::drawMemoryForRegister(QPainter &painter, int reg, CProcessor *p
         {
             painter.setPen(colorText);
             painter.drawText(x + 2 * cxChar, y, ">");
-            painter.setPen(current != previous ? colorRed : colorText);
+            painter.setPen(current != previous ? colorChanged : colorText);
             painter.drawText(x, y, REGISTER_NAME[reg]);
         }
         else if (address == previous)
         {
-            painter.setPen(colorBlue);
+            painter.setPen(colorPrev);
             painter.drawText(x + 2 * cxChar, y, ">");
         }
 

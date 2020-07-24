@@ -208,15 +208,16 @@ void QMemoryView::paintEvent(QPaintEvent * /*event*/)
     QFontMetrics fontmetrics(font);
     int cxChar = fontmetrics.averageCharWidth();
     int cyLine = fontmetrics.height();
-
     QColor colorText = palette().color(QPalette::Text);
-    QColor colorRed = Common_GetColorShifted(palette(), COLOR_RED);
-    QColor colorBlue = Common_GetColorShifted(palette(), COLOR_BLUE);
+    QColor colorChanged = Common_GetColorShifted(palette(), COLOR_VALUECHANGED);
+    QColor colorMemoryRom = Common_GetColorShifted(palette(), COLOR_MEMORYROM);
+    QColor colorMemoryIO = Common_GetColorShifted(palette(), COLOR_MEMORYIO);
+    QColor colorMemoryNA = Common_GetColorShifted(palette(), COLOR_MEMORYNA);
 
     m_cyLineMemory = cyLine;
 
     char buffer[7];
-    const char* ADDRESS_LINE = "  addr   0      2      4      6      10     12     14     16";
+    const char * ADDRESS_LINE = "  addr   0      2      4      6      10     12     14     16";
     painter.drawText(30, cyLine, ADDRESS_LINE);
 
     // Calculate m_nPageSize
@@ -276,9 +277,9 @@ void QMemoryView::paintEvent(QPaintEvent * /*event*/)
             if (okValid)
             {
                 if (addrtype == ADDRTYPE_ROM)
-                    painter.setPen(colorBlue);
+                    painter.setPen(colorMemoryRom);
                 else
-                    painter.setPen(wChanged != 0 ? colorRed : colorText);
+                    painter.setPen(wChanged != 0 ? colorChanged : colorText);
                 if (m_ByteMode)
                 {
                     PrintOctalValue(buffer, (word & 0xff));
@@ -288,6 +289,19 @@ void QMemoryView::paintEvent(QPaintEvent * /*event*/)
                 }
                 else
                     DrawOctalValue(painter, x, y, word);
+            }
+            else
+            {
+                if (addrtype == ADDRTYPE_IO)
+                {
+                    painter.setPen(colorMemoryIO);
+                    painter.drawText(x, y, "  IO  ");
+                }
+                else
+                {
+                    painter.setPen(colorMemoryNA);
+                    painter.drawText(x, y, "  NA  ");
+                }
             }
 
             // Prepare characters to draw at right

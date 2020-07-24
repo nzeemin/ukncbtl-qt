@@ -654,13 +654,13 @@ int QDisasmView::drawDisassemble(QPainter &painter, CProcessor *pProc, quint16 b
     int cxChar = fontmetrics.averageCharWidth();
     int cyLine = fontmetrics.lineSpacing();
     QColor colorText = palette().color(QPalette::Text);
-    QColor colorRed = Common_GetColorShifted(palette(), COLOR_RED);
-    QColor colorBlue = Common_GetColorShifted(palette(), COLOR_BLUE);
+    QColor colorChanged = Common_GetColorShifted(palette(), COLOR_VALUECHANGED);
+    QColor colorPrev = Common_GetColorShifted(palette(), COLOR_PREVIOUS);
     QColor colorHint = Common_GetColorShifted(palette(), COLOR_HINT);
     QColor colorJumpHint = Common_GetColorShifted(palette(), COLOR_JUMPHINT);
     QColor colorJump = Common_GetColorShifted(palette(), COLOR_JUMP);
     QColor colorJumpYes = Common_GetColorShifted(palette(), COLOR_JUMPYES);
-    QColor colorJumpGray = Common_GetColorShifted(palette(), COLOR_JUMPGRAY);
+    QColor colorJumpNo = Common_GetColorShifted(palette(), COLOR_JUMPNO);
     QColor colorSubtitle = Common_GetColorShifted(palette(), COLOR_SUBTITLE);
     QColor colorValue = Common_GetColorShifted(palette(), COLOR_VALUE);
     QColor colorValueRom = Common_GetColorShifted(palette(), COLOR_VALUEROM);
@@ -727,14 +727,14 @@ int QDisasmView::drawDisassemble(QPainter &painter, CProcessor *pProc, quint16 b
         if (address == proccurrent)
         {
             bool okPCchanged = proccurrent != previous;
-            if (okPCchanged) painter.setPen(colorRed);
+            if (okPCchanged) painter.setPen(colorChanged);
             painter.drawText(1 * cxChar, y, "PC");
             painter.setPen(colorText);
             painter.drawText(3 * cxChar, y, ">>");
         }
         else if (address == previous)
         {
-            painter.setPen(colorBlue);
+            painter.setPen(colorPrev);
             painter.drawText(1 * cxChar, y, "  >");
         }
 
@@ -802,7 +802,7 @@ int QDisasmView::drawDisassemble(QPainter &painter, CProcessor *pProc, quint16 b
 
                         if (isjump && abs(delta) < 40)
                         {
-                            QColor jumpcolor = jumppredict ? colorJumpYes : colorJumpGray;
+                            QColor jumpcolor = jumppredict ? colorJumpYes : colorJumpNo;
                             drawJump(painter, y, delta, (30 + strlen(strArg)) * cxChar, cyLine, jumpcolor);
                         }
                     }
