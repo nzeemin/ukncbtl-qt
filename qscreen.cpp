@@ -112,7 +112,7 @@ static void UpscaleScreen(void* pImageBits)
                 if (i % 4 == 3)
                     *pdst1 = 0;
                 else
-                    *pdst1 = (quint8)((((quint16) *psrc1) + ((quint16) *psrc2)) / 2);
+                    *pdst1 = (quint8)((((quint16) * psrc1) + ((quint16) * psrc2)) / 2);
                 psrc1++;  psrc2++;  pdst1++;
             }
         }

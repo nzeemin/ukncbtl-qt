@@ -48,6 +48,7 @@ HEADERS += mainwindow.h \
     qdialogs.h
 FORMS += mainwindow.ui
 RESOURCES += QtUkncBtl.qrc
+RC_ICONS = images/ukncbtl.ico
 QT += widgets
 QT += script
 QT += testlib 
