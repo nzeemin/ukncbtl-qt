@@ -6,6 +6,7 @@
 
 //////////////////////////////////////////////////////////////////////
 
+const int MAX_BREAKPOINTCOUNT = 16;
 
 extern CMotherboard* g_pBoard;
 
@@ -21,16 +22,26 @@ extern quint16 g_wEmulatorPrevPpuPC;  // Previous PC value
 
 //////////////////////////////////////////////////////////////////////
 
-void Emulator_SetSound(bool enable);
 bool Emulator_Init();
 void Emulator_Done();
-void Emulator_SetCPUBreakpoint(quint16 address);
-void Emulator_SetPPUBreakpoint(quint16 address);
+
+bool Emulator_AddCPUBreakpoint(quint16 address);
+bool Emulator_AddPPUBreakpoint(quint16 address);
+bool Emulator_RemoveCPUBreakpoint(quint16 address);
+bool Emulator_RemovePPUBreakpoint(quint16 address);
+void Emulator_SetTempCPUBreakpoint(quint16 address);
+void Emulator_SetTempPPUBreakpoint(quint16 address);
+const quint16* Emulator_GetCPUBreakpointList();
+const quint16* Emulator_GetPPUBreakpointList();
 bool Emulator_IsBreakpoint();
+bool Emulator_IsBreakpoint(bool okCpuPpu, quint16 address);
+void Emulator_RemoveAllBreakpoints(bool okCpuPpu);
+
+void Emulator_SetSound(bool enable);
 void Emulator_Start();
 void Emulator_Stop();
 void Emulator_Reset();
-int Emulator_SystemFrame();
+bool Emulator_SystemFrame();
 float Emulator_GetUptime();  // UKNC uptime, in seconds
 
 void Emulator_PrepareScreenRGB32(void* pBits, const quint32* colors);

@@ -2630,11 +2630,11 @@ uint16_t CProcessor::GetWordAddr (uint8_t meth, uint8_t reg)
         SetReg(reg, GetReg(reg) - 2);
         return GetReg(reg);
     case 5: //@-(R)
-		{
-			SetReg(reg, GetReg(reg) - 2);
-			uint16_t addr = GetReg(reg);
-			return GetWord(addr);
-		}
+        {
+            SetReg(reg, GetReg(reg) - 2);
+            uint16_t addr = GetReg(reg);
+            return GetWord(addr);
+        }
     case 6: //d(R)
         {
             uint16_t addr = GetWord(GetPC());

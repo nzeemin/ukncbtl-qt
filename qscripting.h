@@ -112,12 +112,12 @@ public slots:
     /// \brief Get emulator uptime, in seconds.
     float getUptime();
 
-    /// \brief Sets CPU breakpoint address for the next run() call.
+    /// \brief Adds CPU breakpoint address for the next run() call.
     /// \param address Address of the CPU breakpoint to set.
-    void setCPUBreakpoint(quint16 address);
-    /// \brief Sets PPU breakpoint address for the next run() call.
+    void addCPUBreakpoint(quint16 address);
+    /// \brief Adds PPU breakpoint address for the next run() call.
     /// \param address Address of the PPU breakpoint to set.
-    void setPPUBreakpoint(quint16 address);
+    void addPPUBreakpoint(quint16 address);
     /// \brief Check if the emulator stopped on a breakpoint.
     bool isBreakpoint();
 

@@ -646,6 +646,16 @@ int QDisasmView::getInstructionHint(const quint16 *memory, const CProcessor *pPr
     return result;
 }
 
+void QDisasmView::drawBreakpoint(QPainter& painter, int x, int y, int size)
+{
+    QColor colorBreakpoint = qRgb(192, 0, 0);
+    painter.setBrush(colorBreakpoint);
+    painter.setPen(colorBreakpoint);
+    painter.drawEllipse(x, y, size, -size);
+    painter.setPen(palette().color(QPalette::Text));
+    painter.setBrush(Qt::NoBrush);
+}
+
 int QDisasmView::drawDisassemble(QPainter &painter, CProcessor *pProc, quint16 base, quint16 previous)
 {
     int result = -1;
@@ -710,6 +720,11 @@ int QDisasmView::drawDisassemble(QPainter &painter, CProcessor *pProc, quint16 b
             }
         }
 
+        if (Emulator_IsBreakpoint(m_okDisasmProcessor, address))  // Breakpoint
+        {
+            drawBreakpoint(painter, cxChar / 2, y, cxChar);
+        }
+
         DrawOctalValue(painter, 5 * cxChar, y, address);  // Address
         // Value at the address
         quint16 value = memory[index];
@@ -721,21 +736,21 @@ int QDisasmView::drawDisassemble(QPainter &painter, CProcessor *pProc, quint16 b
         // Current position
         if (address == current)
         {
-            painter.drawText(1 * cxChar, y, "  >");
+            painter.drawText(2 * cxChar, y, "  >");
             result = y;  // Remember line for the focus rect
         }
         if (address == proccurrent)
         {
             bool okPCchanged = proccurrent != previous;
             if (okPCchanged) painter.setPen(colorChanged);
-            painter.drawText(1 * cxChar, y, "PC");
+            painter.drawText(2 * cxChar, y, "PC");
             painter.setPen(colorText);
-            painter.drawText(3 * cxChar, y, ">>");
+            painter.drawText(2 * cxChar, y, "  >");
         }
         else if (address == previous)
         {
             painter.setPen(colorPrev);
-            painter.drawText(1 * cxChar, y, "  >");
+            painter.drawText(2 * cxChar, y, "  >");
         }
 
         bool okData = false;

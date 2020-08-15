@@ -255,6 +255,20 @@ void MainWindow::UpdateAllViews()
     UpdateMenu();
 }
 
+void MainWindow::redrawDisasmView()
+{
+    if (m_disasm != nullptr)
+        m_disasm->repaint();
+}
+
+void MainWindow::updateWindowText()
+{
+    if (g_okEmulatorRunning)
+        this->setWindowTitle(tr("UKNC Back to Life [run]"));
+    else
+        this->setWindowTitle(tr("UKNC Back to Life [stop]"));
+}
+
 void MainWindow::setCurrentProc(bool okProc)
 {
     if (m_debug != nullptr)
@@ -497,26 +511,19 @@ void MainWindow::emulatorFrame()
     if (!isActiveWindow())
         return;
 
-    if (Emulator_IsBreakpoint())
-        Emulator_Stop();
-    else if (Emulator_SystemFrame())
-    {
-        m_screen->repaint();
-    }
+    if (!Emulator_SystemFrame())
+        Emulator_Stop();  // Breakpoint hit
+
+    m_screen->repaint();
 }
 
 void MainWindow::emulatorRun()
 {
     if (g_okEmulatorRunning)
-    {
-        this->setWindowTitle(tr("UKNC Back to Life"));
         Emulator_Stop();
-    }
     else
-    {
-        this->setWindowTitle(tr("UKNC Back to Life [run]"));
         Emulator_Start();
-    }
+    updateWindowText();
 }
 
 void MainWindow::emulatorReset()

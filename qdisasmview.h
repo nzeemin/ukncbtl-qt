@@ -71,6 +71,7 @@ private:
             int srcreg, int srcmod, int dstreg, int dstmod);
     int getInstructionHint(const quint16* memory, const CProcessor * pProc, const CMemoryController * pMemCtl,
             QString &buffer, QString &buffer2);
+    void drawBreakpoint(QPainter& painter, int x, int y, int cyLine);
 };
 
 #endif // QDISASMVIEW_H

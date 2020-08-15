@@ -26,6 +26,8 @@ public:
 public:
     void UpdateMenu();
     void UpdateAllViews();
+    void redrawDisasmView();
+    void updateWindowText();
     void setCurrentProc(bool okProc);
     void restoreSettings();
     void showUptime(int uptimeMillisec);

@@ -242,6 +242,10 @@ void QConsoleView::printHelp()
             "  rN XXXXXX  Set register N to value XXXXXX; N=0..7,ps\r\n"
             "  s          Step Into; executes one instruction\r\n"
             "  so         Step Over; executes and stops after the current instruction\r\n"
+            "  b          List breakpoints set for the current processor\r\n"
+            "  bXXXXXX    Set breakpoint at address XXXXXX\r\n"
+            "  bcXXXXXX   Remove breakpoint at address XXXXXX\r\n"
+            "  bc         Remove all breakpoints for the current processor\r\n"
 //            "  u          Save memory dump to file memdumpXPU.bin\r\n"
                   ));
 }
@@ -355,9 +359,9 @@ void QConsoleView::execConsoleCommand(const QString &command)
         quint16 bpaddress = pProc->GetPC() + instrLength * 2;
 
         if (m_okCurrentProc)
-            Emulator_SetCPUBreakpoint(bpaddress);
+            Emulator_SetTempCPUBreakpoint(bpaddress);
         else
-            Emulator_SetPPUBreakpoint(bpaddress);
+            Emulator_SetTempPPUBreakpoint(bpaddress);
         Emulator_Start();
 
         okUpdateMenu = true;
@@ -432,12 +436,60 @@ void QConsoleView::execConsoleCommand(const QString &command)
         else
         {
             if (m_okCurrentProc)
-                Emulator_SetCPUBreakpoint(value);
+                Emulator_SetTempCPUBreakpoint(value);
             else
-                Emulator_SetPPUBreakpoint(value);
+                Emulator_SetTempPPUBreakpoint(value);
             Emulator_Start();
 
             okUpdateMenu = true;
+        }
+    }
+    else if (command == "b")  // b - list breakpoints
+    {
+        const quint16* pbps = m_okCurrentProc ? Emulator_GetCPUBreakpointList() : Emulator_GetPPUBreakpointList();
+        if (pbps == nullptr || *pbps == 0177777)
+        {
+            this->print("  No breakpoints.\r\n");
+        }
+        else
+        {
+            while (*pbps != 0177777)
+            {
+                QString line;  line.sprintf("  %06ho\r\n", *pbps);
+                this->print(line);
+                pbps++;
+            }
+        }
+    }
+    else if (command == "bc")  // bc - remove all breakpoints
+    {
+        Emulator_RemoveAllBreakpoints(m_okCurrentProc);
+        Global_RedrawDisasmView();
+    }
+    else if (command.startsWith("bc"))  // bcXXXXXX - remove breakpoint
+    {
+        quint16 value;
+        if (! ParseOctalValue(command.mid(2), &value))
+            this->print(MESSAGE_WRONG_VALUE);
+        else
+        {
+            bool result = m_okCurrentProc ? Emulator_RemoveCPUBreakpoint(value) : Emulator_RemovePPUBreakpoint(value);
+            if (!result)
+                this->print("  Failed to remove breakpoint.\r\n");
+            Global_RedrawDisasmView();
+        }
+    }
+    else if (command.startsWith("b"))  // bXXXXXX - add breakpoint
+    {
+        quint16 value;
+        if (! ParseOctalValue(command.mid(1), &value))
+            this->print(MESSAGE_WRONG_VALUE);
+        else
+        {
+            bool result = m_okCurrentProc ? Emulator_AddCPUBreakpoint(value) : Emulator_AddPPUBreakpoint(value);
+            if (!result)
+                this->print("  Failed to add breakpoint.\r\n");
+            Global_RedrawDisasmView();
         }
     }
     else
