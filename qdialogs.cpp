@@ -2,6 +2,10 @@
 #include "qdialogs.h"
 #include <QMessageBox>
 
+
+//////////////////////////////////////////////////////////////////////
+
+
 QInputOctalDialog::QInputOctalDialog(QWidget *parent, const QString & title, const QString & prompt, quint16 * value)
     : QDialog(parent, nullptr)
 {
@@ -37,3 +41,36 @@ void QInputOctalDialog::accept()
     *m_result = value;
     QDialog::accept();
 }
+
+
+//////////////////////////////////////////////////////////////////////
+
+
+QAboutDialog::QAboutDialog(QWidget * parent)
+    : QDialog(parent, nullptr)
+{
+    setWindowTitle(tr("About"));
+
+    m_topLabel.setText(tr("UKNCBTL Qt Version 1.0\nCopyright (C) 2007-2020"));
+    m_linkLabel.setText(tr("<a href=\"https://github.com/nzeemin/ukncbtl-qt\">https://github.com/nzeemin/ukncbtl-qt</a>"));
+    m_authorsLabel.setText(tr("Authors:\r\nNikita Zimin\nFelix Lazarev\nAlexey Kisly"));
+    m_thanksLabel.setText(tr("Special thanks to:\nArseny Gordin"));
+    m_bottomLabel.setText(tr("Build date:\t%1 %2\nQt version:\t%3").arg(__DATE__).arg(__TIME__).arg(QT_VERSION_STR));
+
+    m_linkLabel.setOpenExternalLinks(true);
+
+    setMinimumSize(260, 320);
+
+    m_layout.addWidget(&m_topLabel);
+    m_layout.addWidget(&m_linkLabel);
+    m_layout.addWidget(&m_authorsLabel);
+    m_layout.addWidget(&m_thanksLabel);
+    m_layout.addWidget(&m_bottomLabel);
+    m_buttons.setStandardButtons(QDialogButtonBox::Ok);
+    QObject::connect(&m_buttons, SIGNAL(accepted()), this, SLOT(accept()));
+    m_layout.addWidget(&m_buttons);
+    setLayout(&m_layout);
+}
+
+
+//////////////////////////////////////////////////////////////////////

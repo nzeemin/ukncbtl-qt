@@ -11,6 +11,7 @@
 #include "main.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "qdialogs.h"
 #include "qscreen.h"
 #include "qkeyboardview.h"
 #include "qconsoleview.h"
@@ -398,15 +399,8 @@ void MainWindow::screenTextToClipboard()
 
 void MainWindow::helpAbout()
 {
-    QMessageBox::about(this, tr("About"), tr(
-            "UKNCBTL Qt Version 1.0\n"
-            "Copyright (C) 2007-2020\n\n"
-            "https://github.com/nzeemin/ukncbtl-qt\n\n"
-            "Authors:\r\nNikita Zimin\nFelix Lazarev\nAlexey Kisly\n\n"
-            "Special thanks to:\nArseny Gordin\n\n"
-            "Build date:\t%1 %2\n"
-            "Qt version:\t%3")
-            .arg(__DATE__).arg(__TIME__).arg(QT_VERSION_STR));
+    QAboutDialog dialog(this);
+    dialog.exec();
 }
 
 void MainWindow::viewKeyboard()
