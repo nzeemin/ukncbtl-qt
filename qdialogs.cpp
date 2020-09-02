@@ -47,29 +47,42 @@ void QInputOctalDialog::accept()
 
 
 QAboutDialog::QAboutDialog(QWidget * parent)
-    : QDialog(parent, nullptr)
+    : QDialog(parent)
 {
     setWindowTitle(tr("About"));
+    setMinimumSize(440, 300);
 
-    m_topLabel.setText(tr("UKNCBTL Qt Version 1.0\nCopyright (C) 2007-2020"));
-    m_linkLabel.setText(tr("<a href=\"https://github.com/nzeemin/ukncbtl-qt\">https://github.com/nzeemin/ukncbtl-qt</a>"));
-    m_authorsLabel.setText(tr("Authors:\r\nNikita Zimin\nFelix Lazarev\nAlexey Kisly"));
-    m_thanksLabel.setText(tr("Special thanks to:\nArseny Gordin"));
-    m_bottomLabel.setText(tr("Build date:\t%1 %2\nQt version:\t%3").arg(__DATE__).arg(__TIME__).arg(QT_VERSION_STR));
+    QLabel * logoLabel = new QLabel();
+    logoLabel->setPixmap(QPixmap(":/images/ukncbtl.png"));
 
-    m_linkLabel.setOpenExternalLinks(true);
+    QLabel * versionLabel = new QLabel(tr(
+            "UKNCBTL Qt Version 1.0\nCopyright (C) 2007-2020\n"));
 
-    setMinimumSize(260, 320);
+    QLabel * authorsLabel = new QLabel(tr(
+            "Authors:\r\nNikita Zimin\nFelix Lazarev\nAlexey Kisly\n\n"
+            "Special thanks to:\nArseny Gordin"));
 
-    m_layout.addWidget(&m_topLabel);
-    m_layout.addWidget(&m_linkLabel);
-    m_layout.addWidget(&m_authorsLabel);
-    m_layout.addWidget(&m_thanksLabel);
-    m_layout.addWidget(&m_bottomLabel);
-    m_buttons.setStandardButtons(QDialogButtonBox::Ok);
-    QObject::connect(&m_buttons, SIGNAL(accepted()), this, SLOT(accept()));
-    m_layout.addWidget(&m_buttons);
-    setLayout(&m_layout);
+    QLabel * linkLabel = new QLabel(
+        "<a href=\"https://github.com/nzeemin/ukncbtl-qt\">https://github.com/nzeemin/ukncbtl-qt</a>");
+    linkLabel->setOpenExternalLinks(true);
+
+    QLabel * bottomLabel = new QLabel(
+        tr("Build date:\t%1 %2\nQt version:\t%3").arg(__DATE__).arg(__TIME__).arg(QT_VERSION_STR));
+
+    QDialogButtonBox * buttonBox = new QDialogButtonBox(QDialogButtonBox::Close);
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+
+    QGridLayout * layout = new QGridLayout(this);
+    layout->addWidget(logoLabel, 0, 0, 4, 1, Qt::AlignTop);
+    layout->addWidget(versionLabel, 0, 1);
+    layout->addWidget(authorsLabel, 1, 1);
+    layout->addWidget(linkLabel, 2, 1);
+    layout->addWidget(bottomLabel, 3, 1);
+    layout->addWidget(buttonBox, 4, 1);
+    layout->setColumnMinimumWidth(0, 136);
+    layout->setColumnMinimumWidth(1, 220);
+
+    setLayout(layout);
 }
 
 

@@ -399,7 +399,7 @@ void MainWindow::screenTextToClipboard()
 
 void MainWindow::helpAbout()
 {
-    QAboutDialog dialog(this);
+    QAboutDialog dialog(nullptr);
     dialog.exec();
 }
 

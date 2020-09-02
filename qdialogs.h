@@ -1,12 +1,13 @@
 ﻿#ifndef QDIALOGS_H
 #define QDIALOGS_H
 
-#include <QWidget>
 #include <QDialog>
-#include <QVBoxLayout>
 #include <QDialogButtonBox>
-#include <QLineEdit>
 #include <QLabel>
+#include <QLineEdit>
+#include <QVBoxLayout>
+
+class QWidget;
 
 
 //////////////////////////////////////////////////////////////////////
@@ -41,15 +42,6 @@ class QAboutDialog : public QDialog
 
 public:
     QAboutDialog(QWidget * parent);
-
-private:
-    QVBoxLayout m_layout;
-    QLabel m_topLabel;
-    QLabel m_linkLabel;
-    QLabel m_authorsLabel;
-    QLabel m_thanksLabel;
-    QLabel m_bottomLabel;
-    QDialogButtonBox m_buttons;
 };
 
 
