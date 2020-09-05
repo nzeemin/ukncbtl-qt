@@ -9,6 +9,9 @@
 #include "emubase/Emubase.h"
 
 
+const int MAX_DISASMLINECOUNT = 50;
+
+
 //////////////////////////////////////////////////////////////////////
 
 
@@ -41,13 +44,6 @@ void QDisasmView::setCurrentProc(bool okProc)
     m_okDisasmProcessor = okProc;
     this->updateData();
     updateWindowText();
-}
-
-void QDisasmView::updateData()
-{
-    CProcessor* pDisasmPU = (m_okDisasmProcessor) ? g_pBoard->GetCPU() : g_pBoard->GetPPU();
-    ASSERT(pDisasmPU != nullptr);
-    m_wDisasmBaseAddr = pDisasmPU->GetPC();
 }
 
 void QDisasmView::focusInEvent(QFocusEvent *)
@@ -171,38 +167,6 @@ void QDisasmView::parseSubtitles(QTextStream &stream)
             blockComment = line.trimmed();
             //TODO: Собирать многострочные комментарии над блоком
         }
-    }
-}
-
-void QDisasmView::paintEvent(QPaintEvent * /*event*/)
-{
-    if (g_pBoard == nullptr) return;
-
-    QColor colorBackground = palette().color(QPalette::Base);
-    QPainter painter(this);
-    painter.fillRect(0, 0, this->width(), this->height(), colorBackground);
-
-    QFont font = Common_GetMonospacedFont();
-    painter.setFont(font);
-    QFontMetrics fontmetrics(font);
-    int cyLine = fontmetrics.height();
-
-    CProcessor* pDisasmPU = (m_okDisasmProcessor) ? g_pBoard->GetCPU() : g_pBoard->GetPPU();
-    ASSERT(pDisasmPU != nullptr);
-
-    // Draw disassembly for the current processor
-    quint16 prevPC = (m_okDisasmProcessor) ? g_wEmulatorPrevCpuPC : g_wEmulatorPrevPpuPC;
-    int yFocus = drawDisassemble(painter, pDisasmPU, m_wDisasmBaseAddr, prevPC);
-
-    // Draw focus rect
-    if (hasFocus())
-    {
-        QStyleOptionFocusRect option;
-        option.initFrom(this);
-        option.state |= QStyle::State_KeyboardFocusChange;
-        option.backgroundColor = QColor(Qt::gray);
-        option.rect = QRect(0, yFocus - cyLine + fontmetrics.descent(), this->width(), cyLine);
-        style()->drawPrimitive(QStyle::PE_FrameFocusRect, &option, &painter, this);
     }
 }
 
@@ -646,49 +610,21 @@ int QDisasmView::getInstructionHint(const quint16 *memory, const CProcessor *pPr
     return result;
 }
 
-void QDisasmView::drawBreakpoint(QPainter& painter, int x, int y, int size)
+void QDisasmView::updateData()
 {
-    QColor colorBreakpoint = qRgb(192, 0, 0);
-    painter.setBrush(colorBreakpoint);
-    painter.setPen(colorBreakpoint);
-    painter.drawEllipse(x, y, size, -size);
-    painter.setPen(palette().color(QPalette::Text));
-    painter.setBrush(Qt::NoBrush);
-}
+    CProcessor* pProc = (m_okDisasmProcessor) ? g_pBoard->GetCPU() : g_pBoard->GetPPU();
+    ASSERT(pProc != nullptr);
+    m_wDisasmBaseAddr = pProc->GetPC();
 
-int QDisasmView::drawDisassemble(QPainter &painter, CProcessor *pProc, quint16 base, quint16 previous)
-{
-    int result = -1;
-
-    QFontMetrics fontmetrics(painter.font());
-    int cxChar = fontmetrics.averageCharWidth();
-    int cyLine = fontmetrics.lineSpacing();
-    QColor colorText = palette().color(QPalette::Text);
-    QColor colorChanged = Common_GetColorShifted(palette(), COLOR_VALUECHANGED);
-    QColor colorPrev = Common_GetColorShifted(palette(), COLOR_PREVIOUS);
-    QColor colorHint = Common_GetColorShifted(palette(), COLOR_HINT);
-    QColor colorJumpHint = Common_GetColorShifted(palette(), COLOR_JUMPHINT);
-    QColor colorJump = Common_GetColorShifted(palette(), COLOR_JUMP);
-    QColor colorJumpYes = Common_GetColorShifted(palette(), COLOR_JUMPYES);
-    QColor colorJumpNo = Common_GetColorShifted(palette(), COLOR_JUMPNO);
-    QColor colorSubtitle = Common_GetColorShifted(palette(), COLOR_SUBTITLE);
-    QColor colorValue = Common_GetColorShifted(palette(), COLOR_VALUE);
-    QColor colorValueRom = Common_GetColorShifted(palette(), COLOR_VALUEROM);
+    m_DisasmLineItems.clear();
 
     CMemoryController* pMemCtl = pProc->GetMemoryController();
     quint16 proccurrent = pProc->GetPC();
-    quint16 current = base;
+    quint16 current = m_wDisasmBaseAddr;
+    quint16 previous = (m_okDisasmProcessor) ? g_wEmulatorPrevCpuPC : g_wEmulatorPrevPpuPC;
 
-    // Draw current line background
-    if (m_SubtitleItems.isEmpty())  //NOTE: Subtitles can move lines down
-    {
-        QColor colorCurrent = palette().color(QPalette::Window);
-        int yCurrent = (proccurrent - (current - 5)) * cyLine + fontmetrics.descent();
-        painter.fillRect(0, yCurrent, this->width(), cyLine, colorCurrent);
-    }
-
-    // Читаем из памяти процессора в буфер
-    const int nWindowSize = 30; //this->height() / cyLine;
+    // Read from the processor memory to the buffer
+    const int nWindowSize = 30;
     quint16 memory[nWindowSize + 2];
     int addrtype[nWindowSize + 2];
     for (int idx = 0; idx < nWindowSize; idx++)
@@ -702,145 +638,94 @@ int QDisasmView::drawDisassemble(QPainter &painter, CProcessor *pProc, quint16 b
     if ((previous >= address) && previous < current)
         disasmfrom = previous;
 
+    // Prepare the list of lines in m_DisasmLineItems
+    int lineindex = 0;
     int length = 0;
-    quint16 wNextBaseAddr = 0;
-    int y = cyLine;
-    for (int index = 0; index < nWindowSize; index++)  // Рисуем строки
+    for (int index = 0; index < nWindowSize; index++)  // Preparing lines
     {
-        if (!m_SubtitleItems.isEmpty())  // Subtitles - комментарий к блоку
-        {
-            const DisasmSubtitleItem * pSubItem = findSubtitle(address, SUBTYPE_BLOCKCOMMENT);
-            if (pSubItem != nullptr && !pSubItem->comment.isEmpty())
-            {
-                painter.setPen(colorSubtitle);
-                painter.drawText(21 * cxChar, y, pSubItem->comment);
-                painter.setPen(colorText);
-
-                y += cyLine;
-            }
-        }
-
-        if (Emulator_IsBreakpoint(m_okDisasmProcessor, address))  // Breakpoint
-        {
-            drawBreakpoint(painter, cxChar / 2, y, cxChar);
-        }
-
-        DrawOctalValue(painter, 5 * cxChar, y, address);  // Address
-        // Value at the address
-        quint16 value = memory[index];
-        int memorytype = addrtype[index];
-        painter.setPen((memorytype == ADDRTYPE_ROM) ? colorValue : colorValueRom);
-        DrawOctalValue(painter, 13 * cxChar, y, value);
-        painter.setPen(colorText);
-
-        // Current position
-        if (address == current)
-        {
-            painter.drawText(2 * cxChar, y, "  >");
-            result = y;  // Remember line for the focus rect
-        }
-        if (address == proccurrent)
-        {
-            bool okPCchanged = proccurrent != previous;
-            if (okPCchanged) painter.setPen(colorChanged);
-            painter.drawText(2 * cxChar, y, "PC");
-            painter.setPen(colorText);
-            painter.drawText(2 * cxChar, y, "  >");
-        }
-        else if (address == previous)
-        {
-            painter.setPen(colorPrev);
-            painter.drawText(2 * cxChar, y, "  >");
-        }
+        DisasmLineItem lineitem;
+        memset(&lineitem, 0, sizeof(lineitem));
+        lineitem.address = address;
+        lineitem.value = memory[index];
+        lineitem.addrtype = addrtype[index];
 
         bool okData = false;
-        if (!m_SubtitleItems.isEmpty())  // Show subtitle
+        if (!m_SubtitleItems.isEmpty())
         {
-            const DisasmSubtitleItem* pSubItem = findSubtitle(address, SUBTYPE_COMMENT | SUBTYPE_DATA);
-            if (pSubItem != nullptr && (pSubItem->type & SUBTYPE_DATA) != 0)
-                okData = true;
-            if (pSubItem != nullptr && (pSubItem->type & SUBTYPE_COMMENT) != 0 && !pSubItem->comment.isEmpty())
+            // Subtitles - find a comment for a block
+            const DisasmSubtitleItem* pSubItem = findSubtitle(address, SUBTYPE_BLOCKCOMMENT);
+            if (pSubItem != nullptr && !pSubItem->comment.isEmpty())
             {
-                painter.setPen(colorSubtitle);
-                painter.drawText(52 * cxChar, y, pSubItem->comment);
-                painter.setPen(colorText);
+                lineitem.type = LINETYPE_SUBTITLE;
+                lineitem.pSubItem = pSubItem;
+                // Opening next line
+                lineindex++;
+                if (lineindex >= MAX_DISASMLINECOUNT)
+                    break;
+                m_DisasmLineItems.append(lineitem);
+                lineitem.address = address;
+                lineitem.value = memory[index];
+                lineitem.addrtype = addrtype[index];
+            }
 
+            // Subtitles - find a comment for an instruction or data
+            pSubItem = findSubtitle(address, SUBTYPE_COMMENT | SUBTYPE_DATA);
+            if (pSubItem != nullptr && (pSubItem->type & SUBTYPE_DATA) != 0)
+            {
+                okData = true;
+                lineitem.type |= LINETYPE_DATA;
+            }
+            if (pSubItem != nullptr && (pSubItem->type & SUBTYPE_COMMENT) != 0 && pSubItem->comment != nullptr)
+            {
+                lineitem.type |= LINETYPE_SUBTITLE;
+                lineitem.pSubItem = pSubItem;
                 // Строку с субтитром мы можем использовать как опорную для дизассемблера
                 if (disasmfrom > address)
                     disasmfrom = address;
             }
         }
 
+        if ((lineitem.type & LINETYPE_DATA) == 0)
+            lineitem.type |= LINETYPE_INSTR;  // if it's not a data then an instruction
+
         if (address >= disasmfrom && length == 0)
         {
-            char strInstr[8];
-            char strArg[32];
-            if (okData)  // По этому адресу лежат данные -- нет смысла дизассемблировать
+            if (okData)  // We have non-instruction on the address -- no need to disassemble
             {
-                strcpy(strInstr, "data");
-                PrintOctalValue(strArg, *(memory + index));
                 length = 1;
             }
             else
             {
-                length = DisassembleInstruction(memory + index, address, strInstr, strArg);
+                lineitem.type |= LINETYPE_INSTR;
+                length = DisassembleInstruction(memory + index, address, lineitem.strInstr, lineitem.strArg);
 
                 if (m_SubtitleItems.isEmpty())  //NOTE: Subtitles can move lines down
                 {
-                    int delta;
-                    bool isjump = checkForJump(memory + index, &delta);
-                    if (isjump && abs(delta) < 40)
-                        drawJump(painter, y, delta, (30 + strlen(strArg)) * cxChar, cyLine, colorJump);
-
-                    if (address == proccurrent)
+                    if (checkForJump(memory + index, &lineitem.jumpdelta))
                     {
-                        // For current instruction, draw "Instruction Hint"
-                        QString strHint, strHint2;
-                        bool jumppredict = getJumpConditionHint(memory + index, pProc, pMemCtl, strHint);
-                        if (!strHint.isEmpty())  // If we have the hint
-                        {
-                            painter.setPen(colorJumpHint);
-                            painter.drawText(48 * cxChar, y, strHint);
-                        }
-                        else
-                        {
-                            int hint = getInstructionHint(memory + index, pProc, pMemCtl, strHint, strHint2);
-                            if (hint > 0)
-                            {
-                                painter.setPen(colorHint);
-                                painter.drawText(52 * cxChar, y, strHint);
-                                if (!strHint2.isEmpty())
-                                    painter.drawText(52 * cxChar, y + cyLine, strHint2);
-                                painter.setPen(colorText);
-                            }
-                        }
+                        lineitem.type |= LINETYPE_JUMP;
+                    }
 
-                        if (isjump && abs(delta) < 40)
+                    if (address == proccurrent)  // For current instruction, prepare the instruction hints
+                    {
+                        m_okDisasmJumpPredict = getJumpConditionHint(memory + index, pProc, pMemCtl, m_strDisasmHint);
+                        if (m_strDisasmHint.isEmpty())  // we don't have the jump hint
                         {
-                            QColor jumpcolor = jumppredict ? colorJumpYes : colorJumpNo;
-                            drawJump(painter, y, delta, (30 + strlen(strArg)) * cxChar, cyLine, jumpcolor);
+                            getInstructionHint(memory + index, pProc, pMemCtl, m_strDisasmHint, m_strDisasmHint2);
                         }
                     }
                 }
             }
-            painter.setPen(colorText);
-            if (index + length <= nWindowSize)
-            {
-                painter.drawText(21 * cxChar, y, strInstr);
-                painter.drawText(29 * cxChar, y, strArg);
-            }
-            if (wNextBaseAddr == 0)
-                wNextBaseAddr = address + length * 2;
         }
+
+        m_DisasmLineItems.append(lineitem);
         if (length > 0) length--;
 
         address += 2;
-        y += cyLine;
+        lineindex++;
+        if (lineindex >= MAX_DISASMLINECOUNT)
+            break;
     }
-
-    m_wDisasmNextBaseAddr = wNextBaseAddr;
-
-    return result;
 }
 
 void QDisasmView::drawJump(QPainter &painter, int yFrom, int delta, int x, int cyLine, QColor color)
@@ -862,6 +747,182 @@ void QDisasmView::drawJump(QPainter &painter, int yFrom, int delta, int x, int c
 
     painter.setPen(color);
     painter.drawPath(path);
+}
+
+void QDisasmView::paintEvent(QPaintEvent * /*event*/)
+{
+    if (g_pBoard == nullptr) return;
+
+    QColor colorBackground = palette().color(QPalette::Base);
+    QPainter painter(this);
+    painter.fillRect(0, 0, this->width(), this->height(), colorBackground);
+
+    QFont font = Common_GetMonospacedFont();
+    painter.setFont(font);
+    QFontMetrics fontmetrics(font);
+    int cyLine = fontmetrics.height();
+
+    CProcessor* pDisasmPU = (m_okDisasmProcessor) ? g_pBoard->GetCPU() : g_pBoard->GetPPU();
+    ASSERT(pDisasmPU != nullptr);
+
+    // Draw disassembly for the current processor
+    quint16 prevPC = (m_okDisasmProcessor) ? g_wEmulatorPrevCpuPC : g_wEmulatorPrevPpuPC;
+    int yFocus = drawDisassemble(painter, pDisasmPU, m_wDisasmBaseAddr, prevPC);
+
+    // Draw focus rect
+    if (hasFocus())
+    {
+        QStyleOptionFocusRect option;
+        option.initFrom(this);
+        option.state |= QStyle::State_KeyboardFocusChange;
+        option.backgroundColor = QColor(Qt::gray);
+        option.rect = QRect(0, yFocus - cyLine + fontmetrics.descent(), this->width(), cyLine);
+        style()->drawPrimitive(QStyle::PE_FrameFocusRect, &option, &painter, this);
+    }
+}
+
+void QDisasmView::drawBreakpoint(QPainter& painter, int x, int y, int size)
+{
+    QColor colorBreakpoint = qRgb(192, 0, 0);
+    painter.setBrush(colorBreakpoint);
+    painter.setPen(colorBreakpoint);
+    painter.drawEllipse(x, y, size, -size);
+    painter.setPen(palette().color(QPalette::Text));
+    painter.setBrush(Qt::NoBrush);
+}
+
+int QDisasmView::drawDisassemble(QPainter &painter, CProcessor *pProc, quint16 current, quint16 previous)
+{
+    int result = -1;
+
+    QFontMetrics fontmetrics(painter.font());
+    int cxChar = fontmetrics.averageCharWidth();
+    int cyLine = fontmetrics.lineSpacing();
+    QColor colorText = palette().color(QPalette::Text);
+    QColor colorPrev = Common_GetColorShifted(palette(), COLOR_PREVIOUS);
+    QColor colorChanged = Common_GetColorShifted(palette(), COLOR_VALUECHANGED);
+    QColor colorValue = Common_GetColorShifted(palette(), COLOR_VALUE);
+    QColor colorValueRom = Common_GetColorShifted(palette(), COLOR_VALUEROM);
+    QColor colorSubtitle = Common_GetColorShifted(palette(), COLOR_SUBTITLE);
+    QColor colorJump = Common_GetColorShifted(palette(), COLOR_JUMP);
+
+    quint16 proccurrent = pProc->GetPC();
+
+    // Draw current line background
+    if (m_SubtitleItems.isEmpty())  //NOTE: Subtitles can move lines down
+    {
+        int yCurrent = (proccurrent - (current - 5)) * cyLine + fontmetrics.descent();
+        QColor colorCurrent = palette().color(QPalette::Window);
+        painter.fillRect(0, yCurrent, this->width(), -cyLine, colorCurrent);
+    }
+
+    int y = 0;
+    for (int lineindex = 0; lineindex < m_DisasmLineItems.count(); lineindex++)  // Draw the lines
+    {
+        DisasmLineItem& lineitem = m_DisasmLineItems[lineindex];
+        if (lineitem.type == LINETYPE_NONE)
+            break;
+        quint16 address = lineitem.address;
+
+        if ((lineitem.type & LINETYPE_SUBTITLE) != 0 && (lineitem.type & (LINETYPE_DATA | LINETYPE_INSTR)) == 0 &&
+            lineitem.pSubItem != nullptr)  // Subtitles - comment for a block
+        {
+            const DisasmSubtitleItem * pSubItem = lineitem.pSubItem;
+
+            painter.setPen(colorSubtitle);
+            painter.drawText(21 * cxChar, y, pSubItem->comment);
+            painter.setPen(colorText);
+
+            y += cyLine;
+            continue;
+        }
+
+        if (Emulator_IsBreakpoint(m_okDisasmProcessor, address))  // Breakpoint
+        {
+            drawBreakpoint(painter, cxChar / 2, y, cxChar);
+        }
+
+        painter.setPen(colorText);
+        DrawOctalValue(painter, 5 * cxChar, y, address);  // Address
+        // Value at the address
+        quint16 value = lineitem.value;
+        int memorytype = lineitem.addrtype;
+        painter.setPen((memorytype == ADDRTYPE_ROM) ? colorValueRom : colorValue);
+        DrawOctalValue(painter, 13 * cxChar, y, value);
+        painter.setPen(colorText);
+
+        // Current position
+        if (address == current)
+        {
+            //painter.drawText(2 * cxChar, y, "  >");
+            result = y;  // Remember line for the focus rect
+        }
+        if (address == proccurrent)
+        {
+            bool okPCchanged = proccurrent != previous;
+            if (okPCchanged) painter.setPen(colorChanged);
+            painter.drawText(2 * cxChar, y, "PC>");
+            painter.setPen(colorText);
+            painter.drawText(2 * cxChar, y, "  >");
+        }
+        else if (address == previous)
+        {
+            painter.setPen(colorPrev);
+            painter.drawText(2 * cxChar, y, " > ");
+        }
+
+        int posAfterArgs = 30;
+        if ((lineitem.type & (LINETYPE_DATA | LINETYPE_INSTR)) != 0)
+        {
+            painter.setPen(colorText);
+            painter.drawText(21 * cxChar, y, lineitem.strInstr);
+            painter.drawText(29 * cxChar, y, lineitem.strArg);
+            posAfterArgs += strlen(lineitem.strArg);
+        }
+
+        if ((lineitem.type & LINETYPE_SUBTITLE) != 0 && (lineitem.type & (LINETYPE_DATA | LINETYPE_INSTR)) != 0 &&
+            lineitem.pSubItem != nullptr)  // Show subtitle comment for instruction or data
+        {
+            const DisasmSubtitleItem * pSubItem = lineitem.pSubItem;
+            if (!pSubItem->comment.isEmpty())
+            {
+                painter.setPen(colorSubtitle);
+                painter.drawText(52 * cxChar, y, pSubItem->comment);
+                painter.setPen(colorText);
+            }
+        }
+
+        if (m_SubtitleItems.isEmpty())  // We don't show jumps and hints with subtitles
+        {
+            bool isjump = (lineitem.type & LINETYPE_JUMP) != 0;
+
+            if (isjump)
+            {
+                int delta = lineitem.jumpdelta;
+                if (abs(delta) < 40)
+                {
+                    QColor jumpcolor = colorJump;
+                    if (address == proccurrent)
+                        jumpcolor = Common_GetColorShifted(palette(), m_okDisasmJumpPredict ? COLOR_JUMPYES : COLOR_JUMPNO);
+                    drawJump(painter, y, delta, posAfterArgs * cxChar, cyLine, jumpcolor);
+                }
+            }
+
+            if (address == proccurrent && !m_strDisasmHint.isEmpty())  // For current instruction, draw "Instruction Hints"
+            {
+                QColor hintcolor = Common_GetColorShifted(palette(), isjump ? COLOR_JUMPHINT : COLOR_HINT);
+                painter.setPen(hintcolor);
+                painter.drawText(52 * cxChar, y, m_strDisasmHint);
+                if (!m_strDisasmHint2.isEmpty())
+                    painter.drawText(52 * cxChar, y + cyLine, m_strDisasmHint2);
+                painter.setPen(colorText);
+            }
+        }
+
+        y += cyLine;
+    }
+
+    return result;
 }
 
 
