@@ -65,6 +65,7 @@ protected:
     void contextMenuEvent(QContextMenuEvent *event);
     void focusInEvent(QFocusEvent *);
     void focusOutEvent(QFocusEvent *);
+    void mousePressEvent(QMouseEvent *);
 
     void parseSubtitles(QTextStream& stream);
     void addSubtitle(quint16 addr, DisasmSubtitleType type, const QString& comment);
@@ -78,6 +79,8 @@ private:
     QString m_strDisasmHint;
     QString m_strDisasmHint2;
     QVector<DisasmLineItem> m_DisasmLineItems;
+    int m_cxDisasmBreakpointZone;
+    int m_cyDisasmLine;
 
     const DisasmSubtitleItem * findSubtitle(quint16 address, quint16 typemask);
 

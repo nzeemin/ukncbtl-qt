@@ -20,6 +20,8 @@ QDisasmView::QDisasmView()
     m_okDisasmProcessor = Settings_GetDebugCpuPpu();
     m_wDisasmBaseAddr = 0;
     m_wDisasmNextBaseAddr = 0;
+    m_cxDisasmBreakpointZone = 16;
+    m_cyDisasmLine = 10;
 
     QFont font = Common_GetMonospacedFont();
     QFontMetrics fontmetrics(font);
@@ -61,6 +63,40 @@ void QDisasmView::contextMenuEvent(QContextMenuEvent *event)
     menu.addAction(m_okDisasmProcessor ? "Switch to PPU" : "Switch to CPU", this, SLOT(switchCpuPpu()));
     menu.addAction(m_SubtitleItems.isEmpty() ? "Show Subtitles..." : "Hide Subtitles", this, SLOT(showHideSubtitles()));
     menu.exec(event->globalPos());
+}
+
+void QDisasmView::mousePressEvent(QMouseEvent * event)
+{
+    if (event->button() == Qt::LeftButton)
+    {
+        if (event->x() < m_cxDisasmBreakpointZone)
+        {
+            int lineindex = event->y() / m_cyDisasmLine;
+            if (lineindex >= 0 && lineindex < m_DisasmLineItems.count())
+            {
+                DisasmLineItem& lineitem = m_DisasmLineItems[lineindex];
+                if (lineitem.type != LINETYPE_NONE)
+                {
+                    quint16 address = lineitem.address;
+                    if (!Emulator_IsBreakpoint(m_okDisasmProcessor, address))
+                    {
+                        bool result = m_okDisasmProcessor ? Emulator_AddCPUBreakpoint(address) : Emulator_AddPPUBreakpoint(address);
+                        if (!result)
+                            AlertWarning(QString("Failed to add breakpoint at %1.").arg(address, 6, 8, QLatin1Char('0')));
+                    }
+                    else
+                    {
+                        bool result = m_okDisasmProcessor ? Emulator_RemoveCPUBreakpoint(address) : Emulator_RemovePPUBreakpoint(address);
+                        if (!result)
+                            AlertWarning(QString("Failed to remove breakpoint at %1.").arg(address, 6, 8, QLatin1Char('0')));
+                    }
+                    repaint();
+                }
+            }
+        }
+    }
+
+    QWidget::mousePressEvent(event);
 }
 
 void QDisasmView::switchCpuPpu()
@@ -610,6 +646,7 @@ int QDisasmView::getInstructionHint(const quint16 *memory, const CProcessor *pPr
     return result;
 }
 
+// Update after Run or Step
 void QDisasmView::updateData()
 {
     CProcessor* pProc = (m_okDisasmProcessor) ? g_pBoard->GetCPU() : g_pBoard->GetPPU();
@@ -798,6 +835,8 @@ int QDisasmView::drawDisassemble(QPainter &painter, CProcessor *pProc, quint16 c
     QFontMetrics fontmetrics(painter.font());
     int cxChar = fontmetrics.averageCharWidth();
     int cyLine = fontmetrics.lineSpacing();
+    m_cxDisasmBreakpointZone = cxChar * 2;
+    m_cyDisasmLine = cyLine;
     QColor colorText = palette().color(QPalette::Text);
     QColor colorPrev = Common_GetColorShifted(palette(), COLOR_PREVIOUS);
     QColor colorChanged = Common_GetColorShifted(palette(), COLOR_VALUECHANGED);
@@ -813,10 +852,10 @@ int QDisasmView::drawDisassemble(QPainter &painter, CProcessor *pProc, quint16 c
     {
         int yCurrent = (proccurrent - (current - 5)) * cyLine + fontmetrics.descent();
         QColor colorCurrent = palette().color(QPalette::Window);
-        painter.fillRect(0, yCurrent, this->width(), -cyLine, colorCurrent);
+        painter.fillRect(0, yCurrent, this->width(), cyLine, colorCurrent);
     }
 
-    int y = 0;
+    int y = cyLine;
     for (int lineindex = 0; lineindex < m_DisasmLineItems.count(); lineindex++)  // Draw the lines
     {
         DisasmLineItem& lineitem = m_DisasmLineItems[lineindex];
