@@ -145,10 +145,13 @@ void QDebugView::paintEvent(QPaintEvent * /*event*/)
     CMemoryController* pDebugMemCtl = pDebugPU->GetMemoryController();
     drawPorts(painter, m_okDebugProcessor, pDebugMemCtl, g_pBoard, 30 + 54 * cxChar, 1 * cyLine);
 
+    bool okBreakpoints = drawBreakpoints(painter, 30 + 70 * cxChar, 1 * cyLine);
+
+    int xMemoryMap = 30 + (70 + (okBreakpoints ? 10 : 0)) * cxChar;
     if (m_okDebugProcessor)
-        drawCPUMemoryMap(painter, 30 + 70 * cxChar, 0 * cyLine, pDebugPU->IsHaltMode());
+        drawCPUMemoryMap(painter, xMemoryMap, 0 * cyLine, pDebugPU->IsHaltMode());
     else
-        drawPPUMemoryMap(painter, 30 + 70 * cxChar, 0 * cyLine, pDebugMemCtl);
+        drawPPUMemoryMap(painter, xMemoryMap, 0 * cyLine, pDebugMemCtl);
 
     // Draw focus rect
     if (hasFocus())
@@ -159,7 +162,7 @@ void QDebugView::paintEvent(QPaintEvent * /*event*/)
         option.backgroundColor = QColor(Qt::gray);
         option.rect = this->rect();
         option.rect.setLeft(option.rect.left() + 30);
-        option.rect.setRight(30 + 92 * cxChar);
+        option.rect.setRight(30 + (92 + (okBreakpoints ? 10 : 0)) * cxChar);
         style()->drawPrimitive(QStyle::PE_FrameFocusRect, &option, &painter, this);
     }
 }
@@ -173,7 +176,7 @@ void QDebugView::drawProcessor(QPainter &painter, const CProcessor *pProc, int x
     QColor colorChanged = Common_GetColorShifted(palette(), COLOR_VALUECHANGED);
 
     painter.setPen(QColor(Qt::gray));
-    painter.drawRect(x - cxChar, y - cyLine / 2, 33 * cxChar, cyLine * 15 + cyLine / 2);
+    painter.drawRect(x - cxChar, y - cyLine / 2, 32 * cxChar, cyLine * 15 + cyLine / 2);
 
     // Registers
     for (int r = 0; r < 8; r++)
@@ -346,6 +349,26 @@ void QDebugView::drawPorts(QPainter &painter, bool okProcessor, CMemoryControlle
         DrawOctalValue(painter, x + 0 * cxChar, y + 15 * cyLine, 0177714);
         DrawOctalValue(painter, x + 7 * cxChar, y + 15 * cyLine, value177714);
     }
+}
+
+bool QDebugView::drawBreakpoints(QPainter &painter, int x, int y)
+{
+    const quint16* pbps = m_okDebugProcessor ? Emulator_GetCPUBreakpointList() : Emulator_GetPPUBreakpointList();
+    if (*pbps == 0177777)
+        return false;
+
+    QFontMetrics fontmetrics(painter.font());
+    int cyLine = fontmetrics.height();
+
+    painter.drawText(x, y, tr("Breakpts:"));
+    y += cyLine;
+    while (*pbps != 0177777)
+    {
+        DrawOctalValue(painter, x, y, *pbps);
+        y += cyLine;
+        pbps++;
+    }
+    return true;
 }
 
 void QDebugView::drawCPUMemoryMap(QPainter &painter, int x, int y, bool okHalt)

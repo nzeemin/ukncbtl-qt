@@ -256,6 +256,11 @@ void MainWindow::UpdateAllViews()
     UpdateMenu();
 }
 
+void MainWindow::redrawDebugView()
+{
+    if (m_debug != nullptr)
+        m_debug->repaint();
+}
 void MainWindow::redrawDisasmView()
 {
     if (m_disasm != nullptr)

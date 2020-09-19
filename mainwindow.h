@@ -26,6 +26,7 @@ public:
 public:
     void UpdateMenu();
     void UpdateAllViews();
+    void redrawDebugView();
     void redrawDisasmView();
     void updateWindowText();
     void setCurrentProc(bool okProc);

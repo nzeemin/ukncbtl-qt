@@ -464,6 +464,7 @@ void QConsoleView::execConsoleCommand(const QString &command)
     else if (command == "bc")  // bc - remove all breakpoints
     {
         Emulator_RemoveAllBreakpoints(m_okCurrentProc);
+        Global_RedrawDebugView();
         Global_RedrawDisasmView();
     }
     else if (command.startsWith("bc"))  // bcXXXXXX - remove breakpoint
@@ -476,6 +477,7 @@ void QConsoleView::execConsoleCommand(const QString &command)
             bool result = m_okCurrentProc ? Emulator_RemoveCPUBreakpoint(value) : Emulator_RemovePPUBreakpoint(value);
             if (!result)
                 this->print("  Failed to remove breakpoint.\r\n");
+            Global_RedrawDebugView();
             Global_RedrawDisasmView();
         }
     }
@@ -489,6 +491,7 @@ void QConsoleView::execConsoleCommand(const QString &command)
             bool result = m_okCurrentProc ? Emulator_AddCPUBreakpoint(value) : Emulator_AddPPUBreakpoint(value);
             if (!result)
                 this->print("  Failed to add breakpoint.\r\n");
+            Global_RedrawDebugView();
             Global_RedrawDisasmView();
         }
     }

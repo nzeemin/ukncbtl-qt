@@ -42,6 +42,7 @@ private:
     void drawProcessor(QPainter &painter, const CProcessor *pProc, int x, int y, quint16 *arrR, bool *arrRChanged);
     void drawMemoryForRegister(QPainter &painter, int reg, CProcessor *pProc, int x, int y, quint16 oldValue);
     void drawPorts(QPainter &painter, bool okProcessor, CMemoryController* pMemCtl, CMotherboard* pBoard, int x, int y);
+    bool drawBreakpoints(QPainter &painter, int x, int y);
     void drawCPUMemoryMap(QPainter &painter, int x, int y, bool okHalt);
     void drawPPUMemoryMap(QPainter &painter, int x, int y, const CMemoryController* pMemCtl);
 };
