@@ -61,11 +61,11 @@ public slots:
     void showHideSubtitles();
 
 protected:
-    void paintEvent(QPaintEvent *event);
-    void contextMenuEvent(QContextMenuEvent *event);
-    void focusInEvent(QFocusEvent *);
-    void focusOutEvent(QFocusEvent *);
-    void mousePressEvent(QMouseEvent *);
+    void paintEvent(QPaintEvent *event) override;
+    void contextMenuEvent(QContextMenuEvent *event) override;
+    void focusInEvent(QFocusEvent *) override;
+    void focusOutEvent(QFocusEvent *) override;
+    void mousePressEvent(QMouseEvent *) override;
 
     void parseSubtitles(QTextStream& stream);
     void addSubtitle(quint16 addr, DisasmSubtitleType type, const QString& comment);

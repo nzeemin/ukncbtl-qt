@@ -176,7 +176,7 @@ void QDebugView::drawProcessor(QPainter &painter, const CProcessor *pProc, int x
     QColor colorChanged = Common_GetColorShifted(palette(), COLOR_VALUECHANGED);
 
     painter.setPen(QColor(Qt::gray));
-    painter.drawRect(x - cxChar, y - cyLine / 2, 32 * cxChar, cyLine * 15 + cyLine / 2);
+    painter.drawRect(x - cxChar, y - cyLine / 2, 33 * cxChar, cyLine * 15 + cyLine / 2);
 
     // Registers
     for (int r = 0; r < 8; r++)
