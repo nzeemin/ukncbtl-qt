@@ -57,3 +57,4 @@ DEFINES -= UNICODE _UNICODE
 TRANSLATIONS = ukncbtl_en.ts
 CONFIG += c++11
 QMAKE_CXXFLAGS += -std=c++11
+ICON = images/ukncbtl.icns

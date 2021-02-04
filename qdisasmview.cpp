@@ -917,7 +917,7 @@ int QDisasmView::drawDisassemble(QPainter &painter, CProcessor *pProc, quint16 c
             painter.setPen(colorText);
             painter.drawText(21 * cxChar, y, lineitem.strInstr);
             painter.drawText(29 * cxChar, y, lineitem.strArg);
-            posAfterArgs += strlen(lineitem.strArg);
+            posAfterArgs += (int)strlen(lineitem.strArg);
         }
 
         if ((lineitem.type & LINETYPE_SUBTITLE) != 0 && (lineitem.type & (LINETYPE_DATA | LINETYPE_INSTR)) != 0 &&

@@ -591,13 +591,17 @@ void Emulator_PrepareScreenRGB32(void* pImageBits, const quint32* colors)
                     *pBits++ = valueRGB;
                     *pBits++ = valueRGB;
                     *pBits++ = valueRGB;
+                    /* FALLTHRU */
                 case 4:
                     *pBits++ = valueRGB;
                     *pBits++ = valueRGB;
+                    /* FALLTHRU */
                 case 2:
                     *pBits++ = valueRGB;
+                    /* FALLTHRU */
                 case 1:
                     *pBits++ = valueRGB;
+                    /* FALLTHRU */
                 default:
                     break;
                 }
