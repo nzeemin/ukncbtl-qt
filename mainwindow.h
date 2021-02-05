@@ -56,6 +56,7 @@ public slots:
     void emulatorFrame();
     void emulatorRun();
     void emulatorReset();
+    void emulatorAutostart();
     void emulatorFloppy0();
     void emulatorFloppy1();
     void emulatorFloppy2();
@@ -87,11 +88,13 @@ public slots:
     void consolePrint(const QString&);
 
 protected:
-    void changeEvent(QEvent *e);
+    void showEvent(QShowEvent *);
+    void changeEvent(QEvent *);
     void closeEvent(QCloseEvent *);
 
 private:
     Ui::MainWindow *ui;
+    bool autoStartProcessed;
 
     QEmulatorScreen *m_screen;
     QKeyboardView *m_keyboard;

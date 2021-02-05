@@ -4,6 +4,13 @@
 
 
 //////////////////////////////////////////////////////////////////////
+// Options
+
+bool Option_ShowHelp = false;
+int Option_AutoBoot = 0;
+
+
+//////////////////////////////////////////////////////////////////////
 
 
 void Settings_SetFloppyFilePath(int slot, const QString & sFilePath)
@@ -46,6 +53,16 @@ QString Settings_GetHardFilePath(int slot)
     bufValueName[4] = slot + '0';
     QVariant value = Global_getSettings()->value(bufValueName, "");
     return value.toString();
+}
+
+void Settings_SetAutostart(bool flag)
+{
+    Global_getSettings()->setValue("Autostart", flag);
+}
+bool Settings_GetAutostart()
+{
+    QVariant value = Global_getSettings()->value("Autostart", false);
+    return value.toBool();
 }
 
 void Settings_SetSound(bool flag)

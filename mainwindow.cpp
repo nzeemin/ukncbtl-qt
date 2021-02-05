@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QSettings>
+#include <QTimer>
 #include <QVBoxLayout>
 #include "main.h"
 #include "mainwindow.h"
@@ -40,6 +41,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionFileExit, SIGNAL(triggered()), this, SLOT(close()));
     QObject::connect(ui->actionEmulatorRun, SIGNAL(triggered()), this, SLOT(emulatorRun()));
     QObject::connect(ui->actionEmulatorReset, SIGNAL(triggered()), this, SLOT(emulatorReset()));
+    QObject::connect(ui->actionactionEmulatorAutostart, SIGNAL(triggered()), this, SLOT(emulatorAutostart()));
     QObject::connect(ui->actionDrivesFloppy0, SIGNAL(triggered()), this, SLOT(emulatorFloppy0()));
     QObject::connect(ui->actionDrivesFloppy1, SIGNAL(triggered()), this, SLOT(emulatorFloppy1()));
     QObject::connect(ui->actionDrivesFloppy2, SIGNAL(triggered()), this, SLOT(emulatorFloppy2()));
@@ -115,6 +117,8 @@ MainWindow::MainWindow(QWidget *parent) :
     statusBar()->addPermanentWidget(m_statusLabelUptime, 150);
 
     this->setFocusProxy(m_screen);
+
+    autoStartProcessed = false;
 }
 
 MainWindow::~MainWindow()
@@ -133,6 +137,22 @@ MainWindow::~MainWindow()
     delete m_statusLabelInfo;
     delete m_statusLabelFrames;
     delete m_statusLabelUptime;
+}
+
+void MainWindow::showEvent(QShowEvent *e)
+{
+    QMainWindow::showEvent(e);
+
+    // Process Autostart/Autoboot on first show event
+    if (!autoStartProcessed)
+    {
+        if (Settings_GetAutostart() || Option_AutoBoot > 0)
+        {
+            QTimer::singleShot(0, this, SLOT(emulatorRun()));
+        }
+
+        autoStartProcessed = true;
+    }
 }
 
 void MainWindow::changeEvent(QEvent *e)
@@ -193,6 +213,7 @@ void MainWindow::restoreSettings()
 void MainWindow::UpdateMenu()
 {
     ui->actionEmulatorRun->setChecked(g_okEmulatorRunning);
+    ui->actionactionEmulatorAutostart->setChecked(Settings_GetAutostart());
     ui->actionViewRgbScreen->setChecked(m_screen->mode() == RGBScreen);
     ui->actionViewGrbScreen->setChecked(m_screen->mode() == GRBScreen);
     ui->actionViewGrayscaleScreen->setChecked(m_screen->mode() == GrayScreen);
@@ -523,6 +544,7 @@ void MainWindow::emulatorRun()
     else
         Emulator_Start();
     updateWindowText();
+    UpdateMenu();
 }
 
 void MainWindow::emulatorReset()
@@ -530,6 +552,12 @@ void MainWindow::emulatorReset()
     Emulator_Reset();
 
     m_screen->repaint();
+}
+
+void MainWindow::emulatorAutostart()
+{
+    Settings_SetAutostart(!Settings_GetAutostart());
+    UpdateMenu();
 }
 
 void MainWindow::soundEnabled()

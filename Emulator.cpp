@@ -47,6 +47,12 @@ int m_EmulatorKeyQueueTop = 0;
 int m_EmulatorKeyQueueBottom = 0;
 int m_EmulatorKeyQueueCount = 0;
 
+// Digit keys scan codes uset for AutoBoot feature
+const quint8 m_arrDigitKeyScans[] =
+{
+    0176, 0030, 0031, 0032, 0013, 0034, 0035, 0016, 0017, 0177  // 0, 1, ... 9
+};
+
 
 void CALLBACK Emulator_FeedDAC(unsigned short l, unsigned short r);
 
@@ -386,6 +392,23 @@ bool Emulator_SystemFrame()
         m_nUptimeFrameCount = 0;
 
         Global_showUptime(m_dwEmulatorUptime);
+    }
+
+    // Auto-boot option processing: select boot menu item and press Enter
+    if (Option_AutoBoot > 0)
+    {
+        quint8 digitKeyScan = m_arrDigitKeyScans[Option_AutoBoot];
+        if (m_dwEmulatorUptime == 2 && m_nUptimeFrameCount == 6)
+            Emulator_KeyEvent(digitKeyScan, true);  // Press the digit key
+        else if (m_dwEmulatorUptime == 2 && m_nUptimeFrameCount == 10)
+            Emulator_KeyEvent(digitKeyScan, false);  // Release the digit key
+        else if (m_dwEmulatorUptime == 2 && m_nUptimeFrameCount == 16)
+            Emulator_KeyEvent(0153, true);  // Press "Enter"
+        else if (m_dwEmulatorUptime == 2 && m_nUptimeFrameCount == 20)
+        {
+            Emulator_KeyEvent(0153, false);  // Release "Enter"
+            Option_AutoBoot = 0;  // All done
+        }
     }
 
     return true;

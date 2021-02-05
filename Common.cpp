@@ -32,6 +32,12 @@ bool AssertFailedLine(const char * lpszFileName, int nLine)
     return false;
 }
 
+void AlertInfo(const QString &sMessage)
+{
+    QMessageBox::information(nullptr, QT_TRANSLATE_NOOP("Common", "UKNC Back to Life"),
+            sMessage, QMessageBox::Ok);
+}
+
 void AlertWarning(const QString &sMessage)
 {
     QMessageBox::warning(nullptr, QT_TRANSLATE_NOOP("Common", "UKNC Back to Life"),

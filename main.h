@@ -32,6 +32,8 @@ void Settings_SetCartridgeFilePath(int slot, const QString &sFilePath);
 QString Settings_GetCartridgeFilePath(int slot);
 void Settings_SetHardFilePath(int slot, const QString &sFilePath);
 QString Settings_GetHardFilePath(int slot);
+void Settings_SetAutostart(bool flag);
+bool Settings_GetAutostart();
 void Settings_SetSound(bool flag);
 bool Settings_GetSound();
 bool Settings_GetDebugCpuPpu();
@@ -42,6 +44,13 @@ void Settings_SetDebugMemoryAddress(quint16 address);
 quint16 Settings_GetDebugMemoryAddress();
 bool Settings_GetDebugMemoryByte();
 void Settings_SetDebugMemoryByte(bool flag);
+
+
+//////////////////////////////////////////////////////////////////////
+// Options
+
+extern bool Option_ShowHelp;
+extern int Option_AutoBoot;
 
 
 //////////////////////////////////////////////////////////////////////
