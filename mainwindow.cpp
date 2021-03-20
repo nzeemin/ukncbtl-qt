@@ -54,6 +54,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionDebugDebugView, SIGNAL(triggered()), this, SLOT(debugDebugView()));
     QObject::connect(ui->actionDebugDisasmView, SIGNAL(triggered()), this, SLOT(debugDisasmView()));
     QObject::connect(ui->actionDebugMemoryView, SIGNAL(triggered()), this, SLOT(debugMemoryView()));
+    QObject::connect(ui->actionDebugCpuPpu, SIGNAL(triggered()), this, SLOT(debugCpuPpu()));
     QObject::connect(ui->actionDebugStepInto, SIGNAL(triggered()), this, SLOT(debugStepInto()));
     QObject::connect(ui->actionDebugStepOver, SIGNAL(triggered()), this, SLOT(debugStepOver()));
     QObject::connect(ui->actionHelpAbout, SIGNAL(triggered()), this, SLOT(helpAbout()));
@@ -746,6 +747,12 @@ void MainWindow::debugMemoryView()
 {
     m_dockMemory->setVisible(!m_dockMemory->isVisible());
     UpdateMenu();
+}
+
+void MainWindow::debugCpuPpu()
+{
+    if (!g_okEmulatorRunning)
+        m_debug->switchCpuPpu();
 }
 
 void MainWindow::debugStepInto()

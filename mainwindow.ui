@@ -20,7 +20,7 @@
      <x>0</x>
      <y>0</y>
      <width>662</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -75,6 +75,7 @@
      <string>Debug</string>
     </property>
     <addaction name="actionDebugConsoleView"/>
+    <addaction name="actionDebugCpuPpu"/>
     <addaction name="separator"/>
     <addaction name="actionDebugDebugView"/>
     <addaction name="actionDebugDisasmView"/>
@@ -531,6 +532,11 @@
    </property>
    <property name="text">
     <string>Autostart</string>
+   </property>
+  </action>
+  <action name="actionDebugCpuPpu">
+   <property name="text">
+    <string>Switch CPU / PPU</string>
    </property>
   </action>
  </widget>

@@ -61,7 +61,7 @@ void QDisasmView::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu menu(this);
     menu.addAction(m_okDisasmProcessor ? "Switch to PPU" : "Switch to CPU", this, SLOT(switchCpuPpu()));
-    menu.addAction(m_SubtitleItems.isEmpty() ? "Show Subtitles..." : "Hide Subtitles", this, SLOT(showHideSubtitles()));
+    menu.addAction(m_SubtitleItems.isEmpty() ? "Load Subtitles..." : "Unload Subtitles", this, SLOT(showHideSubtitles()));
     menu.exec(event->globalPos());
 }
 

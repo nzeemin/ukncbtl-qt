@@ -40,9 +40,10 @@ public:
 
 protected:
     void createDisplay();
-    void paintEvent(QPaintEvent *event);
-    void keyPressEvent(QKeyEvent *event);
-    void keyReleaseEvent(QKeyEvent *event);
+    void paintEvent(QPaintEvent *event) override;
+    void contextMenuEvent(QContextMenuEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
 
 private:
     QImage* m_image;

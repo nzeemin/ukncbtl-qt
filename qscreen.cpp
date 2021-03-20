@@ -1,6 +1,8 @@
 ﻿#include "stdafx.h"
 #include <QtGui>
+#include <QMenu>
 #include "qscreen.h"
+#include "mainwindow.h"
 #include "Emulator.h"
 #include "emubase/Emubase.h"
 
@@ -382,6 +384,15 @@ void QEmulatorScreen::paintEvent(QPaintEvent * /*event*/)
 
     QPainter painter(this);
     painter.drawImage(0, 0, *m_image);
+}
+
+void QEmulatorScreen::contextMenuEvent(QContextMenuEvent *event)
+{
+    QMenu menu(this);
+    menu.addAction("Screenshot", Global_getMainWindow(), SLOT(saveScreenshot()));
+    menu.addAction("Screenshot to Clipboard", Global_getMainWindow(), SLOT(screenshotToClipboard()));
+    menu.addAction("Screen Text to Clipboard", Global_getMainWindow(), SLOT(screenTextToClipboard()));
+    menu.exec(event->globalPos());
 }
 
 void QEmulatorScreen::keyPressEvent(QKeyEvent *event)
