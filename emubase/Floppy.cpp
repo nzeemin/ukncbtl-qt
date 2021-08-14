@@ -14,6 +14,7 @@ UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
 
 #include "stdafx.h"
 #include <sys/stat.h>
+#include <share.h>
 #include "Emubase.h"
 
 
@@ -181,7 +182,7 @@ void CFloppyController::SetCommand(uint16_t cmd)
 
     // Check if the current drive was changed or not
     uint16_t newdrive = (cmd & 3) ^ 3;
-    if (m_drive != newdrive)
+    if ((cmd & 02000) != 0 && m_drive != newdrive)
     {
         FlushChanges();
 
@@ -257,9 +258,7 @@ void CFloppyController::SetCommand(uint16_t cmd)
 
 uint16_t CFloppyController::GetData(void)
 {
-//#if !defined(PRODUCT)
-//    DebugLogFormat(_T("Floppy READ\t\t%04x\r\n"), m_datareg);  //DEBUG
-//#endif
+    if (m_okTrace) DebugLogFormat(_T("Floppy READ\t\t%04x\r\n"), m_datareg);
 
     m_status &= ~FLOPPY_STATUS_MOREDATA;
     m_writing = m_searchsync = false;
@@ -270,9 +269,7 @@ uint16_t CFloppyController::GetData(void)
 
 void CFloppyController::WriteData(uint16_t data)
 {
-//#if !defined(PRODUCT)
-//	DebugLogFormat(_T("Floppy WRITE\t\t%04x\r\n"), data);  //DEBUG
-//#endif
+//        DebugLogFormat(_T("Floppy WRITE\t\t%04x\r\n"), data);
 
     m_writing = true;  // Switch to write mode if not yet
     m_searchsync = false;
@@ -355,18 +352,16 @@ void CFloppyController::Periodic()
 
             if (m_shiftmarker)
             {
-//#if !defined(PRODUCT)
-//            DebugLogFormat(_T("Floppy WRITING %04x MARKER at %04hx SC %hu\r\n"), m_shiftreg, m_pDrive->dataptr, (m_pDrive->dataptr - 0x5e) / 614 + 1);  //DEBUG
-//#endif
+//            DebugLogFormat(_T("Floppy WRITING %04x MARKER at %04hx SC %hu\r\n"), m_shiftreg, m_pDrive->dataptr, (m_pDrive->dataptr - 0x5e) / 614 + 1);
+
                 m_pDrive->marker[m_pDrive->dataptr / 2] = true;
                 m_shiftmarker = false;
                 m_crccalculus = true;  // Start CRC calculation
             }
             else
             {
-//#if !defined(PRODUCT)
-//            DebugLogFormat(_T("Floppy WRITING %04x\r\n"), m_shiftreg);  //DEBUG
-//#endif
+//            DebugLogFormat(_T("Floppy WRITING %04x\r\n"), m_shiftreg);
+
                 m_pDrive->marker[m_pDrive->dataptr / 2] = false;
             }
 
@@ -396,9 +391,8 @@ void CFloppyController::Periodic()
 void CFloppyController::PrepareTrack()
 {
     FlushChanges();
-#if !defined(PRODUCT)
+
     if (m_okTrace) DebugLogFormat(_T("Floppy PREP  %hu TR %hu SD %hu\r\n"), m_drive, m_track, m_side);
-#endif
 
     //TCHAR buffer[512];
 
@@ -411,8 +405,7 @@ void CFloppyController::PrepareTrack()
     // Track has 10 sectors, 512 bytes each; offset of the file is === ((Track<<1)+SIDE)*5120
     long foffset = ((m_track * 2) + (m_side)) * 5120;
     if (m_pDrive->okNetRT11Image) foffset += 256;  // Skip .RTD image header
-    //wsprintf(buffer,_T("floppy file offset %d  for trk %d side %d\r\n"),foffset,m_track,m_side);
-    //DebugPrint(buffer);
+    //DebugPrintFormat(_T("floppy file offset %d  for trk %d side %d\r\n"), foffset, m_track, m_side);
 
     uint8_t data[5120];
     memset(data, 0, 5120);
@@ -420,7 +413,7 @@ void CFloppyController::PrepareTrack()
     if (m_pDrive->fpFile != nullptr)
     {
         ::fseek(m_pDrive->fpFile, foffset, SEEK_SET);
-        size_t count = ::fread(&data, 1, 5120, m_pDrive->fpFile);
+        size_t count = ::fread(data, 1, 5120, m_pDrive->fpFile);
         //TODO: Check for reading error
     }
 
@@ -446,9 +439,7 @@ void CFloppyController::FlushChanges()
     if (!IsAttached(m_drive)) return;
     if (!m_trackchanged) return;
 
-#if !defined(PRODUCT)
     if (m_okTrace) DebugLogFormat(_T("Floppy FLUSH %hu TR %hu SD %hu\r\n"), m_drive, m_pDrive->datatrack, m_pDrive->dataside);
-#endif
 
     // Decode track data from m_data
     uint8_t data[5120];  memset(data, 0, 5120);
@@ -475,14 +466,12 @@ void CFloppyController::FlushChanges()
 
         // Save data into the file
         ::fseek(m_pDrive->fpFile, foffset, SEEK_SET);
-        ::fwrite(&data, 1, 5120, m_pDrive->fpFile);
+        size_t dwBytesWritten = ::fwrite(data, 1, 5120, m_pDrive->fpFile);
         //TODO: Check for writing error
     }
     else
     {
-#if !defined(PRODUCT)
-        if (m_okTrace) DebugLog(_T("Floppy FLUSH FAILED\r\n"));  //DEBUG
-#endif
+        if (m_okTrace) DebugLog(_T("Floppy FLUSH FAILED\r\n"));
     }
 
     m_trackchanged = false;

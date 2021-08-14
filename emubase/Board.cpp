@@ -188,6 +188,8 @@ CMotherboard::CMotherboard ()
     m_pFirstMemCtl = new CFirstMemoryController();
     m_pSecondMemCtl = new CSecondMemoryController();
     m_pFloppyCtl = new CFloppyController();
+    m_pHardDrives[0] = nullptr;
+    m_pHardDrives[1] = nullptr;
 
     // Connect devices
     m_pCPU->AttachMemoryController(m_pFirstMemCtl);
@@ -202,8 +204,6 @@ CMotherboard::CMotherboard ()
     m_pROM    = static_cast<uint8_t*>(calloc(32768, 1));
     m_pROMCart[0] = nullptr;
     m_pROMCart[1] = nullptr;
-    m_pHardDrives[0] = nullptr;
-    m_pHardDrives[1] = nullptr;
 
     // Prepare bus devices
     m_pCpuDevices = static_cast<CBusDevice**>(calloc(6, sizeof(CBusDevice*)));
@@ -268,8 +268,12 @@ CMotherboard::~CMotherboard ()
 void CMotherboard::SetTrace(uint32_t dwTrace)
 {
     m_dwTrace = dwTrace;
+    if (m_pPPU != nullptr)
+        m_pPPU->SetTrace((dwTrace & TRACE_PPU) != 0);
+    if (m_pCPU != nullptr)
+        m_pCPU->SetTrace((dwTrace & TRACE_CPU) != 0);
     if (m_pFloppyCtl != nullptr)
-        m_pFloppyCtl->SetTrace(dwTrace & TRACE_FLOPPY);
+        m_pFloppyCtl->SetTrace((dwTrace & TRACE_FLOPPY) != 0);
 }
 
 void CMotherboard::Reset ()
@@ -596,7 +600,7 @@ uint16_t CMotherboard::GetTimerState() // Returns timer state
     return res;
 }
 
-void CMotherboard::SetTimerReload(uint16_t val)	 // Sets timer reload value
+void CMotherboard::SetTimerReload(uint16_t val)  // Sets timer reload value
 {
     m_timerreload = val & 07777;
     if ((m_timerflags & 1) == 0)
@@ -1105,7 +1109,7 @@ uint8_t CMotherboard::ChanReadByPPU(uint8_t chan)
     ASSERT(chan < 3);
 
     //if((chan==0)&&(m_chan0disabled))
-    //	return 0;
+    //    return 0;
 
     res = m_chanppurx[chan].data;
     m_chanppurx[chan].ready = 0;
@@ -1604,38 +1608,6 @@ void CMotherboard::SetNetworkCallbacks(NETWORKINCALLBACK incallback, NETWORKOUTC
         //TODO: Set port value to indicate we are ready to translate
     }
 }
-
-
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(PRODUCT)
-
-void TraceInstruction(CProcessor* pProc, CMotherboard* /*pBoard*/)
-{
-    uint16_t address = pProc->GetPC();
-    bool okHaltMode = pProc->IsHaltMode();
-    CMemoryController* pMemCtl = pProc->GetMemoryController();
-
-    uint16_t memory[4];
-    int addrtype = 0;
-    memory[0] = pMemCtl->GetWordView(address + 0 * 2, okHaltMode, true, &addrtype);
-    memory[1] = pMemCtl->GetWordView(address + 1 * 2, okHaltMode, true, &addrtype);
-    memory[2] = pMemCtl->GetWordView(address + 2 * 2, okHaltMode, true, &addrtype);
-    memory[3] = pMemCtl->GetWordView(address + 3 * 2, okHaltMode, true, &addrtype);
-
-    TCHAR bufaddr[7];
-    PrintOctalValue(bufaddr, address);
-
-    TCHAR instr[8];
-    TCHAR args[32];
-    DisassembleInstruction(memory, address, instr, args);
-    TCHAR buffer[64];
-    _sntprintf(buffer, 64, _T("%s\t%s\t%s\r\n"), bufaddr, instr, args);
-
-    DebugLog(buffer);
-}
-
-#endif
 
 
 //////////////////////////////////////////////////////////////////////

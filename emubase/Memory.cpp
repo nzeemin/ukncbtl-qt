@@ -149,7 +149,7 @@ uint16_t CMemoryController::GetWord(uint16_t address, bool okHaltMode, bool okEx
         return m_pBoard->GetROMCartWord(2, offset);
     case ADDRTYPE_DENY:
     case ADDRTYPE_NONE:
-        //TODO: Exception processing
+        m_pProcessor->MemoryError();
         return 0;
     }
 
@@ -186,7 +186,7 @@ uint8_t CMemoryController::GetByte(uint16_t address, bool okHaltMode)
         return m_pBoard->GetROMCartByte(2, offset);
     case ADDRTYPE_DENY:
     case ADDRTYPE_NONE:
-        //TODO: Exception processing
+        m_pProcessor->MemoryError();
         return 0;
     }
 
@@ -224,7 +224,7 @@ void CMemoryController::SetWord(uint16_t address, bool okHaltMode, uint16_t word
         return;
     case ADDRTYPE_DENY:
     case ADDRTYPE_NONE:
-        //TODO: Exception processing
+        m_pProcessor->MemoryError();
         return;
     }
 
@@ -263,7 +263,7 @@ void CMemoryController::SetByte(uint16_t address, bool okHaltMode, uint8_t byte)
         return;
     case ADDRTYPE_DENY:
     case ADDRTYPE_NONE:
-        //TODO: Exception processing
+        m_pProcessor->MemoryError();
         return;
     }
 
@@ -584,7 +584,6 @@ void CFirstMemoryController::SetPortByte(uint16_t address, uint8_t byte)
     default:
         if (!(((m_Port176644 & 0x103) == 0x100) && m_Port176646 == address))
             m_pProcessor->MemoryError();
-//			ASSERT(0);
         break;
     }
 }
@@ -860,40 +859,6 @@ void CSecondMemoryController::UpdateMemoryMap()
 
 int CSecondMemoryController::TranslateAddress(uint16_t address, bool /*okHaltMode*/, bool okExec, uint16_t* pOffset, bool /*okView*/) const
 {
-    //uint8_t addrtype = m_pMapping[address];
-    //switch (addrtype)
-    //{
-    //case ADDRTYPE_ROM:
-    //    *pOffset = address - 0100000;
-    //    return ADDRTYPE_ROM;
-    //case ADDRTYPE_RAM0:
-    //    *pOffset = address;
-    //    return ADDRTYPE_RAM0;
-    //case ADDRTYPE_ROMCART1: case ADDRTYPE_ROMCART2:
-    //    {
-    //        int bank = (m_Port177054 & 6) >> 1;
-    //        *pOffset = address - 0100000 + (((uint16_t)bank - 1) << 13);
-    //        return addrtype;
-    //    }
-    //default:
-    //    if ((addrtype & (128+64)) == ADDRTYPE_IO)
-    //    {
-    //        if (okExec) {  // Execution on this address is denied
-    //            *pOffset = 0;
-    //            return ADDRTYPE_DENY;
-    //        }
-    //        else {
-    //            *pOffset = address;
-    //            return ADDRTYPE_IO;
-    //        }
-    //    }
-    //    else
-    //    {
-    //        *pOffset = 0;
-    //        return ADDRTYPE_NONE;
-    //    }
-    //}
-
     switch ((address >> 13) & 7)
     {
     default:  // case 0..3 - 000000-077777 - PPU RAM
@@ -1121,15 +1086,12 @@ uint16_t CSecondMemoryController::GetPortWord(uint16_t address)
     case 0177130:  // FDD status
     case 0177131:
         value = m_pBoard->GetFloppyState();
-        //PrintOctalValue(oct2, value);
-        //wsprintf(str, _T("FDD STATE R %s, %s\r\n"), oct1, oct2);
-        //DebugLog(str);
+        //DebugLogFormat(_T("FDD STATE R %06o, %06o\r\n"), address, value);
         return value;
     case 0177132: //fdd data
     case 0177133:
         value = m_pBoard->GetFloppyData();
-        //wsprintf(str,_T("FDD DATA  R %s, %04x\r\n"), oct1, value);
-        //DebugLog(str);
+        //DebugLogFormat(_T("FDD DATA  R %06o, %04x\r\n"), address, value);
         return value;
 
         // HDD ports
@@ -1410,8 +1372,7 @@ void CSecondMemoryController::SetPortWord(uint16_t address, uint16_t word)
         break;
     case 0177054:  // Address space control
     case 0177055:
-        //wsprintf(str,_T("W %s, %s\r\n"),oct1,oct);
-        //DebugPrint(str);
+        //DebugPrintFormat(_T("W %s, %s\r\n"), oct1, oct);
         {
             uint16_t oldvalue = m_Port177054;
             m_Port177054 = word & 01777;
@@ -1462,16 +1423,14 @@ void CSecondMemoryController::SetPortWord(uint16_t address, uint16_t word)
     case 0177130:  // FDD status
     case 0177131:
         //ASSERT(word==0);
-        //wsprintf(str,_T("FDD CMD   W %s, %s\r\n"), oct1,oct);
-        //DebugLog(str);
+        //DebugLogFormat(_T("FDD CMD   W %s, %s\r\n"), oct1, oct);
         m_pBoard->SetFloppyState(word);
         break;
     case 0177132:  // FDD data
     case 0177133:
         //ASSERT(word==0);
-        //wsprintf(str,_T("%s: FDD DATA W %s, %s\r\n"),oct2,oct1,oct);
-        //wsprintf(str,_T("FDD DATA  W %04x\r\n"), word);
-        //DebugLog(str);
+        //DebugLogFormat(_T("%s: FDD DATA W %s, %s\r\n"), oct2, oct1, oct);
+        //DebugLogFormat(_T("FDD DATA  W %04x\r\n"), word);
         m_pBoard->SetFloppyData(word);
         break;
 
@@ -1488,9 +1447,7 @@ void CSecondMemoryController::SetPortWord(uint16_t address, uint16_t word)
 
     case 0177704: // fdd params:
     case 0177705:
-        //#if !defined(PRODUCT)
-        //            DebugLogFormat(_T("FDD 177704 W %s, %s, %s\r\n"), oct2, oct1, oct);
-        //#endif
+        //DebugLogFormat(_T("FDD 177704 W %s, %s, %s\r\n"), oct2, oct1, oct);
         break;
 
     case 0177710: //timer status
@@ -1534,7 +1491,6 @@ void CSecondMemoryController::SetPortWord(uint16_t address, uint16_t word)
     default:
         //DebugLogFormat(_T("MemoryError SetPortWord PPU %06o\r\n"), address);
         m_pProcessor->MemoryError();
-        //ASSERT(0);
         break;
     }
 }
