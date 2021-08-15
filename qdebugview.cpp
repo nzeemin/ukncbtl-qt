@@ -48,7 +48,7 @@ QDebugView::QDebugView(QWidget *mainWindow) :
 void QDebugView::updateWindowText()
 {
     CProcessor* pDebugPU = m_okDebugProcessor ? g_pBoard->GetCPU() : g_pBoard->GetPPU();
-    QString buffer = QString(tr("Debug - %1")).arg(pDebugPU->GetName());
+    QString buffer = tr("Debug - %1").arg(pDebugPU->GetName());
     parentWidget()->setWindowTitle(buffer);
 }
 
@@ -107,7 +107,7 @@ void QDebugView::focusOutEvent(QFocusEvent *)
 void QDebugView::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu menu(this);
-    menu.addAction(m_okDebugProcessor ? "Switch to PPU" : "Switch to CPU", this, SLOT(switchCpuPpu()));
+    menu.addAction(m_okDebugProcessor ? tr("Switch to PPU") : tr("Switch to CPU"), this, SLOT(switchCpuPpu()));
     menu.exec(event->globalPos());
 }
 

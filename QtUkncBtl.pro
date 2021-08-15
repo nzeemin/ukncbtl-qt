@@ -54,7 +54,7 @@ QT += script
 QT += testlib 
 QT += multimedia
 DEFINES -= UNICODE _UNICODE
-TRANSLATIONS = ukncbtl_en.ts
+TRANSLATIONS = ukncbtl_en.ts ukncbtl_ru.ts
 CONFIG += c++11
 QMAKE_CXXFLAGS += -std=c++11
 ICON = images/ukncbtl.icns

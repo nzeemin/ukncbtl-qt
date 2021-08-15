@@ -449,7 +449,7 @@ void QConsoleView::execConsoleCommand(const QString &command)
         const quint16* pbps = m_okCurrentProc ? Emulator_GetCPUBreakpointList() : Emulator_GetPPUBreakpointList();
         if (pbps == nullptr || *pbps == 0177777)
         {
-            this->print("  No breakpoints.\r\n");
+            this->print(tr("  No breakpoints.\r\n"));
         }
         else
         {
@@ -490,7 +490,7 @@ void QConsoleView::execConsoleCommand(const QString &command)
         {
             bool result = m_okCurrentProc ? Emulator_AddCPUBreakpoint(value) : Emulator_AddPPUBreakpoint(value);
             if (!result)
-                this->print("  Failed to add breakpoint.\r\n");
+                this->print(tr("  Failed to add breakpoint.\r\n"));
             Global_RedrawDebugView();
             Global_RedrawDisasmView();
         }

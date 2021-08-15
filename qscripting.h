@@ -79,7 +79,6 @@ public slots:
     QScriptValue disassemble(ushort addr);
 
     //TODO: writeWord(addr, value);
-    //TODO: stepInto(); stepOver();
 
 private:
     QScriptEngine* m_engine;
@@ -112,14 +111,24 @@ public slots:
     /// \brief Get emulator uptime, in seconds.
     float getUptime();
 
-    /// \brief Adds CPU breakpoint address for the next run() call.
+    /// \brief Adds CPU breakpoint.
     /// \param address Address of the CPU breakpoint to set.
-    void addCPUBreakpoint(quint16 address);
-    /// \brief Adds PPU breakpoint address for the next run() call.
+    bool addCPUBreakpoint(quint16 address);
+    /// \brief Adds PPU breakpoint.
     /// \param address Address of the PPU breakpoint to set.
-    void addPPUBreakpoint(quint16 address);
+    bool addPPUBreakpoint(quint16 address);
+    /// \brief Removes CPU breakpoint.
+    /// \param address Address of the CPU breakpoint to remove.
+    bool removeCPUBreakpoint(quint16 address);
+    /// \brief Removes PPU breakpoint.
+    /// \param address Address of the PPU breakpoint to remove.
+    bool removePPUBreakpoint(quint16 address);
     /// \brief Check if the emulator stopped on a breakpoint.
     bool isBreakpoint();
+    /// \brief Get list of breakpoint addresses for CPU.
+    QScriptValue getCPUBreakpoints();
+    /// \brief Get list of breakpoint addresses for PPU.
+    QScriptValue getPPUBreakpoints();
 
     /// \brief Save screenshot to PNG file.
     void saveScreenshot(const QString& filename);

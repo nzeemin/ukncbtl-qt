@@ -24,8 +24,8 @@ public:
     ~MainWindow();
 
 public:
-    void UpdateMenu();
-    void UpdateAllViews();
+    void updateMenu();
+    void updateAllViews();
     void redrawDebugView();
     void redrawDisasmView();
     void updateWindowText();

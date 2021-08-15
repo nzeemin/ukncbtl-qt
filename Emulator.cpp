@@ -83,14 +83,14 @@ bool Emulator_Init()
     QFile romFile(":/uknc_rom.bin");
     if (!romFile.open(QIODevice::ReadOnly))
     {
-        AlertWarning(QT_TRANSLATE_NOOP("Emulator", "Failed to load ROM file."));
+        AlertWarning(QT_TRANSLATE_NOOP("Emulator", "Failed to load ROM image file."));
         return false;
     }
     qint64 bytesRead = romFile.read((char*)buffer, 32256);
     romFile.close();
     if (bytesRead != 32256)
     {
-        AlertWarning(QT_TRANSLATE_NOOP("Emulator", "Failed to load ROM file."));
+        AlertWarning(QT_TRANSLATE_NOOP("Emulator", "Failed to load ROM image file."));
         return false;
     }
 

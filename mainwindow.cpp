@@ -211,7 +211,7 @@ void MainWindow::restoreSettings()
     m_memory->updateWindowText();
 }
 
-void MainWindow::UpdateMenu()
+void MainWindow::updateMenu()
 {
     ui->actionEmulatorRun->setChecked(g_okEmulatorRunning);
     ui->actionactionEmulatorAutostart->setChecked(Settings_GetAutostart());
@@ -254,7 +254,7 @@ void MainWindow::UpdateMenu()
     ui->actionDebugMemoryView->setChecked(m_dockMemory->isVisible());
 }
 
-void MainWindow::UpdateAllViews()
+void MainWindow::updateAllViews()
 {
     Emulator_OnUpdate();
 
@@ -275,7 +275,7 @@ void MainWindow::UpdateAllViews()
     if (m_memory != nullptr)
         m_memory->repaint();
 
-    UpdateMenu();
+    updateMenu();
 }
 
 void MainWindow::redrawDebugView()
@@ -365,7 +365,7 @@ void MainWindow::loadStateImage(const QString& strFileName)
     const char * sFileName = qPrintable(strFileName);
     Emulator_LoadImage(sFileName);
 
-    UpdateAllViews();
+    updateAllViews();
 }
 
 void MainWindow::saveScreenshot()
@@ -408,7 +408,7 @@ void MainWindow::screenTextToClipboard()
 
     if (!m_screen->getScreenText(buffer))
     {
-        AlertWarning("Failed to prepare text clipboard from screen.");
+        AlertWarning(tr("Failed to prepare text clipboard from screen."));
         return;
     }
 
@@ -433,29 +433,29 @@ void MainWindow::helpAbout()
 void MainWindow::viewKeyboard()
 {
     m_keyboard->setVisible(!m_keyboard->isVisible());
-    UpdateMenu();
+    updateMenu();
 }
 
 void MainWindow::viewRgbScreen()
 {
     m_screen->setMode(RGBScreen);
-    UpdateMenu();
+    updateMenu();
 }
 void MainWindow::viewGrbScreen()
 {
     m_screen->setMode(GRBScreen);
-    UpdateMenu();
+    updateMenu();
 }
 void MainWindow::viewGrayscaleScreen()
 {
     m_screen->setMode(GrayScreen);
-    UpdateMenu();
+    updateMenu();
 }
 
 void MainWindow::viewSizeRegular()
 {
     m_screen->setSizeMode(RegularScreen);
-    UpdateMenu();
+    updateMenu();
 
     //Update centralWidget size
     ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
@@ -464,7 +464,7 @@ void MainWindow::viewSizeRegular()
 void MainWindow::viewSizeUpscaled()
 {
     m_screen->setSizeMode(UpscaledScreen);
-    UpdateMenu();
+    updateMenu();
 
     //Update centralWidget size
     ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
@@ -473,7 +473,7 @@ void MainWindow::viewSizeUpscaled()
 void MainWindow::viewSizeDoubleInterlaced()
 {
     m_screen->setSizeMode(DoubleInterlacedScreen);
-    UpdateMenu();
+    updateMenu();
 
     //Update centralWidget size
     ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
@@ -482,7 +482,7 @@ void MainWindow::viewSizeDoubleInterlaced()
 void MainWindow::viewSizeDouble()
 {
     m_screen->setSizeMode(DoubleScreen);
-    UpdateMenu();
+    updateMenu();
 
     //Update centralWidget size
     ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
@@ -491,7 +491,7 @@ void MainWindow::viewSizeDouble()
 void MainWindow::viewSizeUpscaled3()
 {
     m_screen->setSizeMode(UpscaledScreen3);
-    UpdateMenu();
+    updateMenu();
 
     //Update centralWidget size
     ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
@@ -500,7 +500,7 @@ void MainWindow::viewSizeUpscaled3()
 void MainWindow::viewSizeUpscaled4()
 {
     m_screen->setSizeMode(UpscaledScreen4);
-    UpdateMenu();
+    updateMenu();
 
     //Update centralWidget size
     ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
@@ -509,7 +509,7 @@ void MainWindow::viewSizeUpscaled4()
 void MainWindow::viewSizeUpscaled175()
 {
     m_screen->setSizeMode(UpscaledScreen175);
-    UpdateMenu();
+    updateMenu();
 
     //Update centralWidget size
     ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
@@ -518,7 +518,7 @@ void MainWindow::viewSizeUpscaled175()
 void MainWindow::viewSizeUpscaled5()
 {
     m_screen->setSizeMode(UpscaledScreen5);
-    UpdateMenu();
+    updateMenu();
 
     //Update centralWidget size
     ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
@@ -545,7 +545,7 @@ void MainWindow::emulatorRun()
     else
         Emulator_Start();
     updateWindowText();
-    UpdateMenu();
+    updateMenu();
 }
 
 void MainWindow::emulatorReset()
@@ -558,7 +558,7 @@ void MainWindow::emulatorReset()
 void MainWindow::emulatorAutostart()
 {
     Settings_SetAutostart(!Settings_GetAutostart());
-    UpdateMenu();
+    updateMenu();
 }
 
 void MainWindow::soundEnabled()
@@ -599,7 +599,7 @@ bool MainWindow::attachCartridge(int slot, const QString & strFileName)
 
     Settings_SetCartridgeFilePath(slot, strFullName);
 
-    UpdateMenu();
+    updateMenu();
 
     return true;
 }
@@ -609,7 +609,7 @@ void MainWindow::detachCartridge(int slot)
 
     Settings_SetCartridgeFilePath(slot, nullptr);
 
-    UpdateMenu();
+    updateMenu();
 }
 
 void MainWindow::emulatorFloppy0() { emulatorFloppy(0); }
@@ -649,7 +649,7 @@ bool MainWindow::attachFloppy(int slot, const QString & strFileName)
 
     Settings_SetFloppyFilePath(slot, strFullName);
 
-    UpdateMenu();
+    updateMenu();
 
     return true;
 }
@@ -659,7 +659,7 @@ void MainWindow::detachFloppy(int slot)
 
     Settings_SetFloppyFilePath(slot, nullptr);
 
-    UpdateMenu();
+    updateMenu();
 }
 
 void MainWindow::emulatorHardDrive1() { emulatorHardDrive(1); }
@@ -708,7 +708,7 @@ bool MainWindow::attachHardDrive(int slot, const QString & strFileName)
 
     Settings_SetHardFilePath(slot, strFullName);
 
-    UpdateMenu();
+    updateMenu();
 
     return true;
 }
@@ -731,22 +731,22 @@ void MainWindow::debugConsoleView()
         this->adjustSize();
     }
 
-    UpdateMenu();
+    updateMenu();
 }
 void MainWindow::debugDebugView()
 {
     m_dockDebug->setVisible(!m_dockDebug->isVisible());
-    UpdateMenu();
+    updateMenu();
 }
 void MainWindow::debugDisasmView()
 {
     m_dockDisasm->setVisible(!m_dockDisasm->isVisible());
-    UpdateMenu();
+    updateMenu();
 }
 void MainWindow::debugMemoryView()
 {
     m_dockMemory->setVisible(!m_dockMemory->isVisible());
-    UpdateMenu();
+    updateMenu();
 }
 
 void MainWindow::debugCpuPpu()

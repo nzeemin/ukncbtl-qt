@@ -92,7 +92,7 @@ static const char * GetMemoryModeName(int mode)
 
 void QMemoryView::updateWindowText()
 {
-    QString buffer = QString(tr("Memory - %1")).arg(GetMemoryModeName(m_Mode));
+    QString buffer = tr("Memory - %1").arg(GetMemoryModeName(m_Mode));
     parentWidget()->setWindowTitle(buffer);
 }
 
@@ -112,7 +112,7 @@ void QMemoryView::focusOutEvent(QFocusEvent *)
 void QMemoryView::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu menu(this);
-    menu.addAction("Go to Address...", this, SLOT(gotoAddress()));
+    menu.addAction(tr("Go to Address..."), this, SLOT(gotoAddress()));
     menu.addSeparator();
 
     for (int mode = 0; mode <= MEMMODE_LAST; mode++)
@@ -126,7 +126,7 @@ void QMemoryView::contextMenuEvent(QContextMenuEvent *event)
     }
 
     menu.addSeparator();
-    menu.addAction("Words / Bytes", this, SLOT(changeWordByteMode()));
+    menu.addAction(tr("Words / Bytes"), this, SLOT(changeWordByteMode()));
 
     menu.exec(event->globalPos());
 }
@@ -168,7 +168,7 @@ void QMemoryView::scrollBy(qint16 delta)
 void QMemoryView::gotoAddress()
 {
     quint16 value = m_wBaseAddress;
-    QInputOctalDialog dialog(this, "Go To Address", "Address (octal):", &value);
+    QInputOctalDialog dialog(this, tr("Go To Address"), tr("Address (octal):"), &value);
     if (dialog.exec() == QDialog::Rejected) return;
 
     // Scroll to the address
@@ -399,3 +399,6 @@ void QMemoryView::wheelEvent(QWheelEvent * event)
     int steps = -event->delta() / 60;
     scrollBy(steps * 16);
 }
+
+
+//////////////////////////////////////////////////////////////////////

@@ -60,8 +60,8 @@ void QDisasmView::focusOutEvent(QFocusEvent *)
 void QDisasmView::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu menu(this);
-    menu.addAction(m_okDisasmProcessor ? "Switch to PPU" : "Switch to CPU", this, SLOT(switchCpuPpu()));
-    menu.addAction(m_SubtitleItems.isEmpty() ? "Load Subtitles..." : "Unload Subtitles", this, SLOT(showHideSubtitles()));
+    menu.addAction(m_okDisasmProcessor ? tr("Switch to PPU") : tr("Switch to CPU"), this, SLOT(switchCpuPpu()));
+    menu.addAction(m_SubtitleItems.isEmpty() ? tr("Load Subtitles...") : tr("Unload Subtitles"), this, SLOT(showHideSubtitles()));
     menu.exec(event->globalPos());
 }
 
@@ -82,13 +82,13 @@ void QDisasmView::mousePressEvent(QMouseEvent * event)
                     {
                         bool result = m_okDisasmProcessor ? Emulator_AddCPUBreakpoint(address) : Emulator_AddPPUBreakpoint(address);
                         if (!result)
-                            AlertWarning(QString("Failed to add breakpoint at %1.").arg(address, 6, 8, QLatin1Char('0')));
+                            AlertWarning(tr("Failed to add breakpoint at %1.").arg(address, 6, 8, QLatin1Char('0')));
                     }
                     else
                     {
                         bool result = m_okDisasmProcessor ? Emulator_RemoveCPUBreakpoint(address) : Emulator_RemovePPUBreakpoint(address);
                         if (!result)
-                            AlertWarning(QString("Failed to remove breakpoint at %1.").arg(address, 6, 8, QLatin1Char('0')));
+                            AlertWarning(tr("Failed to remove breakpoint at %1.").arg(address, 6, 8, QLatin1Char('0')));
                     }
                     repaint();
                     Global_RedrawDebugView();
@@ -123,7 +123,7 @@ void QDisasmView::showHideSubtitles()
         QFile file(fileName);
         if (!file.open(QIODevice::ReadOnly))
         {
-            AlertWarning(tr("Failed to open the file."));
+            AlertWarning(tr("Failed to open the subtitles file."));
             return;
         }
 
