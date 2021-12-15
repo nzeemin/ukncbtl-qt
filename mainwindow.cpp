@@ -57,6 +57,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionDebugCpuPpu, SIGNAL(triggered()), this, SLOT(debugCpuPpu()));
     QObject::connect(ui->actionDebugStepInto, SIGNAL(triggered()), this, SLOT(debugStepInto()));
     QObject::connect(ui->actionDebugStepOver, SIGNAL(triggered()), this, SLOT(debugStepOver()));
+    QObject::connect(ui->actionDebugClearConsole, SIGNAL(triggered()), this, SLOT(debugClearConsole()));
+    QObject::connect(ui->actionDebugRemoveAllBreakpoints, SIGNAL(triggered()), this, SLOT(debugRemoveAllBreakpoints()));
     QObject::connect(ui->actionHelpAbout, SIGNAL(triggered()), this, SLOT(helpAbout()));
     QObject::connect(ui->actionViewKeyboard, SIGNAL(triggered()), this, SLOT(viewKeyboard()));
     QObject::connect(ui->actionViewRgbScreen, SIGNAL(triggered()), this, SLOT(viewRgbScreen()));
@@ -764,6 +766,15 @@ void MainWindow::debugStepOver()
 {
     if (!g_okEmulatorRunning)
         m_console->execConsoleCommand("so");
+}
+
+void MainWindow::debugClearConsole()
+{
+    m_console->clear();
+}
+void MainWindow::debugRemoveAllBreakpoints()
+{
+    m_console->execConsoleCommand("bc");
 }
 
 void MainWindow::scriptRun()

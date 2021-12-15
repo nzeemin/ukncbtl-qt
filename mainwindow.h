@@ -72,6 +72,8 @@ public slots:
     void debugMemoryView();
     void debugStepInto();
     void debugStepOver();
+    void debugClearConsole();
+    void debugRemoveAllBreakpoints();
     void viewKeyboard();
     void viewRgbScreen();
     void viewGrbScreen();

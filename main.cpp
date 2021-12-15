@@ -219,13 +219,13 @@ void ParseCommandLine(int argc, char *argv[])
                 Settings_SetFloppyFilePath(slot, option.mid(6));
             }
             else if (option.startsWith("cart") && option.length() > 6 && // "/cartN:filePath", N=1..2
-                     option[4] >= '1' && option[4] <= '2' && option[5] == ':')
+                    option[4] >= '1' && option[4] <= '2' && option[5] == ':')
             {
                 int slot = option[4].toLatin1() - '0';
                 Settings_SetCartridgeFilePath(slot, option.mid(6));
             }
             else if (option.startsWith("hard") && option.length() > 6 && // "/hardN:filePath", N=1..2
-                     option[4] >= '1' && option[4] <= '2' && option[5] == ':')
+                    option[4] >= '1' && option[4] <= '2' && option[5] == ':')
             {
                 int slot = option[4].toLatin1() - '0';
                 Settings_SetHardFilePath(slot, option.mid(6));

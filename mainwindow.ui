@@ -20,7 +20,7 @@
      <x>0</x>
      <y>0</y>
      <width>662</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -83,6 +83,9 @@
     <addaction name="separator"/>
     <addaction name="actionDebugStepInto"/>
     <addaction name="actionDebugStepOver"/>
+    <addaction name="separator"/>
+    <addaction name="actionDebugClearConsole"/>
+    <addaction name="actionDebugRemoveAllBreakpoints"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -537,6 +540,16 @@
   <action name="actionDebugCpuPpu">
    <property name="text">
     <string>Switch CPU / PPU</string>
+   </property>
+  </action>
+  <action name="actionDebugClearConsole">
+   <property name="text">
+    <string>Clear Console Log</string>
+   </property>
+  </action>
+  <action name="actionDebugRemoveAllBreakpoints">
+   <property name="text">
+    <string>Remove All Breakpoints</string>
    </property>
   </action>
  </widget>
