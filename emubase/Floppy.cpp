@@ -14,7 +14,6 @@ UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
 
 #include "stdafx.h"
 #include <sys/stat.h>
-#include <share.h>
 #include "Emubase.h"
 
 

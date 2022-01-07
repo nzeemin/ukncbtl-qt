@@ -525,18 +525,23 @@ void QDisasmView::instructionHint(const quint16 *memory, const CProcessor *pProc
         }
     }
 
+    // Prepare 1st line of the instruction hint
     if (!srchint1.isEmpty() && !dsthint1.isEmpty())
     {
-        if (srchint1 == dsthint1)
-            buffer = srchint1;
-        else
+        if (srchint1 != dsthint1)
             buffer = srchint1 + ", " + dsthint1;
+        else
+        {
+            buffer = srchint1;
+            dsthint1.clear();
+        }
     }
     else if (!srchint1.isEmpty())
         buffer = srchint1;
     else if (!dsthint1.isEmpty())
         buffer = dsthint1;
 
+    // Prepare 2nd line of the instruction hint
     if (!srchint2.isEmpty() && !dsthint2.isEmpty())
     {
         if (srchint2 == dsthint2)
@@ -547,10 +552,20 @@ void QDisasmView::instructionHint(const quint16 *memory, const CProcessor *pProc
     else if (!srchint2.isEmpty())
         buffer2 = srchint2;
     else if (!dsthint2.isEmpty())
-        buffer2 = dsthint2;
+    {
+        if (srchint1.isEmpty() || dsthint1.isEmpty())
+            buffer2 = dsthint2;
+        else
+        {
+            // Special case: we have srchint1, dsthint1 and dsthint2, but not srchint2 - let's align dsthint2 to dsthint1
+            int hintpos = srchint1.length() + 2;
+            buffer2 = QString(hintpos, ' ') + dsthint2;
+        }
+    }
 }
 
 // Prepare "Instruction Hint" for a regular instruction (not a branch/jump one)
+// buffer, buffer2 - buffers for 1st and 2nd lines of the instruction hint
 // Returns: number of hint lines; 0 = no hints
 int QDisasmView::getInstructionHint(const quint16 *memory, const CProcessor *pProc, const CMemoryController *pMemCtl,
         QString &buffer, QString &buffer2)
