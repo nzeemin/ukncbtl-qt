@@ -38,7 +38,10 @@ const char CommandLineHelp[] =
     OPTIONSTR "autostart " OPTIONSTR "autostarton    Start emulation on window open\n"
     OPTIONSTR "noautostart " OPTIONSTR "autostartoff    Do not start emulation on window open\n"
     OPTIONSTR "sound " OPTIONSTR "soundon    Turn sound on\n"
-    OPTIONSTR "nosound " OPTIONSTR "soundoff    Turn sound off\n";
+    OPTIONSTR "nosound " OPTIONSTR "soundoff    Turn sound off\n"
+    OPTIONSTR "diskN:filePath    Attach disk image, N=0..3\n"
+    OPTIONSTR "cartN:filePath    Attach cartridge image, N=1..2\n"
+    OPTIONSTR "hardN:filePath    Attach hard disk image, N=1..2\n";
 
 
 int main(int argc, char *argv[])
