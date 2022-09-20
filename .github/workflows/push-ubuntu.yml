@@ -1,0 +1,29 @@
+name: push-ubuntu
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2
+      with:
+        install-deps: 'true'
+        modules: 'qtscript'
+    
+    - name: Versions
+      run: qmake -v
+
+    - name: Build
+      run: |
+        qmake "CONFIG+=debug" QtUkncBtl.pro
+        make
+        
