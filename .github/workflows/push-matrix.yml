@@ -40,10 +40,11 @@ jobs:
       run: qmake -v
 
     - name: Build
+      env:
+        CC: ${{ matrix.config.cc }}
+        CXX: ${{ matrix.config.cxx }}
+        QMAKESPEC: ${{ matrix.config.qmakespec }}
       run: |
-        set(ENV{CC} ${{ matrix.config.cc }})
-        set(ENV{CXX} ${{ matrix.config.cxx }})
-        set(ENV{QMAKESPEC} ${{ matrix.config.qmakespec }})
         qmake "CONFIG+=debug" QtUkncBtl.pro
         make
         
