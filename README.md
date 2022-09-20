@@ -1,7 +1,7 @@
 # ukncbtl-qt
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 [![Build status](https://ci.appveyor.com/api/projects/status/ipvgt62iivnc6j7f?svg=true)](https://ci.appveyor.com/project/nzeemin/ukncbtl-qt)
-[![Build Status](https://travis-ci.org/nzeemin/ukncbtl-qt.svg?branch=master)](https://travis-ci.org/nzeemin/ukncbtl-qt)
+[![Build Status](https://github.com/nzeemin/ukncbtl-qt/actions/workflows/push-matrix.yml/badge.svg?branch=master)](https://github.com/nzeemin/ukncbtl-qt/actions/workflows/push-matrix.yml)
 [![CodeFactor](https://www.codefactor.io/repository/github/nzeemin/ukncbtl-qt/badge)](https://www.codefactor.io/repository/github/nzeemin/ukncbtl-qt)
 
 UKNCBTL emulator, Qt version.
