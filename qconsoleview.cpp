@@ -11,11 +11,13 @@
 
 QString QConsoleView::MESSAGE_UNKNOWN_COMMAND;
 QString QConsoleView::MESSAGE_WRONG_VALUE;
+QString QConsoleView::MESSAGE_INVALID_REGNUM;
 
 QConsoleView::QConsoleView()
 {
     MESSAGE_UNKNOWN_COMMAND = QConsoleView::tr("  Unknown command.\r\n");
     MESSAGE_WRONG_VALUE = QConsoleView::tr("  Wrong value.\r\n");
+    MESSAGE_INVALID_REGNUM = QConsoleView::tr("  Invalid register number, 0..7 expected.\r\n");
 
     m_okCurrentProc = Settings_GetDebugCpuPpu();
 
@@ -226,16 +228,18 @@ int QConsoleView::printDisassemble(CProcessor* pProc, quint16 address, bool okOn
     return totalLength;
 }
 
-void QConsoleView::printHelp()
+void QConsoleView::cmdShowHelp(const ConsoleCommandParams& /*params*/)
 {
     this->print(tr("Console command list:\r\n"
             "  c          Clear console log\r\n"
+            "  d          Disassemble from PC; use D for short format\r\n"
             "  dXXXXXX    Disassemble from address XXXXXX\r\n"
             "  g          Go; free run\r\n"
             "  gXXXXXX    Go; run processor until breakpoint at address XXXXXX\r\n"
             "  m          Memory dump at current address\r\n"
             "  mXXXXXX    Memory dump at address XXXXXX\r\n"
             "  mrN        Memory dump at address from register N; N=0..7\r\n"
+            "  mXXXXXX YYYYYY  Set memory value at address XXXXXX\r\n"
             "  p          Switch to other processor\r\n"
             "  r          Show register values\r\n"
             "  rN         Show value of register N; N=0..7,ps\r\n"
@@ -249,6 +253,289 @@ void QConsoleView::printHelp()
 //            "  u          Save memory dump to file memdumpXPU.bin\r\n"
                   ));
 }
+
+void QConsoleView::cmdClearConsoleLog(const ConsoleCommandParams& /*params*/)
+{
+    this->clear();
+}
+
+void QConsoleView::cmdSwitchCpuPpu(const ConsoleCommandParams& /*params*/)
+{
+    Global_SetCurrentProc(!m_okCurrentProc);
+    Global_UpdateAllViews();
+}
+
+void QConsoleView::cmdSetRegisterValue(const ConsoleCommandParams & params)
+{
+    int r = params.paramReg1;
+    quint16 value = params.paramOct1;
+
+    CProcessor* pProc = getCurrentProcessor();
+
+    pProc->SetReg(r, value);
+    LPCTSTR name = REGISTER_NAME[r];
+    this->printRegister(name, value);
+
+    Global_UpdateAllViews();
+}
+
+void QConsoleView::cmdPrintRegister(const ConsoleCommandParams & params)
+{
+    int r = params.paramReg1;
+
+    const CProcessor* pProc = getCurrentProcessor();
+
+    quint16 value = pProc->GetReg(r);
+    LPCTSTR name = REGISTER_NAME[r];
+    this->printRegister(name, value);
+}
+
+void QConsoleView::cmdPrintAllRegisters(const ConsoleCommandParams &)
+{
+    const CProcessor* pProc = getCurrentProcessor();
+
+    for (int r = 0; r < 8; r++)
+    {
+        LPCTSTR name = REGISTER_NAME[r];
+        quint16 value = pProc->GetReg(r);
+        this->printRegister(name, value);
+    }
+}
+
+void QConsoleView::cmdSetRegisterPSW(const ConsoleCommandParams & params)
+{
+    quint16 value = params.paramOct1;
+
+    CProcessor* pProc = getCurrentProcessor();
+
+    pProc->SetPSW(value);
+    this->printRegister("PS", value);
+    Global_UpdateAllViews();
+}
+
+void QConsoleView::cmdPrintRegisterPSW(const ConsoleCommandParams &)
+{
+    const CProcessor* pProc = getCurrentProcessor();
+
+    quint16 value = pProc->GetPSW();
+    this->printRegister("PS", value);
+}
+
+void QConsoleView::cmdStepInto(const ConsoleCommandParams &)
+{
+    CProcessor* pProc = getCurrentProcessor();
+
+    this->printDisassemble(pProc, pProc->GetPC(), true, false);
+
+    //pProc->Execute();
+    g_pBoard->DebugTicks();
+
+    Global_UpdateAllViews();
+}
+
+void QConsoleView::cmdStepOver(const ConsoleCommandParams &)
+{
+    CProcessor* pProc = getCurrentProcessor();
+
+    int instrLength = this->printDisassemble(pProc, pProc->GetPC(), true, false);
+    quint16 bpaddress = pProc->GetPC() + instrLength * 2;
+
+    if (m_okCurrentProc)
+        Emulator_SetTempCPUBreakpoint(bpaddress);
+    else
+        Emulator_SetTempPPUBreakpoint(bpaddress);
+    Emulator_Start();
+
+    Global_UpdateMenu();
+}
+
+void QConsoleView::cmdPrintDisassembleAtAddress(const ConsoleCommandParams & params)
+{
+    quint16 address = params.paramOct1;
+    bool okShort = (params.commandText[0] == _T('D'));
+
+    CProcessor* pProc = getCurrentProcessor();
+
+    printDisassemble(pProc, address, false, okShort);
+}
+
+void QConsoleView::cmdPrintDisassembleAtPC(const ConsoleCommandParams & params)
+{
+    CProcessor* pProc = getCurrentProcessor();
+
+    uint16_t address = pProc->GetPC();
+    bool okShort = (params.commandText[0] == _T('D'));
+
+    printDisassemble(pProc, address, false, okShort);
+}
+
+void QConsoleView::cmdSetMemoryAtAddress(const ConsoleCommandParams & params)
+{
+    quint16 address = params.paramOct1;
+    quint16 value = params.paramOct2;
+
+    CProcessor* pProc = getCurrentProcessor();
+    CMemoryController* pMemCtl = pProc->GetMemoryController();
+    bool okHaltMode = pProc->IsHaltMode();
+
+    int addrtype;
+    pMemCtl->GetWordView(address, okHaltMode, false, &addrtype);
+    if (addrtype != ADDRTYPE_RAM12 && addrtype != ADDRTYPE_RAM0 && addrtype != ADDRTYPE_RAM1 && addrtype != ADDRTYPE_RAM2)
+    {
+        print(_T("  Can't change memory value for this memory type.\r\n"));
+        return;
+    }
+
+    pMemCtl->SetWord(address, okHaltMode, value);
+
+    Global_UpdateAllViews();
+}
+
+void QConsoleView::cmdPrintMemoryDumpAtAddress(const ConsoleCommandParams & params)
+{
+    quint16 address = params.paramOct1;
+
+    CProcessor* pProc = getCurrentProcessor();
+
+    printMemoryDump(pProc, address);
+}
+
+void QConsoleView::cmdPrintMemoryDumpAtRegister(const ConsoleCommandParams & params)
+{
+    int r = params.paramReg1;
+
+    CProcessor* pProc = getCurrentProcessor();
+    quint16 address = pProc->GetReg(r);
+
+    printMemoryDump(pProc, address);
+}
+
+void QConsoleView::cmdPrintMemoryDumpAtPC(const ConsoleCommandParams &)
+{
+    CProcessor* pProc = getCurrentProcessor();
+    quint16 address = pProc->GetPC();
+
+    printMemoryDump(pProc, address);
+}
+
+void QConsoleView::cmdRunToAddress(const ConsoleCommandParams & params)
+{
+    quint16 value = params.paramOct1;
+
+    if (m_okCurrentProc)
+        Emulator_SetTempCPUBreakpoint(value);
+    else
+        Emulator_SetTempPPUBreakpoint(value);
+    Emulator_Start();
+
+    Global_UpdateMenu();
+}
+
+void QConsoleView::cmdRun(const ConsoleCommandParams &)
+{
+    Emulator_Start();
+    Global_UpdateAllViews();
+}
+
+void QConsoleView::cmdSetBreakpointAtAddress(const ConsoleCommandParams & params)
+{
+    quint16 value = params.paramOct1;
+
+    bool result = m_okCurrentProc ? Emulator_AddCPUBreakpoint(value) : Emulator_AddPPUBreakpoint(value);
+    if (!result)
+        this->print(tr("  Failed to add breakpoint.\r\n"));
+    Global_RedrawDebugView();
+    Global_RedrawDisasmView();
+}
+
+void QConsoleView::cmdPrintAllBreakpoints(const ConsoleCommandParams &)
+{
+    const quint16* pbps = m_okCurrentProc ? Emulator_GetCPUBreakpointList() : Emulator_GetPPUBreakpointList();
+    if (pbps == nullptr || *pbps == 0177777)
+    {
+        this->print(tr("  No breakpoints.\r\n"));
+        return;
+    }
+
+    while (*pbps != 0177777)
+    {
+        QString line;  line.sprintf("  %06ho\r\n", *pbps);
+        this->print(line);
+        pbps++;
+    }
+}
+
+void QConsoleView::cmdRemoveBreakpointAtAddress(const ConsoleCommandParams & params)
+{
+    quint16 value = params.paramOct1;
+
+    bool result = m_okCurrentProc ? Emulator_RemoveCPUBreakpoint(value) : Emulator_RemovePPUBreakpoint(value);
+    if (!result)
+        this->print("  Failed to remove breakpoint.\r\n");
+    Global_RedrawDebugView();
+    Global_RedrawDisasmView();
+}
+
+void QConsoleView::cmdRemoveAllBreakpoints(const ConsoleCommandParams &)
+{
+    Emulator_RemoveAllBreakpoints(m_okCurrentProc);
+    Global_RedrawDebugView();
+    Global_RedrawDisasmView();
+}
+
+
+enum ConsoleCommandArgInfo
+{
+    ARGINFO_NONE,     // No parameters
+    ARGINFO_REG,      // Register number 0..7
+    ARGINFO_OCT,      // Octal value
+    ARGINFO_REG_OCT,  // Register number, octal value
+    ARGINFO_OCT_OCT,  // Octal value, octal value
+};
+
+typedef void(QConsoleView::* CONSOLE_COMMAND_CALLBACK)(const ConsoleCommandParams& params);
+
+struct ConsoleCommandStruct
+{
+    LPCTSTR pattern;
+    ConsoleCommandArgInfo arginfo;
+    CONSOLE_COMMAND_CALLBACK callback;
+}
+static ConsoleCommands[] =
+{
+    // IMPORTANT! First list more complex forms with more arguments, then less complex forms
+    { _T("h"), ARGINFO_NONE, &QConsoleView::cmdShowHelp },
+    { _T("c"), ARGINFO_NONE, &QConsoleView::cmdClearConsoleLog },
+    { _T("p"), ARGINFO_NONE, &QConsoleView::cmdSwitchCpuPpu },
+    { _T("r%d=%ho"), ARGINFO_REG_OCT, &QConsoleView::cmdSetRegisterValue },
+    { _T("r%d %ho"), ARGINFO_REG_OCT, &QConsoleView::cmdSetRegisterValue },
+    { _T("r%d"), ARGINFO_REG, &QConsoleView::cmdPrintRegister },
+    { _T("r"), ARGINFO_NONE, &QConsoleView::cmdPrintAllRegisters },
+    { _T("rps=%ho"), ARGINFO_OCT, &QConsoleView::cmdSetRegisterPSW },
+    { _T("rps %ho"), ARGINFO_OCT, &QConsoleView::cmdSetRegisterPSW },
+    { _T("rps"), ARGINFO_NONE, &QConsoleView::cmdPrintRegisterPSW },
+    { _T("s"), ARGINFO_NONE, &QConsoleView::cmdStepInto },
+    { _T("so"), ARGINFO_NONE, &QConsoleView::cmdStepOver },
+    { _T("d%ho"), ARGINFO_OCT, &QConsoleView::cmdPrintDisassembleAtAddress },
+    { _T("D%ho"), ARGINFO_OCT, &QConsoleView::cmdPrintDisassembleAtAddress },
+    { _T("d"), ARGINFO_NONE, &QConsoleView::cmdPrintDisassembleAtPC },
+    { _T("D"), ARGINFO_NONE, &QConsoleView::cmdPrintDisassembleAtPC },
+//    { _T("u"), ARGINFO_NONE, &QConsoleView::cmdSaveMemoryDump },
+//    { _T("udl"), ARGINFO_NONE, &QConsoleView::cmdSaveDisplayListDump },
+    { _T("m%ho %ho"), ARGINFO_OCT_OCT, &QConsoleView::cmdSetMemoryAtAddress },
+    { _T("m%ho=%ho"), ARGINFO_OCT_OCT, &QConsoleView::cmdSetMemoryAtAddress },
+    { _T("m%ho"), ARGINFO_OCT, &QConsoleView::cmdPrintMemoryDumpAtAddress },
+    { _T("mr%d"), ARGINFO_REG, &QConsoleView::cmdPrintMemoryDumpAtRegister },
+    { _T("m"), ARGINFO_NONE, &QConsoleView::cmdPrintMemoryDumpAtPC },
+    { _T("g%ho"), ARGINFO_OCT, &QConsoleView::cmdRunToAddress },
+    { _T("g"), ARGINFO_NONE, &QConsoleView::cmdRun },
+    { _T("b%ho"), ARGINFO_OCT, &QConsoleView::cmdSetBreakpointAtAddress },
+    { _T("b"), ARGINFO_NONE, &QConsoleView::cmdPrintAllBreakpoints },
+    { _T("bc%ho"), ARGINFO_OCT, &QConsoleView::cmdRemoveBreakpointAtAddress },
+    { _T("bc"), ARGINFO_NONE, &QConsoleView::cmdRemoveAllBreakpoints },
+//    { _T("fc%ho %ho"), ARGINFO_OCT_OCT, &QConsoleView::cmdCalculateFloatNumber },
+};
+const size_t ConsoleCommandsCount = sizeof(ConsoleCommands) / sizeof(ConsoleCommands[0]);
 
 void QConsoleView::execConsoleCommand()
 {
@@ -266,242 +553,64 @@ void QConsoleView::execConsoleCommand(const QString &command)
     this->printConsolePrompt();
     this->printLine(command);
 
-    bool okUpdateAllViews = false;  // Flag - need to update all debug views
-    bool okUpdateMenu = false;  // Flag - need to update main menu
-    CProcessor* pProc = this->getCurrentProcessor();
+    ConsoleCommandParams params;
+    params.commandText = command;
+    params.paramReg1 = -1;
+    params.paramOct1 = 0;
+    params.paramOct2 = 0;
 
-    // Execute the command
-    if (command == "h")
+    // Find matching console command from the list, parse and execute the command
+    bool parsedOkay = false, parseError = false;
+    for (size_t i = 0; i < ConsoleCommandsCount; i++)
     {
-        this->printHelp();
-    }
-    else if (command == "c")  // Clear log
-    {
-        this->clear();
-    }
-    else if (command == "p")  // Switch CPU/PPU
-    {
-        Global_SetCurrentProc(! m_okCurrentProc);
-        okUpdateAllViews = true;
-    }
-    else if (command.startsWith("r"))  // Register operations
-    {
-        if (command.length() == 1)  // Print all registers
+        ConsoleCommandStruct& cmd = ConsoleCommands[i];
+
+        int paramsParsed = 0;
+        switch (cmd.arginfo)
         {
-            for (int r = 0; r < 8; r++)
+        case ARGINFO_NONE:
+            parsedOkay = (command.compare(cmd.pattern) == 0);
+            break;
+        case ARGINFO_REG:
+            paramsParsed = sscanf(command.toLatin1(), cmd.pattern, &params.paramReg1);
+            parsedOkay = (paramsParsed == 1);
+            if (parsedOkay && (params.paramReg1 < 0 || params.paramReg1 > 7))
             {
-                LPCTSTR name = REGISTER_NAME[r];
-                quint16 value = pProc->GetReg(r);
-                this->printRegister(name, value);
+                print(MESSAGE_INVALID_REGNUM);
+                parseError = true;
             }
-        }
-        else if (command[1].toLatin1() >= '0' && command[1].toLatin1() <= '7')  // "r0".."r7"
-        {
-            int r = command[1].toLatin1() - '0';
-            LPCTSTR name = REGISTER_NAME[r];
-            if (command.length() == 2)  // "rN" - show register N
+            break;
+        case ARGINFO_OCT:
+            paramsParsed = sscanf(command.toLatin1(), cmd.pattern, &params.paramOct1);
+            parsedOkay = (paramsParsed == 1);
+            break;
+        case ARGINFO_REG_OCT:
+            paramsParsed = sscanf(command.toLatin1(), cmd.pattern, &params.paramReg1, &params.paramOct1);
+            parsedOkay = (paramsParsed == 2);
+            if (parsedOkay && (params.paramReg1 < 0 || params.paramReg1 > 7))
             {
-                quint16 value = pProc->GetReg(r);
-                this->printRegister(name, value);
+                print(MESSAGE_INVALID_REGNUM);
+                parseError = true;
             }
-            else if (command[2].toLatin1() == '=' || command[2].toLatin1() == ' ')  // "rN=XXXXXX" - set register N to value XXXXXX
-            {
-                quint16 value;
-                if (! ParseOctalValue(command.mid(3), &value))
-                    this->print(MESSAGE_WRONG_VALUE);
-                else
-                {
-                    pProc->SetReg(r, value);
-                    this->printRegister(name, value);
-                    okUpdateAllViews = true;
-                }
-            }
-            else
-                this->print(MESSAGE_UNKNOWN_COMMAND);
-        }
-        else if (command.startsWith("rps"))  // "rps"
-        {
-            if (command.length() == 3)  // "rps" - show PSW
-            {
-                quint16 value = pProc->GetPSW();
-                this->printRegister("PS", value);
-            }
-            else if (command[3].toLatin1() == '=' || command[3].toLatin1() == ' ')  // "rps=XXXXXX" - set PSW to value XXXXXX
-            {
-                quint16 value;
-                if (! ParseOctalValue(command.mid(4), &value))
-                    this->print(MESSAGE_WRONG_VALUE);
-                else
-                {
-                    pProc->SetPSW(value);
-                    this->printRegister("PS", value);
-                    okUpdateAllViews = true;
-                }
-            }
-            else
-                this->print(MESSAGE_UNKNOWN_COMMAND);
-        }
-        else
-            this->print(MESSAGE_UNKNOWN_COMMAND);
-    }
-    else if (command == "s")  // "s" - Step Into, execute one instruction
-    {
-        this->printDisassemble(pProc, pProc->GetPC(), true, false);
-
-        //pProc->Execute();
-        g_pBoard->DebugTicks();
-
-        okUpdateAllViews = true;
-    }
-    else if (command == "so")  // "so" - Step Over
-    {
-        int instrLength = this->printDisassemble(pProc, pProc->GetPC(), true, false);
-        quint16 bpaddress = pProc->GetPC() + instrLength * 2;
-
-        if (m_okCurrentProc)
-            Emulator_SetTempCPUBreakpoint(bpaddress);
-        else
-            Emulator_SetTempPPUBreakpoint(bpaddress);
-        Emulator_Start();
-
-        okUpdateMenu = true;
-    }
-    else if (command.startsWith("d") ||  // Disassemble
-            command.startsWith("D"))    // Disassemble, short format
-    {
-        bool okShort = (command[0] == 'D');
-        quint16 address = 0;
-        bool okValidAddress = false;
-        if (command.length() == 1)  // "d" - disassemble at current address
-        {
-            address = pProc->GetPC();
-            okValidAddress = true;
-        }
-        else if (command[1].toLatin1() >= '0' && command[1].toLatin1() <= '7')  // "dXXXXXX" - disassemble at address XXXXXX
-        {
-            if (! ParseOctalValue(command.mid(1), &address))
-                this->print(MESSAGE_WRONG_VALUE);
-            else
-                okValidAddress = true;
-        }
-        else
-        {
-            this->print(MESSAGE_UNKNOWN_COMMAND);
+            break;
+        case ARGINFO_OCT_OCT:
+            paramsParsed = sscanf(command.toLatin1(), cmd.pattern, &params.paramOct1, &params.paramOct2);
+            parsedOkay = (paramsParsed == 2);
+            break;
         }
 
-        if (okValidAddress)
-        {
-            int length = this->printDisassemble(pProc, address, false, okShort);
-            address += length * 2;
-            QString prompt;  prompt.sprintf("%c%06o", command[0], address);
-            m_edit->setText(prompt);
-        }
-    }
-    else if (command.startsWith("m"))
-    {
-        if (command.length() == 1)  // "m" - dump memory at current address
-        {
-            this->printMemoryDump(pProc, pProc->GetPC(), 8);
-        }
-        else if (command[1].toLatin1() >= '0' && command[1].toLatin1() <= '7')  // "mXXXXXX" - dump memory at address XXXXXX
-        {
-            quint16 value;
-            if (! ParseOctalValue(command.mid(1), &value))
-                this->print(MESSAGE_WRONG_VALUE);
-            else
-                this->printMemoryDump(pProc, value, 8);
-        }
-        else if (command[1].toLatin1() == 'r' && command.length() >= 3 &&
-                command[2].toLatin1() >= '0' && command[2].toLatin1() <= '7')  // "mrN" - dump memory at address from register N
-        {
-            int r = command[2].toLatin1() - '0';
-            quint16 address = pProc->GetReg(r);
-            this->printMemoryDump(pProc, address, 8);
-        }
-        else
-            this->print(MESSAGE_UNKNOWN_COMMAND);
-        //TODO: "mXXXXXX YYYYYY" - set memory cell at XXXXXX to value YYYYYY
-        //TODO: "mrN YYYYYY" - set memory cell at address from rN to value YYYYYY
-    }
-    else if (command == "g")  // Go
-    {
-        Emulator_Start();
-        okUpdateAllViews = true;
-    }
-    else if (command.startsWith("g"))  // Go
-    {
-        quint16 value;
-        if (! ParseOctalValue(command.mid(1), &value))
-            this->print(MESSAGE_WRONG_VALUE);
-        else
-        {
-            if (m_okCurrentProc)
-                Emulator_SetTempCPUBreakpoint(value);
-            else
-                Emulator_SetTempPPUBreakpoint(value);
-            Emulator_Start();
+        if (parseError)
+            break;  // Validation detected error and printed the message already
 
-            okUpdateMenu = true;
-        }
-    }
-    else if (command == "b")  // b - list breakpoints
-    {
-        const quint16* pbps = m_okCurrentProc ? Emulator_GetCPUBreakpointList() : Emulator_GetPPUBreakpointList();
-        if (pbps == nullptr || *pbps == 0177777)
+        if (parsedOkay)
         {
-            this->print(tr("  No breakpoints.\r\n"));
+            (this->*(cmd.callback))(params);  // Execute the command
+            break;
         }
-        else
-        {
-            while (*pbps != 0177777)
-            {
-                QString line;  line.sprintf("  %06ho\r\n", *pbps);
-                this->print(line);
-                pbps++;
-            }
-        }
-    }
-    else if (command == "bc")  // bc - remove all breakpoints
-    {
-        Emulator_RemoveAllBreakpoints(m_okCurrentProc);
-        Global_RedrawDebugView();
-        Global_RedrawDisasmView();
-    }
-    else if (command.startsWith("bc"))  // bcXXXXXX - remove breakpoint
-    {
-        quint16 value;
-        if (! ParseOctalValue(command.mid(2), &value))
-            this->print(MESSAGE_WRONG_VALUE);
-        else
-        {
-            bool result = m_okCurrentProc ? Emulator_RemoveCPUBreakpoint(value) : Emulator_RemovePPUBreakpoint(value);
-            if (!result)
-                this->print("  Failed to remove breakpoint.\r\n");
-            Global_RedrawDebugView();
-            Global_RedrawDisasmView();
-        }
-    }
-    else if (command.startsWith("b"))  // bXXXXXX - add breakpoint
-    {
-        quint16 value;
-        if (! ParseOctalValue(command.mid(1), &value))
-            this->print(MESSAGE_WRONG_VALUE);
-        else
-        {
-            bool result = m_okCurrentProc ? Emulator_AddCPUBreakpoint(value) : Emulator_AddPPUBreakpoint(value);
-            if (!result)
-                this->print(tr("  Failed to add breakpoint.\r\n"));
-            Global_RedrawDebugView();
-            Global_RedrawDisasmView();
-        }
-    }
-    else
-    {
-        this->print(MESSAGE_UNKNOWN_COMMAND);
     }
 
-    if (okUpdateAllViews)
-        Global_UpdateAllViews();
-    else if (okUpdateMenu)
-        Global_UpdateMenu();
+    if (!parsedOkay && !parseError)
+        print(MESSAGE_UNKNOWN_COMMAND);
+
+    //printConsolePrompt();
 }
