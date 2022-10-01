@@ -26,17 +26,17 @@ QDebugView::QDebugView(QWidget *mainWindow) :
     this->setMaximumHeight(cyLine * 16 + cyLine / 2);
 
     m_toolbar = new QToolBar(this);
-    m_toolbar->setGeometry(4, 4, 28, cyLine * 16);
+    m_toolbar->setGeometry(4, 4, 36, cyLine * 16);
     m_toolbar->setOrientation(Qt::Vertical);
-    m_toolbar->setIconSize(QSize(16, 16));
+    m_toolbar->setIconSize(QSize(24, 24));
     m_toolbar->setToolButtonStyle(Qt::ToolButtonIconOnly);
     m_toolbar->setFocusPolicy(Qt::NoFocus);
     m_toolbar->setStyle(QStyleFactory::create("windows"));  // fix for macOS to remove gradient background
 
-    QAction* actionCpuPpu = m_toolbar->addAction(QIcon(":/images/iconCpuPpu.png"), "");
+    QAction* actionCpuPpu = m_toolbar->addAction(QIcon(":/images/iconCpuPpu.svg"), "");
     m_toolbar->addSeparator();
-    QAction* actionStepInto = m_toolbar->addAction(QIcon(":/images/iconStepInto.png"), "");
-    QAction* actionStepOver = m_toolbar->addAction(QIcon(":/images/iconStepOver.png"), "");
+    QAction* actionStepInto = m_toolbar->addAction(QIcon(":/images/iconStepInto.svg"), "");
+    QAction* actionStepOver = m_toolbar->addAction(QIcon(":/images/iconStepOver.svg"), "");
 
     QObject::connect(actionCpuPpu, SIGNAL(triggered()), this, SLOT(switchCpuPpu()));
     QObject::connect(actionStepInto, SIGNAL(triggered()), mainWindow, SLOT(debugStepInto()));
@@ -137,17 +137,17 @@ void QDebugView::paintEvent(QPaintEvent * /*event*/)
     bool* arrRChanged = (m_okDebugProcessor) ? m_okDebugCpuRChanged : m_okDebugPpuRChanged;
     quint16 oldSP = (m_okDebugProcessor) ? m_wDebugCpuR6Old : m_wDebugPpuR6Old;
 
-    drawProcessor(painter, pDebugPU, 30 + cxChar * 2, 1 * cyLine, arrR, arrRChanged);
+    drawProcessor(painter, pDebugPU, 38 + cxChar * 2, 1 * cyLine, arrR, arrRChanged);
 
     // Draw stack
     drawMemoryForRegister(painter, 6, pDebugPU, 30 + 35 * cxChar, 1 * cyLine, oldSP);
 
     CMemoryController* pDebugMemCtl = pDebugPU->GetMemoryController();
-    drawPorts(painter, m_okDebugProcessor, pDebugMemCtl, g_pBoard, 30 + 54 * cxChar, 1 * cyLine);
+    drawPorts(painter, m_okDebugProcessor, pDebugMemCtl, g_pBoard, 38 + 54 * cxChar, 1 * cyLine);
 
-    bool okBreakpoints = drawBreakpoints(painter, 30 + 70 * cxChar, 1 * cyLine);
+    bool okBreakpoints = drawBreakpoints(painter, 38 + 70 * cxChar, 1 * cyLine);
 
-    int xMemoryMap = 30 + (70 + (okBreakpoints ? 10 : 0)) * cxChar;
+    int xMemoryMap = 38 + (70 + (okBreakpoints ? 10 : 0)) * cxChar;
     if (m_okDebugProcessor)
         drawCPUMemoryMap(painter, xMemoryMap, 0 * cyLine, pDebugPU->IsHaltMode());
     else
@@ -161,8 +161,8 @@ void QDebugView::paintEvent(QPaintEvent * /*event*/)
         option.state |= QStyle::State_KeyboardFocusChange;
         option.backgroundColor = QColor(Qt::gray);
         option.rect = this->rect();
-        option.rect.setLeft(option.rect.left() + 30);
-        option.rect.setRight(30 + (92 + (okBreakpoints ? 10 : 0)) * cxChar);
+        option.rect.setLeft(option.rect.left() + 38);
+        option.rect.setRight(38 + (92 + (okBreakpoints ? 10 : 0)) * cxChar);
         style()->drawPrimitive(QStyle::PE_FrameFocusRect, &option, &painter, this);
     }
 }
@@ -183,7 +183,7 @@ void QDebugView::drawProcessor(QPainter &painter, const CProcessor *pProc, int x
     {
         painter.setPen(QColor(arrRChanged[r] ? colorChanged : colorText));
 
-        LPCTSTR strRegName = REGISTER_NAME[r];
+        const char * strRegName = REGISTER_NAME[r];
         painter.drawText(x, y + (1 + r) * cyLine, strRegName);
 
         quint16 value = arrR[r]; //pProc->GetReg(r);

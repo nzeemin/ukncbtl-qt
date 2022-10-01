@@ -95,6 +95,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_dockDebug = new QDockWidget(tr("Processor"));
     m_dockDebug->setObjectName("dockDebug");
     m_dockDebug->setWidget(m_debug);
+    m_dockDebug->setFeatures(m_dockDebug->features() & ~QDockWidget::DockWidgetClosable);
     m_dockDisasm = new QDockWidget(tr("Disassemble"));
     m_dockDisasm->setObjectName("dockDisasm");
     m_dockDisasm->setWidget(m_disasm);
@@ -104,6 +105,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_dockConsole = new QDockWidget(tr("Debug Console"));
     m_dockConsole->setObjectName("dockConsole");
     m_dockConsole->setWidget(m_console);
+    m_dockConsole->setFeatures(m_dockConsole->features() & ~QDockWidget::DockWidgetClosable);
 
     this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
     this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
@@ -232,23 +234,23 @@ void MainWindow::updateMenu()
     ui->actionViewKeyboard->setChecked(m_keyboard->isVisible());
 
     ui->actionDrivesFloppy0->setIcon(QIcon(
-            g_pBoard->IsFloppyImageAttached(0) ? ":/images/iconFloppy.png" : ":/images/iconFloppySlot.png" ));
+            g_pBoard->IsFloppyImageAttached(0) ? ":/images/iconFloppy.svg" : ":/images/iconFloppySlot.svg" ));
     ui->actionDrivesFloppy1->setIcon(QIcon(
-            g_pBoard->IsFloppyImageAttached(1) ? ":/images/iconFloppy.png" : ":/images/iconFloppySlot.png" ));
+            g_pBoard->IsFloppyImageAttached(1) ? ":/images/iconFloppy.svg" : ":/images/iconFloppySlot.svg" ));
     ui->actionDrivesFloppy2->setIcon(QIcon(
-            g_pBoard->IsFloppyImageAttached(2) ? ":/images/iconFloppy.png" : ":/images/iconFloppySlot.png" ));
+            g_pBoard->IsFloppyImageAttached(2) ? ":/images/iconFloppy.svg" : ":/images/iconFloppySlot.svg" ));
     ui->actionDrivesFloppy3->setIcon(QIcon(
-            g_pBoard->IsFloppyImageAttached(3) ? ":/images/iconFloppy.png" : ":/images/iconFloppySlot.png" ));
+            g_pBoard->IsFloppyImageAttached(3) ? ":/images/iconFloppy.svg" : ":/images/iconFloppySlot.svg" ));
 
     ui->actionDrivesCartridge1->setIcon(QIcon(
-            g_pBoard->IsROMCartridgeLoaded(1) ? ":/images/iconCartridge.png" : ":/images/iconCartridgeSlot.png" ));
+            g_pBoard->IsROMCartridgeLoaded(1) ? ":/images/iconCartridge.svg" : ":/images/iconCartridgeSlot.svg" ));
     ui->actionDrivesCartridge2->setIcon(QIcon(
-            g_pBoard->IsROMCartridgeLoaded(2) ? ":/images/iconCartridge.png" : ":/images/iconCartridgeSlot.png" ));
+            g_pBoard->IsROMCartridgeLoaded(2) ? ":/images/iconCartridge.svg" : ":/images/iconCartridgeSlot.svg" ));
 
     ui->actionDrivesHard1->setIcon(QIcon(
-            g_pBoard->IsHardImageAttached(1) ? ":/images/iconHdd.png" : ":/images/iconHddSlot.png" ));
+            g_pBoard->IsHardImageAttached(1) ? ":/images/iconHdd.svg" : ":/images/iconHddSlot.svg" ));
     ui->actionDrivesHard2->setIcon(QIcon(
-            g_pBoard->IsHardImageAttached(2) ? ":/images/iconHdd.png" : ":/images/iconHddSlot.png" ));
+            g_pBoard->IsHardImageAttached(2) ? ":/images/iconHdd.svg" : ":/images/iconHddSlot.svg" ));
 
     ui->actionDebugConsoleView->setChecked(m_console->isVisible());
     ui->actionDebugDebugView->setChecked(m_dockDebug->isVisible());

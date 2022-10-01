@@ -122,8 +122,8 @@
    </property>
    <property name="iconSize">
     <size>
-     <width>16</width>
-     <height>16</height>
+     <width>24</width>
+     <height>24</height>
     </size>
    </property>
    <property name="toolButtonStyle">
@@ -166,7 +166,7 @@
    </property>
    <property name="icon">
     <iconset resource="QtUkncBtl.qrc">
-     <normaloff>:/images/iconRun.png</normaloff>:/images/iconRun.png</iconset>
+     <normaloff>:/images/iconRun.svg</normaloff>:/images/iconRun.svg</iconset>
    </property>
    <property name="text">
     <string>Run</string>
@@ -178,7 +178,7 @@
   <action name="actionEmulatorReset">
    <property name="icon">
     <iconset resource="QtUkncBtl.qrc">
-     <normaloff>:/images/iconReset.png</normaloff>:/images/iconReset.png</iconset>
+     <normaloff>:/images/iconReset.svg</normaloff>:/images/iconReset.svg</iconset>
    </property>
    <property name="text">
     <string>Reset</string>
@@ -195,8 +195,8 @@
    </property>
    <property name="icon">
     <iconset resource="QtUkncBtl.qrc">
-     <normaloff>:/images/iconFloppySlot.png</normaloff>
-     <normalon>:/images/iconFloppy.png</normalon>:/images/iconFloppySlot.png</iconset>
+     <normaloff>:/images/iconFloppySlot.svg</normaloff>
+     <normalon>:/images/iconFloppy.svg</normalon>:/images/iconFloppySlot.svg</iconset>
    </property>
    <property name="text">
     <string>Floppy MZ0:</string>
@@ -211,8 +211,8 @@
    </property>
    <property name="icon">
     <iconset resource="QtUkncBtl.qrc">
-     <normaloff>:/images/iconFloppySlot.png</normaloff>
-     <normalon>:/images/iconFloppy.png</normalon>:/images/iconFloppySlot.png</iconset>
+     <normaloff>:/images/iconFloppySlot.svg</normaloff>
+     <normalon>:/images/iconFloppy.svg</normalon>:/images/iconFloppySlot.svg</iconset>
    </property>
    <property name="text">
     <string>Floppy MZ1:</string>
@@ -227,8 +227,8 @@
    </property>
    <property name="icon">
     <iconset resource="QtUkncBtl.qrc">
-     <normaloff>:/images/iconFloppySlot.png</normaloff>
-     <normalon>:/images/iconFloppy.png</normalon>:/images/iconFloppySlot.png</iconset>
+     <normaloff>:/images/iconFloppySlot.svg</normaloff>
+     <normalon>:/images/iconFloppy.svg</normalon>:/images/iconFloppySlot.svg</iconset>
    </property>
    <property name="text">
     <string>Floppy MZ2:</string>
@@ -243,8 +243,8 @@
    </property>
    <property name="icon">
     <iconset resource="QtUkncBtl.qrc">
-     <normaloff>:/images/iconFloppySlot.png</normaloff>
-     <normalon>:/images/iconFloppy.png</normalon>:/images/iconFloppySlot.png</iconset>
+     <normaloff>:/images/iconFloppySlot.svg</normaloff>
+     <normalon>:/images/iconFloppy.svg</normalon>:/images/iconFloppySlot.svg</iconset>
    </property>
    <property name="text">
     <string>Floppy MZ3:</string>
@@ -258,9 +258,9 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="QtUkncBtl.qrc">
-     <normaloff>:/images/iconCartridgeSlot.png</normaloff>
-     <normalon>:/images/iconCartridge.png</normalon>:/images/iconCartridgeSlot.png</iconset>
+    <iconset>
+     <normaloff>:/images/iconCartridgeSlot.svg</normaloff>
+     <normalon>:/images/iconCartridge.svg</normalon>:/images/iconCartridgeSlot.svg</iconset>
    </property>
    <property name="text">
     <string>Cartridge 1</string>
@@ -275,7 +275,7 @@
    </property>
    <property name="icon">
     <iconset resource="QtUkncBtl.qrc">
-     <normaloff>:/images/iconHddSlot.png</normaloff>:/images/iconHddSlot.png</iconset>
+     <normaloff>:/images/iconHddSlot.svg</normaloff>:/images/iconHddSlot.svg</iconset>
    </property>
    <property name="text">
     <string>Hard Drive 1</string>
@@ -289,9 +289,9 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="QtUkncBtl.qrc">
-     <normaloff>:/images/iconCartridgeSlot.png</normaloff>
-     <normalon>:/images/iconCartridge.png</normalon>:/images/iconCartridgeSlot.png</iconset>
+    <iconset>
+     <normaloff>:/images/iconCartridgeSlot.svg</normaloff>
+     <normalon>:/images/iconCartridge.svg</normalon>:/images/iconCartridgeSlot.svg</iconset>
    </property>
    <property name="text">
     <string>Cartridge 2</string>
@@ -306,7 +306,7 @@
    </property>
    <property name="icon">
     <iconset resource="QtUkncBtl.qrc">
-     <normaloff>:/images/iconHddSlot.png</normaloff>:/images/iconHddSlot.png</iconset>
+     <normaloff>:/images/iconHddSlot.svg</normaloff>:/images/iconHddSlot.svg</iconset>
    </property>
    <property name="text">
     <string>Hard Drive 2</string>
@@ -318,7 +318,7 @@
   <action name="actionFileScreenshot">
    <property name="icon">
     <iconset resource="QtUkncBtl.qrc">
-     <normaloff>:/images/iconScreenshot.png</normaloff>:/images/iconScreenshot.png</iconset>
+     <normaloff>:/images/iconScreenshot.svg</normaloff>:/images/iconScreenshot.svg</iconset>
    </property>
    <property name="text">
     <string>Screenshot</string>
@@ -330,7 +330,7 @@
   <action name="actionDebugStepInto">
    <property name="icon">
     <iconset resource="QtUkncBtl.qrc">
-     <normaloff>:/images/iconStepInto.png</normaloff>:/images/iconStepInto.png</iconset>
+     <normaloff>:/images/iconStepInto.svg</normaloff>:/images/iconStepInto.svg</iconset>
    </property>
    <property name="text">
     <string>Step Into</string>
@@ -339,7 +339,7 @@
   <action name="actionDebugStepOver">
    <property name="icon">
     <iconset resource="QtUkncBtl.qrc">
-     <normaloff>:/images/iconStepOver.png</normaloff>:/images/iconStepOver.png</iconset>
+     <normaloff>:/images/iconStepOver.svg</normaloff>:/images/iconStepOver.svg</iconset>
    </property>
    <property name="text">
     <string>Step Over</string>
@@ -372,6 +372,10 @@
   <action name="actionDebugConsoleView">
    <property name="checkable">
     <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="QtUkncBtl.qrc">
+     <normaloff>:/images/iconDebugger.svg</normaloff>:/images/iconDebugger.svg</iconset>
    </property>
    <property name="text">
     <string>Debug Views</string>
@@ -431,7 +435,7 @@
    </property>
    <property name="icon">
     <iconset resource="QtUkncBtl.qrc">
-     <normaloff>:/images/iconSound.png</normaloff>:/images/iconSound.png</iconset>
+     <normaloff>:/images/iconSound.svg</normaloff>:/images/iconSound.svg</iconset>
    </property>
    <property name="text">
     <string>Sound Enabled</string>
@@ -538,6 +542,10 @@
    </property>
   </action>
   <action name="actionDebugCpuPpu">
+   <property name="icon">
+    <iconset resource="QtUkncBtl.qrc">
+     <normaloff>:/images/iconCpuPpu.svg</normaloff>:/images/iconCpuPpu.svg</iconset>
+   </property>
    <property name="text">
     <string>Switch CPU / PPU</string>
    </property>
