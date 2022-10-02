@@ -140,14 +140,14 @@ void QDebugView::paintEvent(QPaintEvent * /*event*/)
     drawProcessor(painter, pDebugPU, 38 + cxChar * 2, 1 * cyLine, arrR, arrRChanged);
 
     // Draw stack
-    drawMemoryForRegister(painter, 6, pDebugPU, 30 + 35 * cxChar, 1 * cyLine, oldSP);
+    drawMemoryForRegister(painter, 6, pDebugPU, 38 + 35 * cxChar, 1 * cyLine, oldSP);
 
     CMemoryController* pDebugMemCtl = pDebugPU->GetMemoryController();
     drawPorts(painter, m_okDebugProcessor, pDebugMemCtl, g_pBoard, 38 + 54 * cxChar, 1 * cyLine);
 
-    bool okBreakpoints = drawBreakpoints(painter, 38 + 70 * cxChar, 1 * cyLine);
+    drawBreakpoints(painter, 38 + 70 * cxChar, 1 * cyLine);
 
-    int xMemoryMap = 38 + (70 + (okBreakpoints ? 10 : 0)) * cxChar;
+    int xMemoryMap = 38 + 80 * cxChar;
     if (m_okDebugProcessor)
         drawCPUMemoryMap(painter, xMemoryMap, 0 * cyLine, pDebugPU->IsHaltMode());
     else
@@ -162,7 +162,7 @@ void QDebugView::paintEvent(QPaintEvent * /*event*/)
         option.backgroundColor = QColor(Qt::gray);
         option.rect = this->rect();
         option.rect.setLeft(option.rect.left() + 38);
-        option.rect.setRight(38 + (92 + (okBreakpoints ? 10 : 0)) * cxChar);
+        option.rect.setRight(38 + 102 * cxChar);
         style()->drawPrimitive(QStyle::PE_FrameFocusRect, &option, &painter, this);
     }
 }
@@ -290,7 +290,7 @@ void QDebugView::drawPorts(QPainter &painter, bool okProcessor, CMemoryControlle
     int cxChar = fontmetrics.averageCharWidth();
     int cyLine = fontmetrics.height();
 
-    painter.drawText(x, y, tr("Ports:"));
+    painter.drawText(x, y, tr("Ports"));
 
     if (okProcessor)  // CPU
     {
@@ -353,6 +353,8 @@ void QDebugView::drawPorts(QPainter &painter, bool okProcessor, CMemoryControlle
 
 bool QDebugView::drawBreakpoints(QPainter &painter, int x, int y)
 {
+    painter.drawText(x, y, tr("Breakpts"));
+
     const quint16* pbps = m_okDebugProcessor ? Emulator_GetCPUBreakpointList() : Emulator_GetPPUBreakpointList();
     if (*pbps == 0177777)
         return false;
@@ -360,7 +362,6 @@ bool QDebugView::drawBreakpoints(QPainter &painter, int x, int y)
     QFontMetrics fontmetrics(painter.font());
     int cyLine = fontmetrics.height();
 
-    painter.drawText(x, y, tr("Breakpts:"));
     y += cyLine;
     while (*pbps != 0177777)
     {
