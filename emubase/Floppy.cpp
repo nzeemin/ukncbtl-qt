@@ -72,9 +72,7 @@ CFloppyController::~CFloppyController()
 
 void CFloppyController::Reset()
 {
-#if !defined(PRODUCT)
     if (m_okTrace) DebugLog(_T("Floppy RESET\r\n"));
-#endif
 
     FlushChanges();
 
@@ -160,22 +158,18 @@ uint16_t CFloppyController::GetState(void)
     if (m_drivedata[m_drive].fpFile == nullptr)
         res |= FLOPPY_STATUS_MOREDATA;
 
-//#if !defined(PRODUCT)
 //    if (res & FLOPPY_STATUS_MOREDATA)
 //    {
 //        TCHAR oct2[7];  PrintOctalValue(oct2, res);
 //        DebugLogFormat(_T("Floppy GET STATE %s\r\n"), oct2);
 //    }
-//#endif
 
     return res;
 }
 
 void CFloppyController::SetCommand(uint16_t cmd)
 {
-#if !defined(PRODUCT)
     if (m_okTrace) DebugLogFormat(_T("Floppy COMMAND %06o\r\n"), cmd);
-#endif
 
     bool okPrepareTrack = false;  // Is it needed to load the track into the buffer
 
@@ -185,9 +179,7 @@ void CFloppyController::SetCommand(uint16_t cmd)
     {
         FlushChanges();
 
-//#if !defined(PRODUCT)
-//	DebugLogFormat(_T("Floppy DRIVE %hu\r\n"), newdrive);
-//#endif
+        DebugLogFormat(_T("Floppy DRIVE %hu\r\n"), newdrive);
 
         m_drive = newdrive;
         m_pDrive = m_drivedata + m_drive;
@@ -211,9 +203,8 @@ void CFloppyController::SetCommand(uint16_t cmd)
 
     if (cmd & FLOPPY_CMD_STEP)  // Move head for one track to center or from center
     {
-#if !defined(PRODUCT)
-        if (m_okTrace) DebugLog(_T("Floppy STEP\r\n"));  //DEBUG
-#endif
+        if (m_okTrace) DebugLog(_T("Floppy STEP\r\n"));
+
         m_side = (m_flags & FLOPPY_CMD_SIDEUP) ? 1 : 0; // DO WE NEED IT HERE?
 
         if (m_flags & FLOPPY_CMD_DIR)
@@ -229,16 +220,13 @@ void CFloppyController::SetCommand(uint16_t cmd)
     {
         PrepareTrack();
 
-//#if !defined(PRODUCT)
 //    	DebugLogFormat(_T("Floppy DRIVE %hu TR %hu SD %hu\r\n"), m_drive, m_track, m_side);
-//#endif
     }
 
     if (cmd & FLOPPY_CMD_SEARCHSYNC) // Search for marker
     {
-//#if !defined(PRODUCT)
-//        DebugLog(_T("Floppy SEARCHSYNC\r\n"));  //DEBUG
-//#endif
+//        DebugLog(_T("Floppy SEARCHSYNC\r\n"));
+
         m_flags &= ~FLOPPY_CMD_SEARCHSYNC;
         m_searchsync = true;
         m_crccalculus = true;
@@ -247,9 +235,8 @@ void CFloppyController::SetCommand(uint16_t cmd)
 
     if (m_writing && (cmd & FLOPPY_CMD_SKIPSYNC))  // Writing marker
     {
-//#if !defined(PRODUCT)
-//        DebugLog(_T("Floppy MARKER\r\n"));  //DEBUG
-//#endif
+//        DebugLog(_T("Floppy MARKER\r\n"));
+
         m_writemarker = true;
         m_status &= ~FLOPPY_STATUS_CHECKSUMOK;
     }

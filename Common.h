@@ -18,9 +18,11 @@ class QString;
 typedef char TCHAR;
 #define _tfopen     fopen
 #define _tcscpy     strcpy
+#define _tcscpy_s   strcpy_s
 #define _tstat      _stat
 #define _tcsrchr    strrchr
 #define _tcsicmp    _stricmp
+#define _tcscmp     strcmp
 #define _tcslen     strlen
 #define _sntprintf  _snprintf
 #define _T(x)       x
@@ -32,6 +34,7 @@ typedef char TCHAR;
 #define _snprintf   snprintf
 #endif
 
+typedef char * LPTSTR;
 typedef const char * LPCTSTR;
 
 #define MAKELONG(a, b)      ((qint16)(((quint16)(((quint32)(a)) & 0xffff)) | ((quint32)((quint16)(((quint32)(b)) & 0xffff))) << 16))
