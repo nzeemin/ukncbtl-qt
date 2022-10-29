@@ -70,6 +70,7 @@ int main(int argc, char *argv[])
     ParseCommandLine(argc, argv);  // Override settings by command-line option if needed
 
     Emulator_SetSound(Settings_GetSound());
+    Emulator_SetSoundAY(Settings_GetSoundAY());
 
     if (!Emulator_Init())
         return 255;

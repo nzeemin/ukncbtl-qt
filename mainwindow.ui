@@ -48,6 +48,7 @@
     <addaction name="actionactionEmulatorAutostart"/>
     <addaction name="separator"/>
     <addaction name="actionSoundEnabled"/>
+    <addaction name="actionSoundAY"/>
     <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuDrives">
@@ -258,7 +259,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="QtUkncBtl.qrc">
      <normaloff>:/images/iconCartridgeSlot.svg</normaloff>
      <normalon>:/images/iconCartridge.svg</normalon>:/images/iconCartridgeSlot.svg</iconset>
    </property>
@@ -289,7 +290,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="QtUkncBtl.qrc">
      <normaloff>:/images/iconCartridgeSlot.svg</normaloff>
      <normalon>:/images/iconCartridge.svg</normalon>:/images/iconCartridgeSlot.svg</iconset>
    </property>
@@ -558,6 +559,14 @@
   <action name="actionDebugRemoveAllBreakpoints">
    <property name="text">
     <string>Remove All Breakpoints</string>
+   </property>
+  </action>
+  <action name="actionSoundAY">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Sound AY on PPU</string>
    </property>
   </action>
  </widget>

@@ -73,6 +73,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionViewSizeUpscaled175, SIGNAL(triggered()), this, SLOT(viewSizeUpscaled175()));
     QObject::connect(ui->actionViewSizeUpscaled5, SIGNAL(triggered()), this, SLOT(viewSizeUpscaled5()));
     QObject::connect(ui->actionSoundEnabled, SIGNAL(triggered()), this, SLOT(soundEnabled()));
+    QObject::connect(ui->actionSoundAY, SIGNAL(triggered()), this, SLOT(emulatorSoundAY()));
 
     // Screen and keyboard
     m_screen = new QEmulatorScreen();
@@ -210,6 +211,7 @@ void MainWindow::restoreSettings()
     m_dockMemory->setVisible(Global_getSettings()->value("MainWindow/MemoryView", false).toBool());
 
     ui->actionSoundEnabled->setChecked(Settings_GetSound());
+    ui->actionSoundAY->setChecked(Settings_GetSoundAY());
     m_debug->updateWindowText();
     m_disasm->updateWindowText();
     m_memory->updateWindowText();
@@ -570,6 +572,13 @@ void MainWindow::soundEnabled()
     bool sound = ui->actionSoundEnabled->isChecked();
     Emulator_SetSound(sound);
     Settings_SetSound(sound);
+}
+
+void MainWindow::emulatorSoundAY()
+{
+    bool sound = ui->actionSoundAY->isChecked();
+    Emulator_SetSoundAY(sound);
+    Settings_SetSoundAY(sound);
 }
 
 void MainWindow::emulatorCartridge1() { emulatorCartridge(1); }

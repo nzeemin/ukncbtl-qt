@@ -87,6 +87,7 @@ public slots:
     void viewSizeUpscaled4();
     void viewSizeUpscaled5();
     void soundEnabled();
+    void emulatorSoundAY();
     void scriptRun();
     void consolePrint(const QString&);
 

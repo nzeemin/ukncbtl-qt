@@ -181,6 +181,7 @@ CMotherboard::CMotherboard ()
     m_NetworkInCallback = nullptr;
     m_NetworkOutCallback = nullptr;
     m_TerminalOutCallback = nullptr;
+    m_okSoundAY = false;
 
     // Create devices
     m_pCPU = new CProcessor(_T("CPU"));
@@ -190,6 +191,9 @@ CMotherboard::CMotherboard ()
     m_pFloppyCtl = new CFloppyController();
     m_pHardDrives[0] = nullptr;
     m_pHardDrives[1] = nullptr;
+    m_pSoundAY[0] = new CSoundAY();
+    m_pSoundAY[1] = new CSoundAY();
+    m_pSoundAY[2] = new CSoundAY();
 
     // Connect devices
     m_pCPU->AttachMemoryController(m_pFirstMemCtl);
@@ -253,6 +257,9 @@ CMotherboard::~CMotherboard ()
     delete m_pFirstMemCtl;
     delete m_pSecondMemCtl;
     delete m_pFloppyCtl;
+    delete m_pSoundAY[0];
+    delete m_pSoundAY[1];
+    delete m_pSoundAY[2];
 
     // Free memory
     free(m_pRAM[0]);
@@ -301,6 +308,11 @@ void CMotherboard::Reset ()
     m_scanned_key = 0;
     memset(m_kbd_matrix, 0, sizeof(m_kbd_matrix));
     m_kbd_matrix[3].row_Y = 0xFF;
+
+    memset(m_nSoundAYReg, 0, sizeof(m_nSoundAYReg));
+    m_pSoundAY[0]->Reset();
+    m_pSoundAY[1]->Reset();
+    m_pSoundAY[2]->Reset();
 
     //ChanResetByCPU();
     //ChanResetByPPU();
@@ -633,6 +645,20 @@ void CMotherboard::SetTimerState(uint16_t val) // Sets timer state
     }
 }
 
+void CMotherboard::SetSoundAYReg(int chip, uint8_t reg)
+{
+    if (chip >= 0 && chip < 3)
+        m_nSoundAYReg[chip] = reg;
+}
+
+void CMotherboard::SetSoundAYVal(int chip, uint8_t val)
+{
+    if (m_okSoundAY && chip >= 0 && chip < 3)
+    {
+        m_pSoundAY[chip]->SetReg(m_nSoundAYReg[chip], val);
+    }
+}
+
 void CMotherboard::DebugTicks()
 {
     if (!m_pPPU->IsStopped())
@@ -672,9 +698,11 @@ void CMotherboard::DebugTicks()
     { const uint16_t* pbps = m_PPUbps; while(*pbps != 0177777) { if (m_pPPU->GetPC() == *pbps++) return false; } } }
 bool CMotherboard::SystemFrame()
 {
-    int frameticks = 0;  // 20000 ticks
-    const int audioticks = 20286 / (SAMPLERATE / 25);
+    int frameticks = 0;  // count 20000 ticks
+
     m_SoundChanges = 0;
+    int soundSamplesPerFrame = SAMPLERATE / 25, soundBrasErr = 0;
+
     const int serialOutTicks = 20000 / (9600 / 25);
     int serialTxCount = 0;
     const int networkOutTicks = 7; //20000 / (57600 / 25);
@@ -682,10 +710,7 @@ bool CMotherboard::SystemFrame()
 
     int tapeSamplesPerFrame = 1, tapeBrasErr = 0;
     if (m_TapeReadCallback != nullptr || m_TapeWriteCallback != nullptr)
-    {
         tapeSamplesPerFrame = m_nTapeSampleRate / 25;
-        tapeBrasErr = 0;
-    }
 
     do
     {
@@ -772,8 +797,12 @@ bool CMotherboard::SystemFrame()
         if (m_pHardDrives[1] != nullptr)
             m_pHardDrives[1]->Periodic();
 
-        if (frameticks % audioticks == 0) //AUDIO tick
+        soundBrasErr += soundSamplesPerFrame;
+        if (2 * soundBrasErr >= 20000)
+        {
+            soundBrasErr -= 20000;
             DoSound();
+        }
 
         if (m_TapeReadCallback != nullptr || m_TapeWriteCallback != nullptr)
         {
@@ -1478,12 +1507,22 @@ void CMotherboard::DoSound(void)
     if (m_SoundPrevValue == 0 && global != 0)
         m_SoundChanges++;
 
-    if (m_SoundGenCallback == nullptr)
-        return;
+    uint16_t value = global ? 0x7fff : 0;
+    if (m_okSoundAY)
+    {
+        uint8_t bufferay[2];
+        uint8_t valueay = 0;
+        m_pSoundAY[0]->Callback(bufferay, sizeof(bufferay));
+        valueay |= bufferay[1];
+        m_pSoundAY[1]->Callback(bufferay, sizeof(bufferay));
+        valueay |= bufferay[1];
+        m_pSoundAY[2]->Callback(bufferay, sizeof(bufferay));
+        valueay |= bufferay[1];
+        value |= valueay << 7;
+    }
 
-    uint8_t value = global ? 0xff : 0;
-    uint16_t value16 = value << 7;
-    (*m_SoundGenCallback)(value16, value16);
+    if (m_SoundGenCallback != nullptr)
+        (*m_SoundGenCallback)(value, value);
 }
 
 void CMotherboard::SetSound(uint16_t val)

@@ -38,6 +38,7 @@ bool Emulator_IsBreakpoint(bool okCpuPpu, quint16 address);
 void Emulator_RemoveAllBreakpoints(bool okCpuPpu);
 
 void Emulator_SetSound(bool enable);
+void Emulator_SetSoundAY(bool enable);
 void Emulator_Start();
 void Emulator_Stop();
 void Emulator_Reset();

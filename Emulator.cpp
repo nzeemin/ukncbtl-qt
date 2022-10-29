@@ -27,6 +27,7 @@ quint16 m_wEmulatorTempCPUBreakpoint = 0177777;
 quint16 m_wEmulatorTempPPUBreakpoint = 0177777;
 
 bool m_okEmulatorSound = false;
+bool m_okEmulatorSoundAY = false;
 
 long m_nFrameCount = 0;
 QTime m_emulatorTime;
@@ -105,6 +106,7 @@ bool Emulator_Init()
     {
         g_pBoard->SetSoundGenCallback(Emulator_FeedDAC);
     }
+    g_pBoard->SetSoundAY(m_okEmulatorSoundAY);
 
     m_nUptimeFrameCount = 0;
     m_dwEmulatorUptime = 0;
@@ -795,6 +797,15 @@ void Emulator_SetSound(bool enable)
     }
 }
 
+void Emulator_SetSoundAY(bool enable)
+{
+    m_okEmulatorSoundAY = enable;
+    if (g_pBoard != nullptr)
+    {
+        g_pBoard->SetSoundAY(m_okEmulatorSoundAY);
+    }
+}
+
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -894,6 +905,7 @@ bool Emulator_LoadImage(const QString &sFilePath)
     else
     {
         // Restore emulator state from the image
+        g_pBoard->Reset();
         g_pBoard->LoadFromImage(pImage);
 
         m_dwEmulatorUptime = *(quint32*)(pImage + 16);

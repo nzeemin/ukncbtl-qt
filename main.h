@@ -36,6 +36,8 @@ void Settings_SetAutostart(bool flag);
 bool Settings_GetAutostart();
 void Settings_SetSound(bool flag);
 bool Settings_GetSound();
+void Settings_SetSoundAY(bool flag);
+bool Settings_GetSoundAY();
 bool Settings_GetDebugCpuPpu();
 void Settings_SetDebugCpuPpu(bool flag);
 void Settings_SetDebugMemoryMode(quint16 mode);

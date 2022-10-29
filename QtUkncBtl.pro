@@ -13,6 +13,7 @@ SOURCES += main.cpp \
     emubase/Floppy.cpp \
     emubase/Disasm.cpp \
     emubase/Board.cpp \
+    emubase/SoundAY.cpp \
     Emulator.cpp \
     qscreen.cpp \
     qkeyboardview.cpp \
