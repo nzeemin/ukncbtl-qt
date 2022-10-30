@@ -119,12 +119,18 @@ QFont Common_GetMonospacedFont();
 QColor Common_GetColorShifted(const QPalette& palette, QRgb rgb);
 void Common_Cleanup();
 void PrintOctalValue(char* buffer, quint16 value);
+void PrintHexValue(char* buffer, quint16 value);
 void PrintBinaryValue(char* buffer, quint16 value);
 void DrawOctalValue(QPainter &painter, int x, int y, quint16 value);
 void DrawHexValue(QPainter &painter, int x, int y, quint16 value);
 void DrawBinaryValue(QPainter &painter, int x, int y, quint16 value);
 bool ParseOctalValue(const char* text, quint16* pValue);
 bool ParseOctalValue(const QString &text, quint16* pValue);
+
+void CopyTextToClipboard(const char* text);
+void CopyWordOctalToClipboard(uint16_t value);
+void CopyWordHexToClipboard(uint16_t value);
+void CopyWordBinaryToClipboard(uint16_t value);
 
 ushort Translate_KOI8R(quint8 ch);
 

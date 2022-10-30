@@ -149,6 +149,42 @@ QDebugCtrl::QDebugCtrl(QDebugView *debugView)
     setParent(debugView);
 }
 
+DebugCtrlHitTest QDebugCtrl::hitTest(int /*x*/, int y)
+{
+    QFont font = Common_GetMonospacedFont();
+    QFontMetrics fontmetrics(font);
+    int cyLine = fontmetrics.height();
+
+    DebugCtrlHitTest hit;
+    hit.isValid = false;
+    hit.address = hit.value = 0;
+    hit.line = (y - cyLine / 3) / cyLine;
+
+    m_lastHitTest = hit;
+    return hit;
+}
+
+void QDebugCtrl::copyValueOctal()
+{
+    if (!m_lastHitTest.isValid)
+        return;
+    CopyWordOctalToClipboard(m_lastHitTest.value);
+}
+
+void QDebugCtrl::copyValueHex()
+{
+    if (!m_lastHitTest.isValid)
+        return;
+    CopyWordHexToClipboard(m_lastHitTest.value);
+}
+
+void QDebugCtrl::copyValueBinary()
+{
+    if (!m_lastHitTest.isValid)
+        return;
+    CopyWordBinaryToClipboard(m_lastHitTest.value);
+}
+
 //////////////////////////////////////////////////////////////////////
 
 QDebugProcessorCtrl::QDebugProcessorCtrl(QDebugView *debugView)
@@ -255,7 +291,46 @@ void QDebugProcessorCtrl::updateData()
     quint16 pswPPU = pPPU->GetPSW();
     m_okDebugPpuRChanged[8] = (m_wDebugPpuR[8] != pswPPU);
     m_wDebugPpuR[8] = pswPPU;
+}
 
+DebugCtrlHitTest QDebugProcessorCtrl::hitTest(int x, int y)
+{
+    DebugCtrlHitTest hit = QDebugCtrl::hitTest(x, y);
+    if (hit.line < 0 || hit.line == 9 || hit.line > 11)
+        return hit;  // Invalid line number
+    hit.isValid = true;
+
+    const CProcessor* pProc = getProc();
+    if (hit.line < 8)
+        hit.value = pProc->GetReg(hit.line);
+    else if (hit.line == 8)
+        hit.value = pProc->GetCPC();
+    else if (hit.line == 10)
+        hit.value = pProc->GetPSW();
+    else if (hit.line == 11)
+        hit.value = pProc->GetCPSW();
+
+    return hit;
+}
+
+void QDebugProcessorCtrl::contextMenuEvent(QContextMenuEvent *event)
+{
+    DebugCtrlHitTest hit = hitTest(event->x(), event->y());
+    if (!hit.isValid)
+        return;
+    m_lastHitTest = hit;
+
+    char buffer[7], bufferHex[5], bufferBin[17];
+    PrintOctalValue(buffer, hit.value);
+    PrintHexValue(bufferHex, hit.value);
+    PrintBinaryValue(bufferBin, hit.value);
+
+    QMenu menu(this);
+    menu.addAction(tr("Copy Value %1").arg(buffer), this, SLOT(copyValueOctal()));
+    if (hit.line < 10)
+        menu.addAction(tr("Copy Value %1").arg(bufferHex), this, SLOT(copyValueHex()));
+    menu.addAction(tr("Copy Value %1").arg(bufferBin), this, SLOT(copyValueBinary()));
+    menu.exec(event->globalPos());
 }
 
 //////////////////////////////////////////////////////////////////////

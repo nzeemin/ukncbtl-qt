@@ -41,6 +41,14 @@ private:
     bool m_okDebugProcessor;        // TRUE - CPU, FALSE - PPU
 };
 
+struct DebugCtrlHitTest
+{
+    bool        isValid;
+    int         line;       // Line number
+    uint16_t    address;
+    uint16_t    value;
+};
+
 class QDebugCtrl : public QWidget
 {
     Q_OBJECT
@@ -48,9 +56,16 @@ public:
     QDebugCtrl(QDebugView *debugView);
 
     virtual void updateData() { }
+    virtual DebugCtrlHitTest hitTest(int x, int y);
+
+public slots:
+    void copyValueOctal();
+    void copyValueHex();
+    void copyValueBinary();
 
 protected:
     QDebugView *m_pDebugView;
+    DebugCtrlHitTest m_lastHitTest;
 
 protected:
     CProcessor* getProc() const { return m_pDebugView->getCurrentProc(); }
@@ -67,6 +82,8 @@ public:
 
 protected:
     void paintEvent(QPaintEvent *event);
+    virtual DebugCtrlHitTest hitTest(int x, int y);
+    void contextMenuEvent(QContextMenuEvent *event);
 
 private:
     unsigned short m_wDebugCpuR[9];  // Old register values - R0..R7, PSW

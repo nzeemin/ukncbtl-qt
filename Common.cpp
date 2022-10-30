@@ -1,7 +1,9 @@
 ﻿// Common.cpp
 
 #include "stdafx.h"
+#include <QClipboard>
 #include <QMessageBox>
+#include <QGuiApplication>
 #include <QFont>
 #include <QPainter>
 #include <QCoreApplication>
@@ -237,6 +239,31 @@ bool ParseOctalValue(const QString &text, quint16* pValue)
     }
     *pValue = value;
     return true;
+}
+
+void CopyTextToClipboard(const char* text)
+{
+    QClipboard *clipboard = QGuiApplication::clipboard();
+    clipboard->clear();
+    clipboard->setText(text);
+}
+void CopyWordOctalToClipboard(uint16_t value)
+{
+    char buffer[7];
+    PrintOctalValue(buffer, value);
+    CopyTextToClipboard(buffer);
+}
+void CopyWordHexToClipboard(uint16_t value)
+{
+    char bufferHex[5];
+    PrintHexValue(bufferHex, value);
+    CopyTextToClipboard(bufferHex);
+}
+void CopyWordBinaryToClipboard(uint16_t value)
+{
+    char bufferBin[17];
+    PrintBinaryValue(bufferBin, value);
+    CopyTextToClipboard(bufferBin);
 }
 
 
