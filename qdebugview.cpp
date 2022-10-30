@@ -22,16 +22,38 @@ QDebugView::QDebugView(QWidget *mainWindow) :
     QFontMetrics fontmetrics(font);
     int cxChar = fontmetrics.averageCharWidth();
     int cyLine = fontmetrics.height();
-    this->setMinimumSize(cxChar * 55, cyLine * 16 + cyLine / 2);
+    this->setMinimumSize(36 + cxChar * 96, cyLine * 16 + cyLine / 2);
     this->setMaximumHeight(cyLine * 16 + cyLine / 2);
 
-    m_toolbar = new QToolBar(this);
-    m_toolbar->setGeometry(4, 4, 36, cyLine * 16);
+    m_toolbar = new QToolBar();
+    m_toolbar->setGeometry(0, 0, 36, cyLine * 16);
     m_toolbar->setOrientation(Qt::Vertical);
     m_toolbar->setIconSize(QSize(24, 24));
     m_toolbar->setToolButtonStyle(Qt::ToolButtonIconOnly);
     m_toolbar->setFocusPolicy(Qt::NoFocus);
     m_toolbar->setStyle(QStyleFactory::create("windows"));  // fix for macOS to remove gradient background
+
+    m_hlayout = new QHBoxLayout(this);
+    m_hlayout->setMargin(0);
+    m_hlayout->setSpacing(4);
+    m_hlayout->setAlignment(Qt::AlignLeft);
+    m_hlayout->addWidget(m_toolbar, 0, Qt::AlignLeft);
+    m_procCtrl = new QDebugProcessorCtrl(this);
+    m_procCtrl->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+    m_procCtrl->setMinimumWidth(cxChar * 31 + cxChar / 2);
+    m_hlayout->addWidget(m_procCtrl);
+    m_stackCtrl = new QDebugStackCtrl(this);
+    m_stackCtrl->setMinimumWidth(cxChar * 17);
+    m_hlayout->addWidget(m_stackCtrl);
+    m_portsCtrl = new QDebugPortsCtrl(this);
+    m_portsCtrl->setMinimumWidth(cxChar * 14 + cxChar / 2);
+    m_hlayout->addWidget(m_portsCtrl);
+    m_breaksCtrl = new QDebugBreakpointsCtrl(this);
+    m_breaksCtrl->setMinimumWidth(cxChar * 8 + cxChar / 2);
+    m_hlayout->addWidget(m_breaksCtrl);
+    m_memmapCtrl = new QDebugMemoryMapCtrl(this);
+    m_memmapCtrl->setMinimumWidth(cxChar * 21 + cxChar / 2);
+    m_hlayout->addWidget(m_memmapCtrl);
 
     QAction* actionCpuPpu = m_toolbar->addAction(QIcon(":/images/iconCpuPpu.svg"), "");
     m_toolbar->addSeparator();
@@ -47,7 +69,7 @@ QDebugView::QDebugView(QWidget *mainWindow) :
 
 void QDebugView::updateWindowText()
 {
-    CProcessor* pDebugPU = m_okDebugProcessor ? g_pBoard->GetCPU() : g_pBoard->GetPPU();
+    CProcessor* pDebugPU = getCurrentProc();
     QString buffer = tr("Debug - %1").arg(pDebugPU->GetName());
     parentWidget()->setWindowTitle(buffer);
 }
@@ -61,38 +83,24 @@ void QDebugView::setCurrentProc(bool okProc)
     Settings_SetDebugCpuPpu(m_okDebugProcessor);
 }
 
+CProcessor* QDebugView::getCurrentProc()
+{
+    return (m_okDebugProcessor) ? g_pBoard->GetCPU() : g_pBoard->GetPPU();
+}
+
+bool QDebugView::isCpuOrPpu()
+{
+    return m_okDebugProcessor;
+}
+
 // Update after Run or Step
 void QDebugView::updateData()
 {
-    CProcessor* pCPU = g_pBoard->GetCPU();
-    ASSERT(pCPU != nullptr);
-
-    // Get new register values and set change flags
-    m_wDebugCpuR6Old = m_wDebugCpuR[6];
-    for (int r = 0; r < 8; r++)
-    {
-        quint16 value = pCPU->GetReg(r);
-        m_okDebugCpuRChanged[r] = (m_wDebugCpuR[r] != value);
-        m_wDebugCpuR[r] = value;
-    }
-    quint16 pswCPU = pCPU->GetPSW();
-    m_okDebugCpuRChanged[8] = (m_wDebugCpuR[8] != pswCPU);
-    m_wDebugCpuR[8] = pswCPU;
-
-    CProcessor* pPPU = g_pBoard->GetPPU();
-    ASSERT(pPPU != nullptr);
-
-    // Get new register values and set change flags
-    m_wDebugPpuR6Old = m_wDebugPpuR[6];
-    for (int r = 0; r < 8; r++)
-    {
-        quint16 value = pPPU->GetReg(r);
-        m_okDebugPpuRChanged[r] = (m_wDebugPpuR[r] != value);
-        m_wDebugPpuR[r] = value;
-    }
-    quint16 pswPPU = pPPU->GetPSW();
-    m_okDebugPpuRChanged[8] = (m_wDebugPpuR[8] != pswPPU);
-    m_wDebugPpuR[8] = pswPPU;
+    m_procCtrl->updateData();
+    m_stackCtrl->updateData();
+    m_portsCtrl->updateData();
+    m_breaksCtrl->updateData();
+    m_memmapCtrl->updateData();
 }
 
 void QDebugView::focusInEvent(QFocusEvent *)
@@ -119,7 +127,40 @@ void QDebugView::switchCpuPpu()
 
 void QDebugView::paintEvent(QPaintEvent * /*event*/)
 {
-    if (g_pBoard == nullptr) return;
+    QPainter painter(this);
+
+    // Draw focus rect
+    if (hasFocus())
+    {
+        QStyleOptionFocusRect option;
+        option.initFrom(this);
+        option.state |= QStyle::State_KeyboardFocusChange;
+        option.backgroundColor = QColor(Qt::gray);
+        option.rect = this->rect();
+        style()->drawPrimitive(QStyle::PE_FrameFocusRect, &option, &painter, this);
+    }
+}
+
+//////////////////////////////////////////////////////////////////////
+
+QDebugCtrl::QDebugCtrl(QDebugView *debugView)
+{
+    m_pDebugView = debugView;
+}
+
+//////////////////////////////////////////////////////////////////////
+
+QDebugProcessorCtrl::QDebugProcessorCtrl(QDebugView *debugView)
+    : QDebugCtrl(debugView)
+{
+}
+
+void QDebugProcessorCtrl::paintEvent(QPaintEvent * /*event*/)
+{
+    const CProcessor* pProc = getProc();
+
+    quint16* arrR = (isCpuOrPpu()) ? m_wDebugCpuR : m_wDebugPpuR;
+    bool* arrRChanged = (isCpuOrPpu()) ? m_okDebugCpuRChanged : m_okDebugPpuRChanged;
 
     QColor colorBackground = palette().color(QPalette::Base);
     QPainter painter(this);
@@ -130,53 +171,10 @@ void QDebugView::paintEvent(QPaintEvent * /*event*/)
     QFontMetrics fontmetrics(font);
     int cxChar = fontmetrics.averageCharWidth();
     int cyLine = fontmetrics.height();
-
-    CProcessor* pDebugPU = (m_okDebugProcessor) ? g_pBoard->GetCPU() : g_pBoard->GetPPU();
-    ASSERT(pDebugPU != nullptr);
-    quint16* arrR = (m_okDebugProcessor) ? m_wDebugCpuR : m_wDebugPpuR;
-    bool* arrRChanged = (m_okDebugProcessor) ? m_okDebugCpuRChanged : m_okDebugPpuRChanged;
-    quint16 oldSP = (m_okDebugProcessor) ? m_wDebugCpuR6Old : m_wDebugPpuR6Old;
-
-    drawProcessor(painter, pDebugPU, 38 + cxChar * 2, 1 * cyLine, arrR, arrRChanged);
-
-    // Draw stack
-    drawMemoryForRegister(painter, 6, pDebugPU, 38 + 35 * cxChar, 1 * cyLine, oldSP);
-
-    CMemoryController* pDebugMemCtl = pDebugPU->GetMemoryController();
-    drawPorts(painter, m_okDebugProcessor, pDebugMemCtl, g_pBoard, 38 + 54 * cxChar, 1 * cyLine);
-
-    drawBreakpoints(painter, 38 + 70 * cxChar, 1 * cyLine);
-
-    int xMemoryMap = 38 + 80 * cxChar;
-    if (m_okDebugProcessor)
-        drawCPUMemoryMap(painter, xMemoryMap, 0 * cyLine, pDebugPU->IsHaltMode());
-    else
-        drawPPUMemoryMap(painter, xMemoryMap, 0 * cyLine, pDebugMemCtl);
-
-    // Draw focus rect
-    if (hasFocus())
-    {
-        QStyleOptionFocusRect option;
-        option.initFrom(this);
-        option.state |= QStyle::State_KeyboardFocusChange;
-        option.backgroundColor = QColor(Qt::gray);
-        option.rect = this->rect();
-        option.rect.setLeft(option.rect.left() + 38);
-        option.rect.setRight(38 + 102 * cxChar);
-        style()->drawPrimitive(QStyle::PE_FrameFocusRect, &option, &painter, this);
-    }
-}
-
-void QDebugView::drawProcessor(QPainter &painter, const CProcessor *pProc, int x, int y, quint16 *arrR, bool *arrRChanged)
-{
-    QFontMetrics fontmetrics(painter.font());
-    int cxChar = fontmetrics.averageCharWidth();
-    int cyLine = fontmetrics.height();
     QColor colorText = palette().color(QPalette::Text);
     QColor colorChanged = Common_GetColorShifted(palette(), COLOR_VALUECHANGED);
 
-    painter.setPen(QColor(Qt::gray));
-    painter.drawRect(x - cxChar, y - cyLine / 2, 33 * cxChar, cyLine * 15 + cyLine / 2);
+    int x = cxChar * 1, y = 0;
 
     // Registers
     for (int r = 0; r < 8; r++)
@@ -227,18 +225,69 @@ void QDebugView::drawProcessor(QPainter &painter, const CProcessor *pProc, int x
         painter.drawText(x + 6 * cxChar, y + 14 * cyLine, "STOP");
 }
 
-void QDebugView::drawMemoryForRegister(QPainter &painter, int reg, CProcessor *pProc, int x, int y, quint16 oldValue)
+void QDebugProcessorCtrl::updateData()
 {
-    QFontMetrics fontmetrics(painter.font());
+    const CProcessor* pCPU = g_pBoard->GetCPU();
+    ASSERT(pCPU != nullptr);
+
+    // Get new register values and set change flags
+    for (int r = 0; r < 8; r++)
+    {
+        quint16 value = pCPU->GetReg(r);
+        m_okDebugCpuRChanged[r] = (m_wDebugCpuR[r] != value);
+        m_wDebugCpuR[r] = value;
+    }
+    quint16 pswCPU = pCPU->GetPSW();
+    m_okDebugCpuRChanged[8] = (m_wDebugCpuR[8] != pswCPU);
+    m_wDebugCpuR[8] = pswCPU;
+
+    CProcessor* pPPU = g_pBoard->GetPPU();
+    ASSERT(pPPU != nullptr);
+
+    // Get new register values and set change flags
+    for (int r = 0; r < 8; r++)
+    {
+        quint16 value = pPPU->GetReg(r);
+        m_okDebugPpuRChanged[r] = (m_wDebugPpuR[r] != value);
+        m_wDebugPpuR[r] = value;
+    }
+    quint16 pswPPU = pPPU->GetPSW();
+    m_okDebugPpuRChanged[8] = (m_wDebugPpuR[8] != pswPPU);
+    m_wDebugPpuR[8] = pswPPU;
+
+}
+
+//////////////////////////////////////////////////////////////////////
+
+QDebugStackCtrl::QDebugStackCtrl(QDebugView *debugView)
+    : QDebugCtrl(debugView)
+{
+}
+
+void QDebugStackCtrl::paintEvent(QPaintEvent * /*event*/)
+{
+    QColor colorBackground = palette().color(QPalette::Base);
+    QPainter painter(this);
+    painter.fillRect(0, 0, this->width(), this->height(), colorBackground);
+
+    QFont font = Common_GetMonospacedFont();
+    painter.setFont(font);
+    QFontMetrics fontmetrics(font);
     int cxChar = fontmetrics.averageCharWidth();
     int cyLine = fontmetrics.height();
     QColor colorText = palette().color(QPalette::Text);
     QColor colorChanged = Common_GetColorShifted(palette(), COLOR_VALUECHANGED);
     QColor colorPrev = Common_GetColorShifted(palette(), COLOR_PREVIOUS);
 
+    int x = cxChar / 2, y = cyLine;
+
+    CProcessor* pProc = getProc();
+    int reg = 6;
+    quint16 oldValue = (isCpuOrPpu()) ? m_wDebugCpuR6Old : m_wDebugPpuR6Old;
+
     quint16 current = pProc->GetReg(reg);
     quint16 previous = oldValue;
-    bool okExec = (reg == 7);
+    bool okExec = false; //(reg == 7);
 
     // Reading from memory into the buffer
     quint16 memory[16];
@@ -284,15 +333,38 @@ void QDebugView::drawMemoryForRegister(QPainter &painter, int reg, CProcessor *p
     painter.setPen(colorText);
 }
 
-void QDebugView::drawPorts(QPainter &painter, bool okProcessor, CMemoryController* pMemCtl, CMotherboard* pBoard, int x, int y)
+void QDebugStackCtrl::updateData()
 {
-    QFontMetrics fontmetrics(painter.font());
+    m_wDebugCpuR6Old = g_pBoard->GetCPU()->GetSP();
+
+    m_wDebugPpuR6Old = g_pBoard->GetPPU()->GetSP();
+}
+
+//////////////////////////////////////////////////////////////////////
+
+QDebugPortsCtrl::QDebugPortsCtrl(QDebugView *debugView)
+    : QDebugCtrl(debugView)
+{
+}
+
+void QDebugPortsCtrl::paintEvent(QPaintEvent * /*event*/)
+{
+    QColor colorBackground = palette().color(QPalette::Base);
+    QPainter painter(this);
+    painter.fillRect(0, 0, this->width(), this->height(), colorBackground);
+
+    QFont font = Common_GetMonospacedFont();
+    painter.setFont(font);
+    QFontMetrics fontmetrics(font);
     int cxChar = fontmetrics.averageCharWidth();
     int cyLine = fontmetrics.height();
 
+    int x = cxChar, y = cyLine;
+
     painter.drawText(x, y, tr("Ports"));
 
-    if (okProcessor)  // CPU
+    CMemoryController* pMemCtl = getProc()->GetMemoryController();
+    if (isCpuOrPpu())  // CPU
     {
         quint16 value176640 = pMemCtl->GetPortView(0176640);
         DrawOctalValue(painter, x + 0 * cxChar, y + 1 * cyLine, 0176640);
@@ -339,144 +411,161 @@ void QDebugView::drawPorts(QPainter &painter, bool okProcessor, CMemoryControlle
         DrawOctalValue(painter, x + 0 * cxChar, y + 11 * cyLine, 0177716);
         DrawOctalValue(painter, x + 7 * cxChar, y + 11 * cyLine, value177716);
 
-        quint16 value177710 = pBoard->GetTimerStateView();
+        quint16 value177710 = g_pBoard->GetTimerStateView();
         DrawOctalValue(painter, x + 0 * cxChar, y + 13 * cyLine, 0177710);
         DrawOctalValue(painter, x + 7 * cxChar, y + 13 * cyLine, value177710);
-        quint16 value177712 = pBoard->GetTimerReloadView();
+        quint16 value177712 = g_pBoard->GetTimerReloadView();
         DrawOctalValue(painter, x + 0 * cxChar, y + 14 * cyLine, 0177712);
         DrawOctalValue(painter, x + 7 * cxChar, y + 14 * cyLine, value177712);
-        quint16 value177714 = pBoard->GetTimerValueView();
+        quint16 value177714 = g_pBoard->GetTimerValueView();
         DrawOctalValue(painter, x + 0 * cxChar, y + 15 * cyLine, 0177714);
         DrawOctalValue(painter, x + 7 * cxChar, y + 15 * cyLine, value177714);
     }
 }
 
-bool QDebugView::drawBreakpoints(QPainter &painter, int x, int y)
+//////////////////////////////////////////////////////////////////////
+
+QDebugBreakpointsCtrl::QDebugBreakpointsCtrl(QDebugView *debugView)
+    : QDebugCtrl(debugView)
 {
+}
+
+void QDebugBreakpointsCtrl::paintEvent(QPaintEvent * /*event*/)
+{
+    QColor colorBackground = palette().color(QPalette::Base);
+    QPainter painter(this);
+    painter.fillRect(0, 0, this->width(), this->height(), colorBackground);
+
+    QFont font = Common_GetMonospacedFont();
+    painter.setFont(font);
+    QFontMetrics fontmetrics(font);
+    int cxChar = fontmetrics.averageCharWidth();
+    int cyLine = fontmetrics.height();
+
+    int x = cxChar / 2, y = cyLine;
+
     painter.drawText(x, y, tr("Breakpts"));
 
-    const quint16* pbps = m_okDebugProcessor ? Emulator_GetCPUBreakpointList() : Emulator_GetPPUBreakpointList();
+    const quint16* pbps = isCpuOrPpu() ? Emulator_GetCPUBreakpointList() : Emulator_GetPPUBreakpointList();
     if (*pbps == 0177777)
-        return false;
-
-    QFontMetrics fontmetrics(painter.font());
-    int cyLine = fontmetrics.height();
+        return;
 
     y += cyLine;
     while (*pbps != 0177777)
     {
-        DrawOctalValue(painter, x, y, *pbps);
+        DrawOctalValue(painter, x + cxChar, y, *pbps);
         y += cyLine;
         pbps++;
     }
-    return true;
 }
 
-void QDebugView::drawCPUMemoryMap(QPainter &painter, int x, int y, bool okHalt)
+//////////////////////////////////////////////////////////////////////
+
+QDebugMemoryMapCtrl::QDebugMemoryMapCtrl(QDebugView *debugView)
+    : QDebugCtrl(debugView)
 {
-    QFontMetrics fontmetrics(painter.font());
+}
+
+void QDebugMemoryMapCtrl::paintEvent(QPaintEvent * /*event*/)
+{
+    QColor colorBackground = palette().color(QPalette::Base);
+    QPainter painter(this);
+    painter.fillRect(0, 0, this->width(), this->height(), colorBackground);
+
+    QFont font = Common_GetMonospacedFont();
+    painter.setFont(font);
+    QFontMetrics fontmetrics(font);
     int cxChar = fontmetrics.averageCharWidth();
     int cyLine = fontmetrics.height();
 
-    int x1 = x + cxChar * 7;
+    int x = cxChar, y = 0;
+    int x1 = x + cxChar * 7 - cxChar / 2;
     int y1 = y + cxChar / 2;
-    int x2 = x1 + cxChar * 14;
+    int x2 = x1 + cxChar * 13;
     int y2 = y1 + cyLine * 16;
     int xtype = x1 + cxChar * 3;
     int ybase = y + cyLine * 16;
-
     painter.drawRect(x1, y1, x2 - x1, y2 - y1);
-
     painter.drawText(x, ybase + 2, "000000");
 
-    for (int i = 1; i < 8; i++)
+    if (isCpuOrPpu())
     {
-        int ycur = y2 - cyLine * i * 2;
-        if (i < 7)
-            painter.drawLine(x1, ycur, x1 + 8, ycur);
+        for (int i = 1; i < 8; i++)
+        {
+            int ycur = y2 - cyLine * i * 2;
+            if (i < 7)
+                painter.drawLine(x1, ycur, x1 + 8, ycur);
+            else
+                painter.drawLine(x1, ycur, x2, ycur);
+            quint16 addr = (quint16)i * 020000;
+            DrawOctalValue(painter, x, y2 - cyLine * i * 2 + cyLine / 3, addr);
+        }
+
+        painter.drawText(xtype, ybase - cyLine * 6 - cyLine / 3, "RAM12");
+
+        int ytop = ybase - cyLine * 14 - cyLine / 3;
+        if (getProc()->IsHaltMode())
+            painter.drawText(xtype, ytop, "RAM12");
         else
-            painter.drawLine(x1, ycur, x2, ycur);
-        quint16 addr = (quint16)i * 020000;
-        DrawOctalValue(painter, x, y2 - cyLine * i * 2 + cyLine / 3, addr);
+            painter.drawText(xtype, ytop, "I/O");
     }
-
-    painter.drawText(xtype, ybase - cyLine * 6 - cyLine / 3, "RAM12");
-
-    int ytop = ybase - cyLine * 14 - cyLine / 3;
-    if (okHalt)
-        painter.drawText(xtype, ytop, "RAM12");
     else
-        painter.drawText(xtype, ytop, "I/O");
+    {
+        const CMemoryController *pMemCtl = getProc()->GetMemoryController();
+        quint16 value177054 = pMemCtl->GetPortView(0177054);
+
+        for (int i = 1; i < 8; i++)
+        {
+            int ycur = y2 - cyLine * i * 2;
+            if (i < 4)
+                painter.drawLine(x1, ycur, x1 + 8, ycur);
+            else
+                painter.drawLine(x1, ycur, x2, ycur);
+            quint16 addr = (quint16)i * 020000;
+            DrawOctalValue(painter, x, y2 - cyLine * i * 2 + cyLine / 3, addr);
+        }
+
+        int yp = y1 + cyLine / 4;
+        painter.drawLine(x1, yp, x2, yp);
+
+        painter.drawText(x, ybase - cyLine * 15, "177000");
+        painter.drawText(xtype, ybase - cyLine * 3 - cyLine / 2, "RAM0");
+
+        // 100000-117777 - Window block 0
+        int yb0 = ybase - cyLine * 8 - cyLine / 3;
+        if ((value177054 & 16) != 0)  // Port 177054 bit 4 set => RAM selected
+            painter.drawText(xtype, yb0, "RAM0");
+        else if ((value177054 & 1) != 0)  // ROM selected
+            painter.drawText(xtype, yb0, "ROM");
+        else if ((value177054 & 14) != 0)  // ROM cartridge selected
+        {
+            int slot = ((value177054 & 8) == 0) ? 1 : 2;
+            int bank = (value177054 & 6) >> 1;
+            QString carttext = tr("Cart %1/%2").arg(slot).arg(bank);
+            painter.drawText(xtype, yb0, carttext);
+        }
+
+        // 120000-137777 - Window block 1
+        int yb1 = ybase - cyLine * 10 - cyLine / 3;
+        if ((value177054 & 32) != 0)  // Port 177054 bit 5 set => RAM selected
+            painter.drawText(xtype, yb1, "RAM0");
+        else
+            painter.drawText(xtype, yb1, "ROM");
+
+        // 140000-157777 - Window block 2
+        int yb2 = ybase - cyLine * 12 - cyLine / 3;
+        if ((value177054 & 64) != 0)  // Port 177054 bit 6 set => RAM selected
+            painter.drawText(xtype, yb2, "RAM0");
+        else
+            painter.drawText(xtype, yb2, "ROM");
+
+        // 160000-176777 - Window block 3
+        int yb3 = ybase - cyLine * 14 - cyLine / 3;
+        if ((value177054 & 128) != 0)  // Port 177054 bit 7 set => RAM selected
+            painter.drawText(xtype, yb3, "RAM0");
+        else
+            painter.drawText(xtype, yb3, "ROM");
+    }
 }
 
-void QDebugView::drawPPUMemoryMap(QPainter &painter, int x, int y, const CMemoryController *pMemCtl)
-{
-    QFontMetrics fontmetrics(painter.font());
-    int cxChar = fontmetrics.averageCharWidth();
-    int cyLine = fontmetrics.height();
-
-    quint16 value177054 = pMemCtl->GetPortView(0177054);
-
-    int x1 = x + cxChar * 7;
-    int y1 = y + cxChar / 2;
-    int x2 = x1 + cxChar * 14;
-    int y2 = y1 + cyLine * 16;
-    int xtype = x1 + cxChar * 3;
-    int ybase = y + cyLine * 16;
-
-    painter.drawRect(x1, y1, x2 - x1, y2 - y1);
-
-    painter.drawText(x, ybase + 2, "000000");
-
-    for (int i = 1; i < 8; i++)
-    {
-        int ycur = y2 - cyLine * i * 2;
-        if (i < 4)
-            painter.drawLine(x1, ycur, x1 + 8, ycur);
-        else
-            painter.drawLine(x1, ycur, x2, ycur);
-        quint16 addr = (quint16)i * 020000;
-        DrawOctalValue(painter, x, y2 - cyLine * i * 2 + cyLine / 3, addr);
-    }
-
-    int yp = y1 + cyLine / 4;
-    painter.drawLine(x1, yp, x2, yp);
-
-    painter.drawText(x, ybase - cyLine * 15, "177000");
-    painter.drawText(xtype, ybase - cyLine * 3 - cyLine / 2, "RAM0");
-
-    // 100000-117777 - Window block 0
-    int yb0 = ybase - cyLine * 8 - cyLine / 3;
-    if ((value177054 & 16) != 0)  // Port 177054 bit 4 set => RAM selected
-        painter.drawText(xtype, yb0, "RAM0");
-    else if ((value177054 & 1) != 0)  // ROM selected
-        painter.drawText(xtype, yb0, "ROM");
-    else if ((value177054 & 14) != 0)  // ROM cartridge selected
-    {
-        int slot = ((value177054 & 8) == 0) ? 1 : 2;
-        int bank = (value177054 & 6) >> 1;
-        QString carttext = tr("Cart %1/%2").arg(slot).arg(bank);
-        painter.drawText(xtype, yb0, carttext);
-    }
-
-    // 120000-137777 - Window block 1
-    int yb1 = ybase - cyLine * 10 - cyLine / 3;
-    if ((value177054 & 32) != 0)  // Port 177054 bit 5 set => RAM selected
-        painter.drawText(xtype, yb1, "RAM0");
-    else
-        painter.drawText(xtype, yb1, "ROM");
-
-    // 140000-157777 - Window block 2
-    int yb2 = ybase - cyLine * 12 - cyLine / 3;
-    if ((value177054 & 64) != 0)  // Port 177054 bit 6 set => RAM selected
-        painter.drawText(xtype, yb2, "RAM0");
-    else
-        painter.drawText(xtype, yb2, "ROM");
-
-    // 160000-176777 - Window block 3
-    int yb3 = ybase - cyLine * 14 - cyLine / 3;
-    if ((value177054 & 128) != 0)  // Port 177054 bit 7 set => RAM selected
-        painter.drawText(xtype, yb3, "RAM0");
-    else
-        painter.drawText(xtype, yb3, "ROM");
-}
+//////////////////////////////////////////////////////////////////////
