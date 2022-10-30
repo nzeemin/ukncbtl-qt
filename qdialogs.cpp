@@ -56,7 +56,7 @@ QAboutDialog::QAboutDialog(QWidget * parent)
     logoLabel->setPixmap(QPixmap(":/images/ukncbtl.png"));
 
     QLabel * versionLabel = new QLabel(tr(
-            "UKNCBTL Qt Version 1.0\nCopyright (C) 2007-2021\n"));
+            "UKNCBTL Qt Version 1.0\nCopyright (C) 2007-2022\n"));
 
     QLabel * authorsLabel = new QLabel(tr(
             "Authors:\r\nNikita Zimin\nFelix Lazarev\nAlexey Kisly\n\n"

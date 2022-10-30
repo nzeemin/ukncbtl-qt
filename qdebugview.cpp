@@ -22,7 +22,7 @@ QDebugView::QDebugView(QWidget *mainWindow) :
     QFontMetrics fontmetrics(font);
     int cxChar = fontmetrics.averageCharWidth();
     int cyLine = fontmetrics.height();
-    this->setMinimumSize(36 + cxChar * 96, cyLine * 16 + cyLine / 2);
+    this->setMinimumSize(36 + cxChar * 98, cyLine * 16 + cyLine / 2);
     this->setMaximumHeight(cyLine * 16 + cyLine / 2);
 
     m_toolbar = new QToolBar();
@@ -40,16 +40,16 @@ QDebugView::QDebugView(QWidget *mainWindow) :
     m_hlayout->addWidget(m_toolbar, 0, Qt::AlignLeft);
     m_procCtrl = new QDebugProcessorCtrl(this);
     m_procCtrl->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
-    m_procCtrl->setMinimumWidth(cxChar * 31 + cxChar / 2);
+    m_procCtrl->setMinimumWidth(cxChar * 33);
     m_hlayout->addWidget(m_procCtrl);
     m_stackCtrl = new QDebugStackCtrl(this);
-    m_stackCtrl->setMinimumWidth(cxChar * 17);
+    m_stackCtrl->setMinimumWidth(cxChar * 17 + cxChar / 2);
     m_hlayout->addWidget(m_stackCtrl);
     m_portsCtrl = new QDebugPortsCtrl(this);
-    m_portsCtrl->setMinimumWidth(cxChar * 14 + cxChar / 2);
+    m_portsCtrl->setMinimumWidth(cxChar * 15);
     m_hlayout->addWidget(m_portsCtrl);
     m_breaksCtrl = new QDebugBreakpointsCtrl(this);
-    m_breaksCtrl->setMinimumWidth(cxChar * 8 + cxChar / 2);
+    m_breaksCtrl->setMinimumWidth(cxChar * 9);
     m_hlayout->addWidget(m_breaksCtrl);
     m_memmapCtrl = new QDebugMemoryMapCtrl(this);
     m_memmapCtrl->setMinimumWidth(cxChar * 21 + cxChar / 2);
