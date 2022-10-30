@@ -22,38 +22,38 @@ QDebugView::QDebugView(QWidget *mainWindow) :
     QFontMetrics fontmetrics(font);
     int cxChar = fontmetrics.averageCharWidth();
     int cyLine = fontmetrics.height();
-    this->setMinimumSize(36 + cxChar * 98, cyLine * 16 + cyLine / 2);
-    this->setMaximumHeight(cyLine * 16 + cyLine / 2);
+    int cyHeight = cyLine * 16 + cyLine / 2;
+    this->setMinimumSize(36 + cxChar * 33, cyHeight);
+    this->setMaximumHeight(cyHeight);
 
-    m_toolbar = new QToolBar();
-    m_toolbar->setGeometry(0, 0, 36, cyLine * 16);
+    m_toolbar = new QToolBar(this);
+    m_toolbar->setGeometry(0, 0, 36, cyHeight);
     m_toolbar->setOrientation(Qt::Vertical);
     m_toolbar->setIconSize(QSize(24, 24));
     m_toolbar->setToolButtonStyle(Qt::ToolButtonIconOnly);
     m_toolbar->setFocusPolicy(Qt::NoFocus);
     m_toolbar->setStyle(QStyleFactory::create("windows"));  // fix for macOS to remove gradient background
 
-    m_hlayout = new QHBoxLayout(this);
-    m_hlayout->setMargin(0);
-    m_hlayout->setSpacing(4);
-    m_hlayout->setAlignment(Qt::AlignLeft);
-    m_hlayout->addWidget(m_toolbar, 0, Qt::AlignLeft);
+    int x = 36 + 4;
+    int cxProc = cxChar * 33;
     m_procCtrl = new QDebugProcessorCtrl(this);
-    m_procCtrl->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
-    m_procCtrl->setMinimumWidth(cxChar * 33);
-    m_hlayout->addWidget(m_procCtrl);
+    m_procCtrl->setGeometry(x, 0, cxProc, cyHeight);
+    x += cxProc + 4;
+    int cxStack = cxChar * 17 + cxChar / 2;
     m_stackCtrl = new QDebugStackCtrl(this);
-    m_stackCtrl->setMinimumWidth(cxChar * 17 + cxChar / 2);
-    m_hlayout->addWidget(m_stackCtrl);
+    m_stackCtrl->setGeometry(x, 0, cxStack, cyHeight);
+    x += cxStack + 4;
+    int cxPorts = cxChar * 15;
     m_portsCtrl = new QDebugPortsCtrl(this);
-    m_portsCtrl->setMinimumWidth(cxChar * 15);
-    m_hlayout->addWidget(m_portsCtrl);
+    m_portsCtrl->setGeometry(x, 0, cxPorts, cyHeight);
+    x += cxPorts + 4;
+    int cxBreaks = cxChar * 9;
     m_breaksCtrl = new QDebugBreakpointsCtrl(this);
-    m_breaksCtrl->setMinimumWidth(cxChar * 9);
-    m_hlayout->addWidget(m_breaksCtrl);
+    m_breaksCtrl->setGeometry(x, 0, cxBreaks, cyHeight);
+    x += cxBreaks + 4;
+    int cxMemmap = cxChar * 21 + cxChar / 2;
     m_memmapCtrl = new QDebugMemoryMapCtrl(this);
-    m_memmapCtrl->setMinimumWidth(cxChar * 21 + cxChar / 2);
-    m_hlayout->addWidget(m_memmapCtrl);
+    m_memmapCtrl->setGeometry(x, 0, cxMemmap, cyHeight);
 
     QAction* actionCpuPpu = m_toolbar->addAction(QIcon(":/images/iconCpuPpu.svg"), "");
     m_toolbar->addSeparator();
@@ -83,12 +83,12 @@ void QDebugView::setCurrentProc(bool okProc)
     Settings_SetDebugCpuPpu(m_okDebugProcessor);
 }
 
-CProcessor* QDebugView::getCurrentProc()
+CProcessor* QDebugView::getCurrentProc() const
 {
     return (m_okDebugProcessor) ? g_pBoard->GetCPU() : g_pBoard->GetPPU();
 }
 
-bool QDebugView::isCpuOrPpu()
+bool QDebugView::isCpuOrPpu() const
 {
     return m_okDebugProcessor;
 }
@@ -146,6 +146,7 @@ void QDebugView::paintEvent(QPaintEvent * /*event*/)
 QDebugCtrl::QDebugCtrl(QDebugView *debugView)
 {
     m_pDebugView = debugView;
+    setParent(debugView);
 }
 
 //////////////////////////////////////////////////////////////////////

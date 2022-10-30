@@ -17,8 +17,8 @@ public:
     QDebugView(QWidget *mainWindow);
 
     void setCurrentProc(bool okProc);
-    CProcessor* getCurrentProc();
-    bool isCpuOrPpu();
+    CProcessor* getCurrentProc() const;
+    bool isCpuOrPpu() const;
     void updateData();
     void updateWindowText();
 
@@ -33,7 +33,6 @@ protected:
 
 private:
     QToolBar* m_toolbar;
-    QHBoxLayout* m_hlayout;
     QDebugCtrl* m_procCtrl;
     QDebugCtrl* m_stackCtrl;
     QDebugCtrl* m_portsCtrl;
@@ -54,8 +53,8 @@ protected:
     QDebugView *m_pDebugView;
 
 protected:
-    CProcessor* getProc() { return m_pDebugView->getCurrentProc(); }
-    bool isCpuOrPpu() { return m_pDebugView->isCpuOrPpu(); }
+    CProcessor* getProc() const { return m_pDebugView->getCurrentProc(); }
+    bool isCpuOrPpu() const { return m_pDebugView->isCpuOrPpu(); }
 };
 
 class QDebugProcessorCtrl : public QDebugCtrl
