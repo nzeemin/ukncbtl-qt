@@ -202,7 +202,7 @@ void QMemoryView::paintEvent(QPaintEvent * /*event*/)
     QColor colorBackground = palette().color(QPalette::Base);
 
     QPainter painter(this);
-    painter.fillRect(0, 0, this->width(), this->height(), colorBackground);
+    painter.fillRect(36 + 4, 0, this->width(), this->height(), colorBackground);
 
     QFont font = Common_GetMonospacedFont();
     painter.setFont(font);
@@ -218,7 +218,7 @@ void QMemoryView::paintEvent(QPaintEvent * /*event*/)
     m_cyLineMemory = cyLine;
 
     char buffer[7];
-    const char * ADDRESS_LINE = "  addr";
+    const char * ADDRESS_LINE = "   addr";
     painter.drawText(30, cyLine, ADDRESS_LINE);
     for (int j = 0; j < 8; j++)
     {
