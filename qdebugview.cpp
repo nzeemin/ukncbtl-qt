@@ -147,6 +147,7 @@ QDebugCtrl::QDebugCtrl(QDebugView *debugView)
 {
     m_pDebugView = debugView;
     setParent(debugView);
+    memset(&m_lastHitTest, 0, sizeof(m_lastHitTest));
 }
 
 DebugCtrlHitTest QDebugCtrl::hitTest(int /*x*/, int y)
@@ -190,6 +191,10 @@ void QDebugCtrl::copyValueBinary()
 QDebugProcessorCtrl::QDebugProcessorCtrl(QDebugView *debugView)
     : QDebugCtrl(debugView)
 {
+    memset(m_wDebugCpuR, 0, sizeof(m_wDebugCpuR));
+    memset(m_wDebugPpuR, 0, sizeof(m_wDebugPpuR));
+    memset(m_okDebugCpuRChanged, 0, sizeof(m_okDebugCpuRChanged));
+    memset(m_okDebugPpuRChanged, 0, sizeof(m_okDebugPpuRChanged));
 }
 
 void QDebugProcessorCtrl::paintEvent(QPaintEvent * /*event*/)
@@ -338,6 +343,7 @@ void QDebugProcessorCtrl::contextMenuEvent(QContextMenuEvent *event)
 QDebugStackCtrl::QDebugStackCtrl(QDebugView *debugView)
     : QDebugCtrl(debugView)
 {
+    m_wDebugCpuR6Old = m_wDebugPpuR6Old = 0;
 }
 
 void QDebugStackCtrl::paintEvent(QPaintEvent * /*event*/)

@@ -492,6 +492,7 @@ bool Emulator_LoadROMCartridge(int slot, LPCTSTR sFilePath)
     if (dwBytesRead != 24 * 1024)
     {
         AlertWarning(QT_TRANSLATE_NOOP("Emulator", "Failed to load ROM cartridge image."));
+        ::free(pImage);
         return false;
     }
 

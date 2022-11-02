@@ -242,7 +242,7 @@ void QMemoryView::paintEvent(QPaintEvent * /*event*/)
         {
             // Get word from memory
             quint16 word = 0;
-            int okValid = true;
+            bool okValid = true;
             int addrtype = ADDRTYPE_NONE;
             bool okHalt = false;
             quint16 wChanged = 0;

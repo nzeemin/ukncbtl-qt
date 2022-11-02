@@ -86,6 +86,7 @@ void DebugLog(const char* message)
     if (Common_LogFile == nullptr)
     {
         Common_LogFile = ::fopen(TRACELOG_FILE_NAME, "a+b");
+        //TODO: Check if Common_LogFile == nullptr
     }
 
     ::fseek(Common_LogFile, 0, SEEK_END);
