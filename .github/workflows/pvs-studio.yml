@@ -32,7 +32,7 @@ jobs:
     - name: Convert
       run: |
         mkdir Results
-        plog-converter -t html,totals -o ./Results/ ./PVS-Studio.log
+        plog-converter -t html,totals -o ./Results/ -d V536,V1042 ./PVS-Studio.log
     - name: Upload the report
       uses: actions/upload-artifact@v3
       with:
