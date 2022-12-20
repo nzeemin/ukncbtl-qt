@@ -165,6 +165,13 @@ DebugCtrlHitTest QDebugCtrl::hitTest(int /*x*/, int y)
     return hit;
 }
 
+void QDebugCtrl::copyAddressOctal()
+{
+    if (!m_lastHitTest.isValid)
+        return;
+    CopyWordOctalToClipboard(m_lastHitTest.address);
+}
+
 void QDebugCtrl::copyValueOctal()
 {
     if (!m_lastHitTest.isValid)
@@ -420,6 +427,42 @@ void QDebugStackCtrl::updateData()
     m_wDebugCpuR6Old = g_pBoard->GetCPU()->GetSP();
 
     m_wDebugPpuR6Old = g_pBoard->GetPPU()->GetSP();
+}
+
+DebugCtrlHitTest QDebugStackCtrl::hitTest(int x, int y)
+{
+    DebugCtrlHitTest hit = QDebugCtrl::hitTest(x, y);
+    if (hit.line < 0 || hit.line > 15)
+        return hit;  // Invalid line number
+    hit.isValid = true;
+
+    const CProcessor* pProc = getProc();
+    const CMemoryController* pMemCtl = pProc->GetMemoryControllerConst();
+
+    hit.address = pProc->GetSP() - 16 + hit.line * 2;
+
+    int addrtype;
+    hit.value = pMemCtl->GetWordView(hit.address, pProc->IsHaltMode(), false, &addrtype);
+
+    return hit;
+}
+
+void QDebugStackCtrl::contextMenuEvent(QContextMenuEvent *event)
+{
+    DebugCtrlHitTest hit = hitTest(event->x(), event->y());
+    if (!hit.isValid)
+        return;
+    m_lastHitTest = hit;
+
+    char bufaddr[7];
+    PrintOctalValue(bufaddr, hit.address);
+    char bufval[7];
+    PrintOctalValue(bufval, hit.value);
+
+    QMenu menu(this);
+    menu.addAction(tr("Copy Address %1").arg(bufaddr), this, SLOT(copyAddressOctal()));
+    menu.addAction(tr("Copy Value %1").arg(bufval), this, SLOT(copyValueOctal()));
+    menu.exec(event->globalPos());
 }
 
 //////////////////////////////////////////////////////////////////////
