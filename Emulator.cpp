@@ -523,7 +523,9 @@ void Emulator_PrepareScreenRGB32(void* pImageBits, const quint32* colors)
     bool okTagType = false;  // Type of 4-word tag: true - set palette, false - set params
     int scale = 1;           // Horizontal scale: 1, 2, 4, or 8
     quint32 palette = 0;       // Palette
-    qint32 palettecurrent[8];  memset(palettecurrent, 0, sizeof(palettecurrent)); // Current palette; update each time we change the "palette" variable
+    qint32 palettecurrent[8]; // Current palette; update each time we change the "palette" variable
+    for (int i = 0; i < 8; i++)
+        palettecurrent[i] = 0xFF0000000;
     quint8 pbpgpr = 0;         // 3-bit Y-value modifier
     for (int yy = 0; yy < 307; yy++)
     {

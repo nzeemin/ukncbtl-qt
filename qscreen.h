@@ -46,6 +46,7 @@ protected:
     void keyReleaseEvent(QKeyEvent *event) override;
 
 private:
+    void* m_bits;
     QImage* m_image;
     ScreenViewMode m_mode;
     ScreenSizeMode m_sizeMode;

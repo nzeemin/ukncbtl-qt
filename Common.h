@@ -101,19 +101,20 @@ const LPCTSTR REGISTER_NAME[] = { "R0", "R1", "R2", "R3", "R4", "R5", "SP", "PC"
 const int UKNC_SCREEN_WIDTH = 640;
 const int UKNC_SCREEN_HEIGHT = 288;
 
-#define COLOR_VALUECHANGED  qRgb(255,128,128)
-#define COLOR_PREVIOUS      qRgb(128,128,255)
-#define COLOR_MEMORYROM     qRgb(128,128,255)
-#define COLOR_MEMORYIO      qRgb(128,255,128)
-#define COLOR_MEMORYNA      qRgb(128,128,128)
-#define COLOR_SUBTITLE      qRgb(0,128,0)
-#define COLOR_VALUE         qRgb(128,128,128)
-#define COLOR_VALUEROM      qRgb(128,128,192)
-#define COLOR_JUMP          qRgb(80,192,224)
-#define COLOR_JUMPYES       qRgb(128,255,128)
-#define COLOR_JUMPNO        qRgb(192,192,192)
-#define COLOR_JUMPHINT      qRgb(40,128,160)
-#define COLOR_HINT          qRgb(40,40,160)
+#define COLOR_VALUECHANGED  qRgb(128,   0,   0)
+#define COLOR_PREVIOUS      qRgb(  0,   0, 212)
+#define COLOR_MEMORYROM     qRgb(  0,   0, 128)
+#define COLOR_MEMORYIO      qRgb(  0, 128,   0)
+#define COLOR_MEMORYNA      qRgb(128, 128, 128)
+#define COLOR_SUBTITLE      qRgb(  0,  64,   0)
+#define COLOR_VALUE         qRgb(128, 128, 128)
+#define COLOR_VALUEROM      qRgb(128, 128, 192)
+#define COLOR_JUMP          qRgb( 80, 192, 224)
+#define COLOR_JUMPYES       qRgb( 80, 240,  80)
+#define COLOR_JUMPNO        qRgb(180, 180, 180)
+#define COLOR_JUMPHINT      qRgb( 40, 128, 160)
+#define COLOR_HINT          qRgb( 40,  40, 160)
+#define COLOR_BREAKPOINT    qRgb(255,  64,  64)
 
 QFont Common_GetMonospacedFont();
 QColor Common_GetColorShifted(const QPalette& palette, QRgb rgb);

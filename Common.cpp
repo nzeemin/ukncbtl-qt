@@ -144,9 +144,12 @@ void Common_Cleanup()
 
 QColor Common_GetColorShifted(const QPalette& palette, QRgb rgb)
 {
-    QColor colorText = palette.color(QPalette::Text);
-    QColor color((colorText.red() + qRed(rgb)) / 2, (colorText.green() + qGreen(rgb)) / 2, (colorText.blue() + qBlue(rgb)) / 2);
-    return color;
+    QColor color(qRed(rgb), qGreen(rgb), qBlue(rgb));
+    // For dark theme, invert the color
+    if (palette.windowText().color().lightness() > palette.window().color().lightness())
+        return QColor::fromHsl(color.hslHue(), color.hslSaturation(), 255 - color.lightness(), color.alpha());
+    else
+        return color;
 }
 
 

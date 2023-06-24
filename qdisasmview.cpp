@@ -402,7 +402,7 @@ void QDisasmView::paintEvent(QPaintEvent * /*event*/)
 
 void QDisasmView::drawBreakpoint(QPainter& painter, int x, int y, int size)
 {
-    QColor colorBreakpoint = qRgb(192, 0, 0);
+    QColor colorBreakpoint = Common_GetColorShifted(palette(), COLOR_BREAKPOINT);
     painter.setBrush(colorBreakpoint);
     painter.setPen(colorBreakpoint);
     painter.drawEllipse(x, y, size, -size);

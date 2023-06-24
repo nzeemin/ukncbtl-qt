@@ -126,7 +126,7 @@ void QKeyboardView::paintEvent(QPaintEvent *)
         for (int i = 1; i < imageKeyboard.colorCount(); i++)
         {
             QColor color = QColor(imageKeyboard.color(i));
-            QColor invColor = QColor::fromRgb(255 - color.green(), 255 - color.red(), 255 - color.blue(), color.alpha());
+            QColor invColor = QColor::fromHsl(color.hslHue(), color.hslSaturation(), 255 - color.lightness(), color.alpha());
             imageKeyboard.setColor(i, invColor.rgb());
         }
     }

@@ -93,34 +93,36 @@ const quint32 ScreenView_GrayColors[16 * 8] =
 
 //////////////////////////////////////////////////////////////////////
 
-#define AVERAGERGB(a, b)  ( (((a) & 0xfefefeffUL) + ((b) & 0xfefefeffUL)) >> 1 )
+#define AVERAGERGB(a, b)  ( ((((a) & 0xfefefeffUL) + ((b) & 0xfefefeffUL)) >> 1) | 0xFF000000 )
+
+static void UpscaleScreenCopy(const void* pSrcBits, void* pImageBits)
+{
+    memcpy(pImageBits, pSrcBits, UKNC_SCREEN_WIDTH * UKNC_SCREEN_HEIGHT * 4);
+}
 
 // Upscale screen from height 288 to 432
-static void UpscaleScreen(void* pImageBits)
+static void UpscaleScreen(const void* pSrcBits, void* pImageBits)
 {
+    const quint32* psrcbits = static_cast<const quint32*>(pSrcBits);
     quint32* pbits = static_cast<quint32*>(pImageBits);
-    quint8* pbits8 = static_cast<quint8*>(pImageBits);
-    int ukncline = 287;
+    int ukncline = UKNC_SCREEN_HEIGHT - 1;
     for (int line = 431; line > 0; line--)
     {
         quint32* pdest = pbits + line * UKNC_SCREEN_WIDTH;
         if (line % 3 == 1)
         {
-            quint8* psrc1 = pbits8 + ukncline * UKNC_SCREEN_WIDTH * 4;
-            quint8* psrc2 = pbits8 + (ukncline + 1) * UKNC_SCREEN_WIDTH * 4;
-            quint8* pdst1 = reinterpret_cast<quint8*>(pdest);
-            for (int i = 0; i < UKNC_SCREEN_WIDTH * 4; i++)
+            const quint32* psrc1 = psrcbits + ukncline * UKNC_SCREEN_WIDTH;
+            const quint32* psrc2 = psrcbits + (ukncline + 1) * UKNC_SCREEN_WIDTH;
+            quint32* pdst1 = pdest;
+            for (int i = 0; i < UKNC_SCREEN_WIDTH; i++)
             {
-                if (i % 4 == 3)
-                    *pdst1 = 0;
-                else
-                    *pdst1 = (quint8)((((quint16) * psrc1) + ((quint16) * psrc2)) / 2);
+                *pdst1 = AVERAGERGB(*psrc1, *psrc2);
                 psrc1++;  psrc2++;  pdst1++;
             }
         }
         else
         {
-            quint32* psrc = pbits + ukncline * UKNC_SCREEN_WIDTH;
+            const quint32* psrc = psrcbits + ukncline * UKNC_SCREEN_WIDTH;
             memcpy(pdest, psrc, UKNC_SCREEN_WIDTH * 4);
             ukncline--;
         }
@@ -128,27 +130,30 @@ static void UpscaleScreen(void* pImageBits)
 }
 
 // Upscale screen from height 288 to 576 with "interlaced" effect
-static void UpscaleScreen2(void* pImageBits)
+static void UpscaleScreen2(const void* pSrcBits, void* pImageBits)
 {
+    const quint32* psrcbits = static_cast<const quint32*>(pSrcBits);
     quint32* pbits = static_cast<quint32*>(pImageBits);
     for (int ukncline = 287; ukncline >= 0; ukncline--)
     {
-        quint32* psrc = pbits + ukncline * UKNC_SCREEN_WIDTH;
+        const quint32* psrc = psrcbits + ukncline * UKNC_SCREEN_WIDTH;
         quint32* pdest = pbits + (ukncline * 2) * UKNC_SCREEN_WIDTH;
         memcpy(pdest, psrc, UKNC_SCREEN_WIDTH * 4);
 
         pdest += UKNC_SCREEN_WIDTH;
-        memset(pdest, 0, UKNC_SCREEN_WIDTH * 4);
+        for (int i = 0; i < UKNC_SCREEN_WIDTH; i++)
+            *pdest++ = 0xFF000000;
     }
 }
 
 // Upscale screen from height 288 to 576
-static void UpscaleScreen2d(void* pImageBits)
+static void UpscaleScreen2d(const void* pSrcBits, void* pImageBits)
 {
+    const quint32* psrcbits = static_cast<const quint32*>(pSrcBits);
     quint32* pbits = static_cast<quint32*>(pImageBits);
     for (int ukncline = 287; ukncline >= 0; ukncline--)
     {
-        quint32* psrc = pbits + ukncline * UKNC_SCREEN_WIDTH;
+        const quint32* psrc = psrcbits + ukncline * UKNC_SCREEN_WIDTH;
         quint32* pdest = pbits + (ukncline * 2) * UKNC_SCREEN_WIDTH;
         memcpy(pdest, psrc, UKNC_SCREEN_WIDTH * 4);
 
@@ -158,12 +163,13 @@ static void UpscaleScreen2d(void* pImageBits)
 }
 
 // Upscale screen width 640->960, height 288->576 with "interlaced" effect
-static void UpscaleScreen3(void* pImageBits)
+static void UpscaleScreen3(const void* pSrcBits, void* pImageBits)
 {
+    const quint32* psrcbits = static_cast<const quint32*>(pSrcBits);
     quint32* pbits = static_cast<quint32*>(pImageBits);
     for (int ukncline = 287; ukncline >= 0; ukncline--)
     {
-        quint32* psrc = pbits + ukncline * UKNC_SCREEN_WIDTH;
+        const quint32* psrc = psrcbits + ukncline * UKNC_SCREEN_WIDTH;
         psrc += UKNC_SCREEN_WIDTH - 1;
         quint32* pdest = pbits + (ukncline * 2) * 960;
         pdest += 960 - 1;
@@ -171,7 +177,7 @@ static void UpscaleScreen3(void* pImageBits)
         {
             quint32 c1 = *psrc;  psrc--;
             quint32 c2 = *psrc;  psrc--;
-            quint32 c12 =
+            quint32 c12 = 0xFF000000 |
                 (((c1 & 0xff) + (c2 & 0xff)) >> 1) |
                 ((((c1 & 0xff00) + (c2 & 0xff00)) >> 1) & 0xff00) |
                 ((((c1 & 0xff0000) + (c2 & 0xff0000)) >> 1) & 0xff0000);
@@ -181,18 +187,20 @@ static void UpscaleScreen3(void* pImageBits)
         }
 
         pdest += 960;
-        memset(pdest, 0, 960 * 4);
+        for (int i = 0; i < 960; i++)
+            *pdest++ = 0xFF000000;
     }
 }
 
 // Upscale screen width 640->960, height 288->720
-static void UpscaleScreen4(void* pImageBits)
+static void UpscaleScreen4(const void* pSrcBits, void* pImageBits)
 {
+    const quint32* psrcbits = static_cast<const quint32*>(pSrcBits);
     quint32* pbits = static_cast<quint32*>(pImageBits);
     for (int ukncline = 0; ukncline < 288; ukncline += 2)
     {
-        quint32* psrc1 = pbits + (286 - ukncline) * UKNC_SCREEN_WIDTH;
-        quint32* psrc2 = psrc1 + UKNC_SCREEN_WIDTH;
+        const quint32* psrc1 = psrcbits + (286 - ukncline) * UKNC_SCREEN_WIDTH;
+        const quint32* psrc2 = psrc1 + UKNC_SCREEN_WIDTH;
         quint32* pdest0 = pbits + (286 - ukncline) / 2 * 5 * 960;
         quint32* pdest1 = pdest0 + 960;
         quint32* pdest2 = pdest1 + 960;
@@ -217,12 +225,13 @@ static void UpscaleScreen4(void* pImageBits)
 }
 
 // Upscale screen width 640->1120 (x1.75), height 288->864 (x3) with "interlaced" effect
-static void UpscaleScreen175(void* pImageBits)
+static void UpscaleScreen175(const void* pSrcBits, void* pImageBits)
 {
+    const quint32* psrcbits = static_cast<const quint32*>(pSrcBits);
     quint32* pbits = static_cast<quint32*>(pImageBits);
     for (int ukncline = 287; ukncline >= 0; ukncline--)
     {
-        quint32* psrc = pbits + ukncline * UKNC_SCREEN_WIDTH;
+        const quint32* psrc = psrcbits + ukncline * UKNC_SCREEN_WIDTH;
         quint32* pdest1 = pbits + (ukncline * 3) * 1120;
         quint32* pdest2 = pdest1 + 1120;
         quint32* pdest3 = pdest2 + 1120;
@@ -242,17 +251,19 @@ static void UpscaleScreen175(void* pImageBits)
             *(pdest1++) = *(pdest2++) = c4;
         }
 
-        memset(pdest3, 0, 1120 * 4);
+        for (int i = 0; i < 1120; i++)
+            *pdest3++ = 0xFF000000;
     }
 }
 
 // Upscale screen width 640->1280, height 288->864 with "interlaced" effect
-static void UpscaleScreen5(void* pImageBits)
+static void UpscaleScreen5(const void* pSrcBits, void* pImageBits)
 {
+    const quint32* psrcbits = static_cast<const quint32*>(pSrcBits);
     quint32* pbits = static_cast<quint32*>(pImageBits);
     for (int ukncline = 287; ukncline >= 0; ukncline--)
     {
-        quint32* psrc = pbits + ukncline * UKNC_SCREEN_WIDTH;
+        const quint32* psrc = psrcbits + ukncline * UKNC_SCREEN_WIDTH;
         quint32* pdest = pbits + (ukncline * 3) * 1280;
         psrc += UKNC_SCREEN_WIDTH - 1;
         pdest += 1280 - 1;
@@ -265,8 +276,8 @@ static void UpscaleScreen5(void* pImageBits)
             *pdest = color;  pdest--;
             *pdest2 = color;  pdest2--;
             *pdest2 = color;  pdest2--;
-            *pdest3 = 0;  pdest3--;
-            *pdest3 = 0;  pdest3--;
+            *pdest3 = 0xFF000000;  pdest3--;
+            *pdest3 = 0xFF000000;  pdest3--;
         }
     }
 }
@@ -280,6 +291,7 @@ QEmulatorScreen::QEmulatorScreen(QWidget *parent) :
 {
     setFocusPolicy(Qt::StrongFocus);
 
+    m_bits = calloc(UKNC_SCREEN_WIDTH * UKNC_SCREEN_HEIGHT * 4, 1);
     m_image = nullptr;
     m_mode = RGBScreen;
     m_sizeMode = RegularScreen;
@@ -290,6 +302,7 @@ QEmulatorScreen::QEmulatorScreen(QWidget *parent) :
 QEmulatorScreen::~QEmulatorScreen()
 {
     delete m_image;
+    free(m_bits);
 }
 
 void QEmulatorScreen::setMode(ScreenViewMode mode)
@@ -366,21 +379,24 @@ void QEmulatorScreen::paintEvent(QPaintEvent * /*event*/)
         colors = ScreenView_StandardGRBColors; break;
     }
 
-    Emulator_PrepareScreenRGB32(m_image->bits(), colors);
-    if (m_sizeMode == DoubleInterlacedScreen)
-        UpscaleScreen2(m_image->bits());
+    Emulator_PrepareScreenRGB32(m_bits, colors);
+
+    if (m_sizeMode == RegularScreen)
+        UpscaleScreenCopy(m_bits, m_image->bits());
+    else if (m_sizeMode == DoubleInterlacedScreen)
+        UpscaleScreen2(m_bits, m_image->bits());
     else if (m_sizeMode == DoubleScreen)
-        UpscaleScreen2d(m_image->bits());
+        UpscaleScreen2d(m_bits, m_image->bits());
     else if (m_sizeMode == UpscaledScreen)
-        UpscaleScreen(m_image->bits());
+        UpscaleScreen(m_bits, m_image->bits());
     else if (m_sizeMode == UpscaledScreen3)
-        UpscaleScreen3(m_image->bits());
+        UpscaleScreen3(m_bits, m_image->bits());
     else if (m_sizeMode == UpscaledScreen4)
-        UpscaleScreen4(m_image->bits());
+        UpscaleScreen4(m_bits, m_image->bits());
     else if (m_sizeMode == UpscaledScreen175)
-        UpscaleScreen175(m_image->bits());
+        UpscaleScreen175(m_bits, m_image->bits());
     else if (m_sizeMode == UpscaledScreen5)
-        UpscaleScreen5(m_image->bits());
+        UpscaleScreen5(m_bits, m_image->bits());
 
     QPainter painter(this);
     painter.drawImage(0, 0, *m_image);
