@@ -32,6 +32,7 @@ protected:
     void wheelEvent(QWheelEvent *);
 
     void updateScrollPos();
+    quint16 getWordFromMemory(quint16 address, bool& okValid, int& addrtype, quint16& wChanged);
 
 protected slots:
     void scrollValueChanged();

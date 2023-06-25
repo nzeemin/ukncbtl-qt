@@ -178,9 +178,9 @@ static void UpscaleScreen3(const void* pSrcBits, void* pImageBits)
             quint32 c1 = *psrc;  psrc--;
             quint32 c2 = *psrc;  psrc--;
             quint32 c12 = 0xFF000000 |
-                (((c1 & 0xff) + (c2 & 0xff)) >> 1) |
-                ((((c1 & 0xff00) + (c2 & 0xff00)) >> 1) & 0xff00) |
-                ((((c1 & 0xff0000) + (c2 & 0xff0000)) >> 1) & 0xff0000);
+                    (((c1 & 0xff) + (c2 & 0xff)) >> 1) |
+                    ((((c1 & 0xff00) + (c2 & 0xff00)) >> 1) & 0xff00) |
+                    ((((c1 & 0xff0000) + (c2 & 0xff0000)) >> 1) & 0xff0000);
             *pdest = c1;  pdest--;
             *pdest = c12; pdest--;
             *pdest = c2;  pdest--;
