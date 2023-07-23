@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=UKNCBTL Qt
+Comment=UKNCBTL emulator Qt version
+Exec=QtUkncBtl
+Icon=qtukncbtl
+Categories=Office;

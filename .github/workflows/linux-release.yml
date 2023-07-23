@@ -1,0 +1,62 @@
+name: linux-release
+
+on: workflow_dispatch
+
+env:
+  SOURCE_DIR: ${{ github.workspace }}
+  QT_VERSION: 5.15.2
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v2
+        with:
+          version: ${{ env.QT_VERSION }}
+          target: desktop
+          modules: qtmultimedia
+          install-deps: 'true'
+
+      - name: Install packages
+        run: |
+          sudo apt-get install fuse libfuse2
+          sudo add-apt-repository universe
+          sudo apt-get install libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-good1.0-dev
+
+      - name: Get linuxdeployqt
+        run: |
+          wget -nv -c https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
+          chmod a+x linuxdeployqt-continuous-x86_64.AppImage
+
+      - name: Versions
+        run: qmake -v
+
+      - name: Create build directory
+        run: |
+          mkdir ${{ env.SOURCE_DIR }}/build
+          mkdir -p ${{ env.SOURCE_DIR }}/build/usr/bin
+          mkdir -p ${{ env.SOURCE_DIR }}/build/usr/share
+          mkdir -p ${{ env.SOURCE_DIR }}/build/usr/share/applications
+
+      - name: Build
+        run: |
+          qmake "CONFIG+=release" -r GST_VERSION=1.0 QtUkncBtl.pro
+          make
+
+      - name: Packaging
+        working-directory: ${{ env.SOURCE_DIR }}/build
+        run: |
+          cp ${{ env.SOURCE_DIR }}/QtUkncBtl ./usr/bin/
+          cp ${{ env.SOURCE_DIR }}/linux/qtukncbtl.png .
+          ../linuxdeployqt-continuous-x86_64.AppImage ${{ env.SOURCE_DIR }}/linux/qtukncbtl.desktop -appimage
+          ls -l *.AppImage
+
+      - name: Linux artefact
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: AppImage
+          path: ${{ env.SOURCE_DIR }}/build/*.AppImage
