@@ -16,6 +16,7 @@ moc_*.cpp
 moc_*.h
 qrc_*.cpp
 ui_*.h
+/.qtc_clangd
 
 .autosave
 /debug
@@ -23,4 +24,5 @@ ui_*.h
 /Makefile.*
 /Makefile
 /*.user
+/QtUkncBtl
 /QtUkncBtl.app

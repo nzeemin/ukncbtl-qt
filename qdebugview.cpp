@@ -51,7 +51,7 @@ QDebugView::QDebugView(QWidget *mainWindow) :
     m_breaksCtrl = new QDebugBreakpointsCtrl(this);
     m_breaksCtrl->setGeometry(x, 0, cxBreaks, cyHeight);
     x += cxBreaks + 4;
-    int cxMemmap = cxChar * 21 + cxChar / 2;
+    int cxMemmap = cxChar * 25;
     m_memmapCtrl = new QDebugMemoryMapCtrl(this);
     m_memmapCtrl->setGeometry(x, 0, cxMemmap, cyHeight);
 
@@ -691,6 +691,16 @@ void QDebugMemoryMapCtrl::paintEvent(QPaintEvent * /*event*/)
         else
             painter.drawText(xtype, yb3, "ROM");
     }
+
+    quint16 sp = getProc()->GetSP();
+    int ysp = y2 - ((y2 - y1) * sp / 65536);
+    painter.drawLine(x2, ysp, x2 + cxChar, ysp);
+    painter.drawText(x2 + cxChar, ysp + cyLine / 4, "SP");
+
+    quint16 pc = getProc()->GetPC();
+    int ypc = y2 - ((y2 - y1) * pc / 65536);
+    painter.drawLine(x2, ypc, x2 + cxChar, ypc);
+    painter.drawText(x2 + cxChar, ypc + cyLine / 4, "PC");
 }
 
 //////////////////////////////////////////////////////////////////////
