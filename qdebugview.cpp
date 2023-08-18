@@ -5,6 +5,7 @@
 #include <QStyleOptionFocusRect>
 #include <QToolBar>
 #include "main.h"
+#include "mainwindow.h"
 #include "qdebugview.h"
 #include "Emulator.h"
 #include "emubase/Emubase.h"
@@ -193,6 +194,19 @@ void QDebugCtrl::copyValueBinary()
     CopyWordBinaryToClipboard(m_lastHitTest.value);
 }
 
+void QDebugCtrl::switchCpuPpu()
+{
+    Global_SetCurrentProc(!isCpuOrPpu());
+    Global_UpdateAllViews();
+}
+
+void QDebugCtrl::addStandardContextMenuItems(QMenu& menu)
+{
+    if (!menu.isEmpty())
+        menu.addSeparator();
+    menu.addAction(isCpuOrPpu() ? tr("Switch to PPU") : tr("Switch to CPU"), this, SLOT(switchCpuPpu()));
+}
+
 //////////////////////////////////////////////////////////////////////
 
 QDebugProcessorCtrl::QDebugProcessorCtrl(QDebugView *debugView)
@@ -328,20 +342,21 @@ DebugCtrlHitTest QDebugProcessorCtrl::hitTest(int x, int y)
 void QDebugProcessorCtrl::contextMenuEvent(QContextMenuEvent *event)
 {
     DebugCtrlHitTest hit = hitTest(event->x(), event->y());
-    if (!hit.isValid)
-        return;
     m_lastHitTest = hit;
 
-    char buffer[7], bufferHex[5], bufferBin[17];
-    PrintOctalValue(buffer, hit.value);
-    PrintHexValue(bufferHex, hit.value);
-    PrintBinaryValue(bufferBin, hit.value);
-
     QMenu menu(this);
-    menu.addAction(tr("Copy Value %1").arg(buffer), this, SLOT(copyValueOctal()));
-    if (hit.line < 10)
-        menu.addAction(tr("Copy Value %1").arg(bufferHex), this, SLOT(copyValueHex()));
-    menu.addAction(tr("Copy Value %1").arg(bufferBin), this, SLOT(copyValueBinary()));
+    if (hit.isValid)
+    {
+        char buffer[7], bufferHex[5], bufferBin[17];
+        PrintOctalValue(buffer, hit.value);
+        PrintHexValue(bufferHex, hit.value);
+        PrintBinaryValue(bufferBin, hit.value);
+        menu.addAction(tr("Copy Value %1").arg(buffer), this, SLOT(copyValueOctal()));
+        if (hit.line < 10)
+            menu.addAction(tr("Copy Value %1").arg(bufferHex), this, SLOT(copyValueHex()));
+        menu.addAction(tr("Copy Value %1").arg(bufferBin), this, SLOT(copyValueBinary()));
+    }
+    addStandardContextMenuItems(menu);
     menu.exec(event->globalPos());
 }
 
@@ -462,6 +477,7 @@ void QDebugStackCtrl::contextMenuEvent(QContextMenuEvent *event)
     QMenu menu(this);
     menu.addAction(tr("Copy Address %1").arg(bufaddr), this, SLOT(copyAddressOctal()));
     menu.addAction(tr("Copy Value %1").arg(bufval), this, SLOT(copyValueOctal()));
+    addStandardContextMenuItems(menu);
     menu.exec(event->globalPos());
 }
 
@@ -582,6 +598,19 @@ void QDebugBreakpointsCtrl::paintEvent(QPaintEvent * /*event*/)
         y += cyLine;
         pbps++;
     }
+}
+
+void QDebugBreakpointsCtrl::contextMenuEvent(QContextMenuEvent *event)
+{
+    QMenu menu(this);
+    menu.addAction(tr("Remove All Breakpoints"), this, SLOT(removeAllBreakpoints()));
+    addStandardContextMenuItems(menu);
+    menu.exec(event->globalPos());
+}
+
+void QDebugBreakpointsCtrl::removeAllBreakpoints()
+{
+    Global_getMainWindow()->debugRemoveAllBreakpoints();
 }
 
 //////////////////////////////////////////////////////////////////////

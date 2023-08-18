@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QHBoxLayout>
+#include <QMenu>
 
 class CMotherboard;
 class CProcessor;
@@ -63,6 +64,7 @@ public slots:
     void copyValueOctal();
     void copyValueHex();
     void copyValueBinary();
+    void switchCpuPpu();
 
 protected:
     QDebugView *m_pDebugView;
@@ -71,6 +73,7 @@ protected:
 protected:
     CProcessor* getProc() const { return m_pDebugView->getCurrentProc(); }
     bool isCpuOrPpu() const { return m_pDebugView->isCpuOrPpu(); }
+    void addStandardContextMenuItems(QMenu& menu);
 };
 
 class QDebugProcessorCtrl : public QDebugCtrl
@@ -101,6 +104,8 @@ public:
 
     virtual void updateData();
     virtual DebugCtrlHitTest hitTest(int x, int y);
+
+protected:
     void contextMenuEvent(QContextMenuEvent *event);
 
 protected:
@@ -126,6 +131,12 @@ class QDebugBreakpointsCtrl : public QDebugCtrl
     Q_OBJECT
 public:
     QDebugBreakpointsCtrl(QDebugView *debugView);
+
+public slots:
+    void removeAllBreakpoints();
+
+protected:
+    void contextMenuEvent(QContextMenuEvent *event);
 
 protected:
     void paintEvent(QPaintEvent *event);
