@@ -9,9 +9,9 @@
 *.dll
 *.dylib
 
-/object_script.*
-/.qmake.cache
-/.qmake.stash
+/emulator/object_script.*
+/emulator/.qmake.cache
+/emulator/.qmake.stash
 moc_*.cpp
 moc_*.h
 qrc_*.cpp
@@ -19,10 +19,13 @@ ui_*.h
 /.qtc_clangd
 
 .autosave
-/debug
-/release
-/Makefile.*
-/Makefile
-/*.user
-/QtUkncBtl
-/QtUkncBtl.app
+/emulator/debug
+/emulator/release
+/emulator/Makefile.*
+/emulator/Makefile
+*.user
+/emulator/QtUkncBtl
+/emulator/QtUkncBtl.app
+/emulator/trace.log
+*.dsk
+/x-*
