@@ -50,8 +50,8 @@ jobs:
         working-directory: ${{ env.SOURCE_DIR }}/build
         run: |
           cp ${{ env.SOURCE_DIR }}/emulator/QtUkncBtl ./usr/bin/
-          cp ${{ env.SOURCE_DIR }}/linux/qtukncbtl.desktop ${{ env.SOURCE_DIR }}/build/usr/share/applications/
-          cp ${{ env.SOURCE_DIR }}/linux/qtukncbtl.png .
+          cp ${{ env.SOURCE_DIR }}/linux/qtukncbtl.desktop ./usr/share/applications/
+          cp ${{ env.SOURCE_DIR }}/linux/qtukncbtl.png ./usr/icons/hicolor/256x256/apps/
           ../linuxdeployqt-continuous-x86_64.AppImage usr/share/applications/qtukncbtl.desktop -appimage -extra-plugins=iconengines
           ls -l *.AppImage
 
