@@ -1,4 +1,4 @@
-name: linux-release
+name: macos-release
 
 on: workflow_dispatch
 
@@ -34,7 +34,7 @@ jobs:
         working-directory: ${{ env.SOURCE_DIR }}/emulator
         run: |
           export PATH=$HOME/Qt/5.15/clang_64/bin:$PATH
-          mv QtUkncBtl QtUkncBtl.app
+          ls -l *.app
           macdeployqt QtUkncBtl.app -verbose=1 -dmg
           mv QtUkncBtl.dmg QtUkncBtl-macOS-${{ github.run_id }}.dmg
           ls -l *.dmg
