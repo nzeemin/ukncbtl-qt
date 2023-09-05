@@ -25,6 +25,7 @@ public:
 
 public:
     void updateMenu();
+    void updateCentralWidgetSize();
     void updateAllViews();
     void redrawDebugView();
     void redrawDisasmView();
@@ -86,6 +87,7 @@ public slots:
     void viewSizeUpscaled175();
     void viewSizeUpscaled4();
     void viewSizeUpscaled5();
+    void viewSizeUpscaled6();
     void soundEnabled();
     void emulatorSoundAY();
     void scriptRun();
