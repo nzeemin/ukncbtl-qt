@@ -5,34 +5,6 @@ shallow_clone: true
 # See https://www.appveyor.com/docs/windows-images-software/#qt
 environment:
   matrix:
-    - QTDIR: C:\Qt\5.7\mingw53_32
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-    - QTDIR: C:\Qt\5.7\msvc2015
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-    - QTDIR: C:\Qt\5.9\mingw53_32
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-    - QTDIR: C:\Qt\5.9\msvc2015
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-    - QTDIR: C:\Qt\5.9\msvc2015_64
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-    - QTDIR: C:\Qt\5.10\mingw53_32
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-    - QTDIR: C:\Qt\5.10\msvc2015
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-    - QTDIR: C:\Qt\5.10\msvc2015_64
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-    - QTDIR: C:\Qt\5.11\mingw53_32
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-    - QTDIR: C:\Qt\5.11\msvc2015
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-    - QTDIR: C:\Qt\5.11\msvc2015_64
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-    - QTDIR: C:\Qt\5.12\mingw73_64
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-    - QTDIR: C:\Qt\5.12\mingw73_32
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-    - QTDIR: C:\Qt\5.12\msvc2015_64
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
     - QTDIR: C:\Qt\5.13\mingw73_64
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
     - QTDIR: C:\Qt\5.13\mingw73_32
@@ -47,21 +19,6 @@ environment:
 configuration:
   - debug
   - release
-
-matrix:
-  exclude:
-    - QTDIR: C:\Qt\5.9\msvc2015
-      configuration: debug
-    - QTDIR: C:\Qt\5.9\msvc2015_64
-      configuration: debug
-    - QTDIR: C:\Qt\5.10\msvc2015
-      configuration: debug
-    - QTDIR: C:\Qt\5.10\msvc2015_64
-      configuration: debug
-    - QTDIR: C:\Qt\5.11\msvc2015
-      configuration: debug
-    - QTDIR: C:\Qt\5.11\msvc2015_64
-      configuration: debug
 
 init:
   - git config --global core.autocrlf input
@@ -83,9 +40,8 @@ install:
 before_build:
   # Prepare the out-of-source build directory
   - mkdir %APPVEYOR_BUILD_FOLDER%-build
-  - qmake -o %APPVEYOR_BUILD_FOLDER%-build -r -Wall -Wlogic -Wparser CONFIG+=%CONFIGURATION% %APPVEYOR_BUILD_FOLDER%
+  - qmake -o %APPVEYOR_BUILD_FOLDER%-build -r -Wall -Wlogic -Wparser CONFIG+=%CONFIGURATION% %APPVEYOR_BUILD_FOLDER%/emulator
 
 build_script:
   - cd %APPVEYOR_BUILD_FOLDER%-build
   - '%make%'
-
