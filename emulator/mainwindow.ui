@@ -106,6 +106,7 @@
     <addaction name="actionViewSizeUpscaled4"/>
     <addaction name="actionViewSizeUpscaled175"/>
     <addaction name="actionViewSizeUpscaled5"/>
+    <addaction name="actionViewSizeUpscaled6"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -333,6 +334,9 @@
     <iconset resource="QtUkncBtl.qrc">
      <normaloff>:/images/iconStepInto.svg</normaloff>:/images/iconStepInto.svg</iconset>
    </property>
+   <property name="shortcut">
+    <string>F7</string>
+   </property>
    <property name="text">
     <string>Step Into</string>
    </property>
@@ -341,6 +345,9 @@
    <property name="icon">
     <iconset resource="QtUkncBtl.qrc">
      <normaloff>:/images/iconStepOver.svg</normaloff>:/images/iconStepOver.svg</iconset>
+   </property>
+   <property name="shortcut">
+    <string>F8</string>
    </property>
    <property name="text">
     <string>Step Over</string>
@@ -464,6 +471,14 @@
    </property>
    <property name="text">
     <string>1280 x 864 Interlaced</string>
+   </property>
+  </action>
+  <action name="actionViewSizeUpscaled6">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>1920 x 1440 4:3 Interlaced</string>
    </property>
   </action>
   <action name="actionSaveStateImage">

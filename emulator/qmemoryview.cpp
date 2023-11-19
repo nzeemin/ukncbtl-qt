@@ -265,7 +265,7 @@ void QMemoryView::paintEvent(QPaintEvent * /*event*/)
     painter.drawText(30, cyLine, ADDRESS_LINE);
     for (int j = 0; j < 8; j++)
     {
-        _snprintf(buffer, 7, "%d", j * 2);
+        _snprintf(buffer, 7, "%o", j * 2);
         painter.drawText(38 + (9 + j * 7) * cxChar, cyLine, buffer);
     }
 

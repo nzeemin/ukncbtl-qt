@@ -72,6 +72,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionViewSizeUpscaled4, SIGNAL(triggered()), this, SLOT(viewSizeUpscaled4()));
     QObject::connect(ui->actionViewSizeUpscaled175, SIGNAL(triggered()), this, SLOT(viewSizeUpscaled175()));
     QObject::connect(ui->actionViewSizeUpscaled5, SIGNAL(triggered()), this, SLOT(viewSizeUpscaled5()));
+    QObject::connect(ui->actionViewSizeUpscaled6, SIGNAL(triggered()), this, SLOT(viewSizeUpscaled6()));
     QObject::connect(ui->actionSoundEnabled, SIGNAL(triggered()), this, SLOT(soundEnabled()));
     QObject::connect(ui->actionSoundAY, SIGNAL(triggered()), this, SLOT(emulatorSoundAY()));
 
@@ -182,6 +183,7 @@ void MainWindow::closeEvent(QCloseEvent *)
     Global_getSettings()->setValue("MainWindow/Geometry", saveGeometry());
     Global_getSettings()->setValue("MainWindow/WindowState", saveState());
 
+    Global_getSettings()->setValue("MainWindow/OnscreenKeyboard", m_keyboard->isVisible());
     Global_getSettings()->setValue("MainWindow/ConsoleView", m_dockConsole->isVisible());
     Global_getSettings()->setValue("MainWindow/DebugView", m_dockDebug->isVisible());
     Global_getSettings()->setValue("MainWindow/DisasmView", m_dockDisasm->isVisible());
@@ -205,6 +207,7 @@ void MainWindow::restoreSettings()
     restoreGeometry(Global_getSettings()->value("MainWindow/Geometry").toByteArray());
     restoreState(Global_getSettings()->value("MainWindow/WindowState").toByteArray());
 
+    m_keyboard->setVisible(Global_getSettings()->value("MainWindow/OnscreenKeyboard", false).toBool());
     m_dockConsole->setVisible(Global_getSettings()->value("MainWindow/ConsoleView", false).toBool());
     m_dockDebug->setVisible(Global_getSettings()->value("MainWindow/DebugView", false).toBool());
     m_dockDisasm->setVisible(Global_getSettings()->value("MainWindow/DisasmView", false).toBool());
@@ -232,6 +235,7 @@ void MainWindow::updateMenu()
     ui->actionViewSizeUpscaled4->setChecked(m_screen->sizeMode() == UpscaledScreen4);
     ui->actionViewSizeUpscaled175->setChecked(m_screen->sizeMode() == UpscaledScreen175);
     ui->actionViewSizeUpscaled5->setChecked(m_screen->sizeMode() == UpscaledScreen5);
+    ui->actionViewSizeUpscaled6->setChecked(m_screen->sizeMode() == UpscaledScreen6);
 
     ui->actionViewKeyboard->setChecked(m_keyboard->isVisible());
 
@@ -458,77 +462,64 @@ void MainWindow::viewGrayscaleScreen()
     updateMenu();
 }
 
+void MainWindow::updateCentralWidgetSize()
+{
+    ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
+    ui->centralWidget->setMaximumWidth(m_screen->maximumWidth());
+}
 void MainWindow::viewSizeRegular()
 {
     m_screen->setSizeMode(RegularScreen);
     updateMenu();
-
-    //Update centralWidget size
-    ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
-    ui->centralWidget->setMaximumWidth(m_screen->maximumWidth());
+    updateCentralWidgetSize();
 }
 void MainWindow::viewSizeUpscaled()
 {
     m_screen->setSizeMode(UpscaledScreen);
     updateMenu();
-
-    //Update centralWidget size
-    ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
-    ui->centralWidget->setMaximumWidth(m_screen->maximumWidth());
+    updateCentralWidgetSize();
 }
 void MainWindow::viewSizeDoubleInterlaced()
 {
     m_screen->setSizeMode(DoubleInterlacedScreen);
     updateMenu();
-
-    //Update centralWidget size
-    ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
-    ui->centralWidget->setMaximumWidth(m_screen->maximumWidth());
+    updateCentralWidgetSize();
 }
 void MainWindow::viewSizeDouble()
 {
     m_screen->setSizeMode(DoubleScreen);
     updateMenu();
-
-    //Update centralWidget size
-    ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
-    ui->centralWidget->setMaximumWidth(m_screen->maximumWidth());
+    updateCentralWidgetSize();
 }
 void MainWindow::viewSizeUpscaled3()
 {
     m_screen->setSizeMode(UpscaledScreen3);
     updateMenu();
-
-    //Update centralWidget size
-    ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
-    ui->centralWidget->setMaximumWidth(m_screen->maximumWidth());
+    updateCentralWidgetSize();
 }
 void MainWindow::viewSizeUpscaled4()
 {
     m_screen->setSizeMode(UpscaledScreen4);
     updateMenu();
-
-    //Update centralWidget size
-    ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
-    ui->centralWidget->setMaximumWidth(m_screen->maximumWidth());
+    updateCentralWidgetSize();
 }
 void MainWindow::viewSizeUpscaled175()
 {
     m_screen->setSizeMode(UpscaledScreen175);
     updateMenu();
-
-    //Update centralWidget size
-    ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
-    ui->centralWidget->setMaximumWidth(m_screen->maximumWidth());
+    updateCentralWidgetSize();
 }
 void MainWindow::viewSizeUpscaled5()
 {
     m_screen->setSizeMode(UpscaledScreen5);
     updateMenu();
-
-    //Update centralWidget size
-    ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
-    ui->centralWidget->setMaximumWidth(m_screen->maximumWidth());
+    updateCentralWidgetSize();
+}
+void MainWindow::viewSizeUpscaled6()
+{
+    m_screen->setSizeMode(UpscaledScreen6);
+    updateMenu();
+    updateCentralWidgetSize();
 }
 
 void MainWindow::emulatorFrame()

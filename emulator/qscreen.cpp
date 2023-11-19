@@ -282,6 +282,47 @@ static void UpscaleScreen5(const void* pSrcBits, void* pImageBits)
     }
 }
 
+// Upscale screen width 640->1920, height 288->1440 with "interlaced" effect
+static void UpscaleScreen6(const void* pSrcBits, void* pImageBits)
+{
+    const quint32* psrcbits = static_cast<const quint32*>(pSrcBits);
+    quint32* pbits = static_cast<quint32*>(pImageBits);
+    for (int ukncline = 287; ukncline >= 0; ukncline--)
+    {
+        const quint32* psrc = psrcbits + ukncline * UKNC_SCREEN_WIDTH;
+        quint32* pdest = pbits + (ukncline * 5) * 1920;
+        psrc += UKNC_SCREEN_WIDTH - 1;
+        pdest += 1920 - 1;
+        quint32* pdest2 = pdest + 1920;
+        quint32* pdest3 = pdest2 + 1920;
+        quint32* pdest4 = pdest3 + 1920;
+        quint32* pdest5 = pdest4 + 1920;
+        for (int i = 0; i < UKNC_SCREEN_WIDTH; i++)
+        {
+            quint32 color = *psrc;  psrc--;
+            *pdest  = color;  pdest--;
+            *pdest  = color;  pdest--;
+            *pdest  = color;  pdest--;
+
+            *pdest2 = color;  pdest2--;
+            *pdest2 = color;  pdest2--;
+            *pdest2 = color;  pdest2--;
+
+            *pdest3 = color;  pdest3--;
+            *pdest3 = color;  pdest3--;
+            *pdest3 = color;  pdest3--;
+
+            *pdest4 = color;  pdest4--;
+            *pdest4 = color;  pdest4--;
+            *pdest4 = color;  pdest4--;
+
+            *pdest5 = 0xFF000000;  pdest5--;
+            *pdest5 = 0xFF000000;  pdest5--;
+            *pdest5 = 0xFF000000;  pdest5--;
+        }
+    }
+}
+
 
 //////////////////////////////////////////////////////////////////////
 
@@ -359,6 +400,11 @@ void QEmulatorScreen::createDisplay()
         cxScreenWidth = UKNC_SCREEN_WIDTH * 2;
         cyScreenHeight = UKNC_SCREEN_HEIGHT * 3;
     }
+    else if (m_sizeMode == UpscaledScreen6)
+    {
+        cxScreenWidth = UKNC_SCREEN_WIDTH * 3;
+        cyScreenHeight = UKNC_SCREEN_HEIGHT * 5;
+    }
 
     m_image = new QImage(cxScreenWidth, cyScreenHeight, QImage::Format_RGB32);
 
@@ -397,6 +443,8 @@ void QEmulatorScreen::paintEvent(QPaintEvent * /*event*/)
         UpscaleScreen175(m_bits, m_image->bits());
     else if (m_sizeMode == UpscaledScreen5)
         UpscaleScreen5(m_bits, m_image->bits());
+    else if (m_sizeMode == UpscaledScreen6)
+        UpscaleScreen6(m_bits, m_image->bits());
 
     QPainter painter(this);
     painter.drawImage(0, 0, *m_image);
