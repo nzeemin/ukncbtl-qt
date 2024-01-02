@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
     g_Application = &application;
 
 //    QTranslator translator;
-//    translator.load("ukncbtl_en.tr");
+//    translator.load(QLocale::Russian, "ukncbtl_ru.qm");
 //    application.installTranslator(&translator);
 
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "Back to Life", "UKNCBTL");

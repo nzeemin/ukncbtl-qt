@@ -50,21 +50,25 @@ QAboutDialog::QAboutDialog(QWidget * parent)
     : QDialog(parent)
 {
     setWindowTitle(tr("About"));
-    setMinimumSize(440, 300);
+    setMinimumSize(480, 340);
 
     QLabel * logoLabel = new QLabel();
     logoLabel->setPixmap(QPixmap(":/images/ukncbtl.png"));
 
     QLabel * versionLabel = new QLabel(tr(
-            "UKNCBTL Qt Version 1.0\nCopyright (C) 2007-2023\n"));
+            "UKNCBTL Qt Version 1.0\nCopyright (C) 2007-2024\n"));
 
     QLabel * authorsLabel = new QLabel(tr(
             "Authors:\r\nNikita Zimin\nFelix Lazarev\nAlexey Kisly\n\n"
             "Special thanks to:\nArseny Gordin"));
 
     QLabel * linkLabel = new QLabel(
-        "<a href=\"https://github.com/nzeemin/ukncbtl-qt\">https://github.com/nzeemin/ukncbtl-qt</a>");
+            "<a href=\"https://github.com/nzeemin/ukncbtl-qt\">https://github.com/nzeemin/ukncbtl-qt</a>");
     linkLabel->setOpenExternalLinks(true);
+
+    QLabel * disclamerLabel = new QLabel(tr(
+            "This program is provided by authors and contributors AS IS, with absolutely no warranty of any kind.  Please use it on your own risk."));
+    disclamerLabel->setWordWrap(true);
 
     QLabel * bottomLabel = new QLabel(
         tr("Build date:\t%1 %2\nQt version:\t%3").arg(__DATE__).arg(__TIME__).arg(QT_VERSION_STR));
@@ -73,14 +77,15 @@ QAboutDialog::QAboutDialog(QWidget * parent)
     connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
     QGridLayout * layout = new QGridLayout(this);
-    layout->addWidget(logoLabel, 0, 0, 4, 1, Qt::AlignTop);
+    layout->addWidget(logoLabel, 0, 0, 5, 1, Qt::AlignTop);
     layout->addWidget(versionLabel, 0, 1);
     layout->addWidget(authorsLabel, 1, 1);
     layout->addWidget(linkLabel, 2, 1);
-    layout->addWidget(bottomLabel, 3, 1);
-    layout->addWidget(buttonBox, 4, 1);
+    layout->addWidget(disclamerLabel, 3, 1);
+    layout->addWidget(bottomLabel, 4, 1);
+    layout->addWidget(buttonBox, 5, 1);
     layout->setColumnMinimumWidth(0, 136);
-    layout->setColumnMinimumWidth(1, 220);
+    layout->setColumnMinimumWidth(1, 250);
 
     setLayout(layout);
 }

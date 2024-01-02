@@ -42,5 +42,5 @@ jobs:
       - name: Linux artefact
         uses: actions/upload-artifact@v3
         with:
-          name: AppImage
+          name: DMG
           path: ${{ env.SOURCE_DIR }}/emulator/*.dmg
