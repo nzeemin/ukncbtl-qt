@@ -56,16 +56,26 @@ QDebugView::QDebugView(QWidget *mainWindow) :
     m_memmapCtrl = new QDebugMemoryMapCtrl(this);
     m_memmapCtrl->setGeometry(x, 0, cxMemmap, cyHeight);
 
+    m_actionDebugger = m_toolbar->addAction(QIcon(":/images/iconDebugger.svg"), "");
     QAction* actionCpuPpu = m_toolbar->addAction(QIcon(":/images/iconCpuPpu.svg"), "");
     m_toolbar->addSeparator();
     QAction* actionStepInto = m_toolbar->addAction(QIcon(":/images/iconStepInto.svg"), "");
     QAction* actionStepOver = m_toolbar->addAction(QIcon(":/images/iconStepOver.svg"), "");
+    m_actionDebugger->setCheckable(true);
 
+    QObject::connect(m_actionDebugger, SIGNAL(triggered()), mainWindow, SLOT(debugConsoleView()));
     QObject::connect(actionCpuPpu, SIGNAL(triggered()), this, SLOT(switchCpuPpu()));
     QObject::connect(actionStepInto, SIGNAL(triggered()), mainWindow, SLOT(debugStepInto()));
     QObject::connect(actionStepOver, SIGNAL(triggered()), mainWindow, SLOT(debugStepOver()));
 
     setFocusPolicy(Qt::ClickFocus);
+
+    updateToolbar();
+}
+
+void QDebugView::updateToolbar()
+{
+    m_actionDebugger->setChecked(true);
 }
 
 void QDebugView::updateWindowText()

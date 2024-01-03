@@ -68,7 +68,6 @@ public slots:
     void emulatorHardDrive2();
     void debugCpuPpu();
     void debugConsoleView();
-    void debugDebugView();
     void debugDisasmView();
     void debugMemoryView();
     void debugStepInto();

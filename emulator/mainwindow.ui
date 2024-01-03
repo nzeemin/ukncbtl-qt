@@ -78,7 +78,6 @@
     <addaction name="actionDebugConsoleView"/>
     <addaction name="actionDebugCpuPpu"/>
     <addaction name="separator"/>
-    <addaction name="actionDebugDebugView"/>
     <addaction name="actionDebugDisasmView"/>
     <addaction name="actionDebugMemoryView"/>
     <addaction name="separator"/>
@@ -351,14 +350,6 @@
    </property>
    <property name="text">
     <string>Step Over</string>
-   </property>
-  </action>
-  <action name="actionDebugDebugView">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Processor View</string>
    </property>
   </action>
   <action name="actionDebugDisasmView">
