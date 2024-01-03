@@ -2,6 +2,7 @@
 #include <QAction>
 #include <QClipboard>
 #include <QDateTime>
+#include <QDesktopWidget>
 #include <QDockWidget>
 #include <QFileDialog>
 #include <QLabel>
@@ -174,7 +175,7 @@ void MainWindow::changeEvent(QEvent *e)
     }
 }
 
-void MainWindow::closeEvent(QCloseEvent *)
+void MainWindow::closeEvent(QCloseEvent* event)
 {
     Global_getSettings()->setValue("MainWindow/ScreenViewMode", m_screen->mode());
     Global_getSettings()->setValue("MainWindow/ScreenSizeMode", m_screen->sizeMode());
@@ -187,6 +188,8 @@ void MainWindow::closeEvent(QCloseEvent *)
     Global_getSettings()->setValue("MainWindow/DebugView", m_dockDebug->isVisible());
     Global_getSettings()->setValue("MainWindow/DisasmView", m_dockDisasm->isVisible());
     Global_getSettings()->setValue("MainWindow/MemoryView", m_dockMemory->isVisible());
+
+    QMainWindow::closeEvent(event);
 }
 
 void MainWindow::restoreSettings()
@@ -198,12 +201,16 @@ void MainWindow::restoreSettings()
     if (scrSizeMode == 0) scrSizeMode = RegularScreen;
     m_screen->setSizeMode(scrSizeMode);
 
-    //Update centralWidget size
+    // Update centralWidget size
     ui->centralWidget->setMaximumHeight(m_screen->maximumHeight() + m_keyboard->maximumHeight());
-    ui->centralWidget->setMaximumWidth(m_screen->maximumWidth());
+    int maxwid = m_screen->maximumWidth() > m_keyboard->maximumWidth() ? m_screen->maximumWidth() : m_keyboard->maximumWidth();
+    ui->centralWidget->setMaximumWidth(maxwid);
 
-    //NOTE: Restore from maximized state fails, see https://bugreports.qt-project.org/browse/QTBUG-15080
-    restoreGeometry(Global_getSettings()->value("MainWindow/Geometry").toByteArray());
+    QByteArray geometry = Global_getSettings()->value("MainWindow/Geometry").toByteArray();
+    if (!geometry.isEmpty())
+        restoreGeometry(geometry);
+    if (isMaximized())  //HACK for restoring maximized window, see https://bugreports.qt.io/browse/QTBUG-46620
+        setGeometry(QApplication::desktop()->availableGeometry(this));
     restoreState(Global_getSettings()->value("MainWindow/WindowState").toByteArray());
 
     m_keyboard->setVisible(Global_getSettings()->value("MainWindow/OnscreenKeyboard", false).toBool());
