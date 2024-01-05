@@ -65,6 +65,7 @@ protected:
     void contextMenuEvent(QContextMenuEvent *event) override;
     void focusInEvent(QFocusEvent *) override;
     void focusOutEvent(QFocusEvent *) override;
+    void mouseMoveEvent(QMouseEvent *) override;
     void mousePressEvent(QMouseEvent *) override;
 
     void parseSubtitles(QTextStream& stream);
@@ -84,8 +85,8 @@ private:
 
     const DisasmSubtitleItem * findSubtitle(quint16 address, quint16 typemask);
 
-    void drawJump(QPainter& painter, int yFrom, int delta, int x, int cyLine, QColor color);
-    void drawBreakpoint(QPainter& painter, int x, int y, int cyLine);
+    void drawJump(QPainter& painter, int yFrom, int delta, int x, QColor color);
+    void drawBreakpoint(QPainter& painter, int x, int y, int size);
     int drawDisassemble(QPainter& painter, CProcessor* pProc, quint16 current, quint16 previous);
 };
 
