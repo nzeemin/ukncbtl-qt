@@ -62,7 +62,7 @@ void QDisasmView::focusOutEvent(QFocusEvent *)
 void QDisasmView::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu menu(this);
-    menu.addAction(m_okDisasmProcessor ? tr("Switch to PPU") : tr("Switch to CPU"), this, SLOT(switchCpuPpu()));
+    menu.addAction(QIcon(":/images/iconCpuPpu.svg"), m_okDisasmProcessor ? tr("Switch to PPU") : tr("Switch to CPU"), this, SLOT(switchCpuPpu()));
     menu.addAction(m_SubtitleItems.isEmpty() ? tr("Load Subtitles...") : tr("Unload Subtitles"), this, SLOT(showHideSubtitles()));
     menu.exec(event->globalPos());
 }

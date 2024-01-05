@@ -48,7 +48,7 @@ QDebugView::QDebugView(QWidget *mainWindow) :
     m_portsCtrl = new QDebugPortsCtrl(this);
     m_portsCtrl->setGeometry(x, 0, cxPorts, cyHeight);
     x += cxPorts + 4;
-    int cxBreaks = cxChar * 9;
+    int cxBreaks = cxChar * 10 + cxChar / 2;
     m_breaksCtrl = new QDebugBreakpointsCtrl(this);
     m_breaksCtrl->setGeometry(x, 0, cxBreaks, cyHeight);
     x += cxBreaks + 4;
@@ -126,7 +126,7 @@ void QDebugView::focusOutEvent(QFocusEvent *)
 void QDebugView::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu menu(this);
-    menu.addAction(m_okDebugProcessor ? tr("Switch to PPU") : tr("Switch to CPU"), this, SLOT(switchCpuPpu()));
+    menu.addAction(QIcon(":/images/iconCpuPpu.svg"), m_okDebugProcessor ? tr("Switch to PPU") : tr("Switch to CPU"), this, SLOT(switchCpuPpu()));
     menu.exec(event->globalPos());
 }
 
@@ -214,7 +214,7 @@ void QDebugCtrl::addStandardContextMenuItems(QMenu& menu)
 {
     if (!menu.isEmpty())
         menu.addSeparator();
-    menu.addAction(isCpuOrPpu() ? tr("Switch to PPU") : tr("Switch to CPU"), this, SLOT(switchCpuPpu()));
+    menu.addAction(QIcon(":/images/iconCpuPpu.svg"), isCpuOrPpu() ? tr("Switch to PPU") : tr("Switch to CPU"), this, SLOT(switchCpuPpu()));
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -226,6 +226,7 @@ QDebugProcessorCtrl::QDebugProcessorCtrl(QDebugView *debugView)
     memset(m_wDebugPpuR, 0, sizeof(m_wDebugPpuR));
     memset(m_okDebugCpuRChanged, 0, sizeof(m_okDebugCpuRChanged));
     memset(m_okDebugPpuRChanged, 0, sizeof(m_okDebugPpuRChanged));
+    m_wDebugCpuPswOld = m_wDebugPpuPswOld = 0;
 }
 
 void QDebugProcessorCtrl::paintEvent(QPaintEvent * /*event*/)
@@ -241,13 +242,16 @@ void QDebugProcessorCtrl::paintEvent(QPaintEvent * /*event*/)
 
     QFont font = Common_GetMonospacedFont();
     painter.setFont(font);
-    QFontMetrics fontmetrics(font);
+    QFontMetrics fontmetrics = painter.fontMetrics();
     int cxChar = fontmetrics.averageCharWidth();
     int cyLine = fontmetrics.height();
     QColor colorText = palette().color(QPalette::Text);
     QColor colorChanged = Common_GetColorShifted(palette(), COLOR_VALUECHANGED);
 
-    int x = cxChar * 1, y = 0;
+    painter.setPen(colorText);
+    painter.drawText(cxChar, cyLine, pProc->GetName());
+
+    int x = cxChar * 1, y = cyLine;
 
     // Registers
     for (int r = 0; r < 8; r++)
@@ -272,13 +276,15 @@ void QDebugProcessorCtrl::paintEvent(QPaintEvent * /*event*/)
     DrawBinaryValue(painter, x + cxChar * 15, y + 9 * cyLine, cpc);
 
     // PSW value
+    painter.drawText(x + cxChar * 15, y + 10 * cyLine, "       HP  TNZVC");
     painter.setPen(QColor(arrRChanged[8] ? colorChanged : colorText));
     painter.drawText(x, y + 11 * cyLine, "PS");
     quint16 psw = arrR[8]; // pProc->GetPSW();
     DrawOctalValue(painter, x + cxChar * 3, y + 11 * cyLine, psw);
     //DrawHexValue(painter, x + cxChar * 10, y + 11 * cyLine, psw);
-    painter.drawText(x + cxChar * 15, y + 10 * cyLine, "       HP  TNZVC");
-    DrawBinaryValue(painter, x + cxChar * 15, y + 11 * cyLine, psw);
+    //DrawBinaryValue(painter, x + cxChar * 15, y + 11 * cyLine, psw);
+    quint16 oldpsw = isCpuOrPpu() ? m_wDebugCpuPswOld : m_wDebugPpuPswOld;
+    DrawBinaryValueChanged(painter, x + cxChar * 15, y + 11 * cyLine, psw, oldpsw, colorChanged, colorText);
 
     painter.setPen(colorText);
 
@@ -300,6 +306,9 @@ void QDebugProcessorCtrl::paintEvent(QPaintEvent * /*event*/)
 
 void QDebugProcessorCtrl::updateData()
 {
+    m_wDebugCpuPswOld = m_wDebugCpuR[8];
+    m_wDebugPpuPswOld = m_wDebugPpuR[8];
+
     const CProcessor* pCPU = g_pBoard->GetCPU();
     ASSERT(pCPU != nullptr);
 
@@ -311,7 +320,7 @@ void QDebugProcessorCtrl::updateData()
         m_wDebugCpuR[r] = value;
     }
     quint16 pswCPU = pCPU->GetPSW();
-    m_okDebugCpuRChanged[8] = (m_wDebugCpuR[8] != pswCPU);
+    m_okDebugCpuRChanged[8] = (m_wDebugCpuPswOld != pswCPU);
     m_wDebugCpuR[8] = pswCPU;
 
     CProcessor* pPPU = g_pBoard->GetPPU();
@@ -325,8 +334,28 @@ void QDebugProcessorCtrl::updateData()
         m_wDebugPpuR[r] = value;
     }
     quint16 pswPPU = pPPU->GetPSW();
-    m_okDebugPpuRChanged[8] = (m_wDebugPpuR[8] != pswPPU);
+    m_okDebugPpuRChanged[8] = (m_wDebugPpuPswOld != pswPPU);
     m_wDebugPpuR[8] = pswPPU;
+}
+
+void QDebugProcessorCtrl::DrawBinaryValueChanged(
+    QPainter &painter, int x, int y, quint16 value, quint16 oldValue, QColor colorChanged, QColor colorText)
+{
+    char buffera[17], bufferb[17];
+    for (int b = 0; b < 16; b++)
+    {
+        int bit = (value >> b) & 1;
+        int oldbit = (oldValue >> b) & 1;
+        char ch = bit ? '1' : '0';
+        buffera[15 - b] = bit == oldbit ? ' ' : ch;
+        bufferb[15 - b] = bit == oldbit ? ch : ' ';
+    }
+    buffera[16] = 0;  bufferb[16] = 0;
+
+    painter.setPen(colorChanged);
+    painter.drawText(x, y, buffera);
+    painter.setPen(colorText);
+    painter.drawText(x, y, bufferb);
 }
 
 DebugCtrlHitTest QDebugProcessorCtrl::hitTest(int x, int y)
@@ -386,7 +415,7 @@ void QDebugStackCtrl::paintEvent(QPaintEvent * /*event*/)
 
     QFont font = Common_GetMonospacedFont();
     painter.setFont(font);
-    QFontMetrics fontmetrics(font);
+    QFontMetrics fontmetrics = painter.fontMetrics();
     int cxChar = fontmetrics.averageCharWidth();
     int cyLine = fontmetrics.height();
     QColor colorText = palette().color(QPalette::Text);
@@ -506,7 +535,7 @@ void QDebugPortsCtrl::paintEvent(QPaintEvent * /*event*/)
 
     QFont font = Common_GetMonospacedFont();
     painter.setFont(font);
-    QFontMetrics fontmetrics(font);
+    QFontMetrics fontmetrics = painter.fontMetrics();
     int cxChar = fontmetrics.averageCharWidth();
     int cyLine = fontmetrics.height();
 
@@ -589,11 +618,11 @@ void QDebugBreakpointsCtrl::paintEvent(QPaintEvent * /*event*/)
 
     QFont font = Common_GetMonospacedFont();
     painter.setFont(font);
-    QFontMetrics fontmetrics(font);
+    QFontMetrics fontmetrics = painter.fontMetrics();
     int cxChar = fontmetrics.averageCharWidth();
     int cyLine = fontmetrics.height();
 
-    int x = cxChar / 2, y = cyLine;
+    int x = cxChar, y = cyLine;
 
     painter.drawText(x, y, tr("Breakpts"));
 
@@ -638,7 +667,7 @@ void QDebugMemoryMapCtrl::paintEvent(QPaintEvent * /*event*/)
 
     QFont font = Common_GetMonospacedFont();
     painter.setFont(font);
-    QFontMetrics fontmetrics(font);
+    QFontMetrics fontmetrics = painter.fontMetrics();
     int cxChar = fontmetrics.averageCharWidth();
     int cyLine = fontmetrics.height();
 
@@ -647,8 +676,9 @@ void QDebugMemoryMapCtrl::paintEvent(QPaintEvent * /*event*/)
     int y1 = y + cxChar / 2;
     int x2 = x1 + cxChar * 13;
     int y2 = y1 + cyLine * 16;
-    int xtype = x1 + cxChar * 3;
+    int xtype = x1 + cxChar * 2;
     int ybase = y + cyLine * 16;
+
     painter.drawRect(x1, y1, x2 - x1, y2 - y1);
     painter.drawText(x, ybase + 2, "000000");
 

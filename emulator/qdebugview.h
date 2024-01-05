@@ -88,14 +88,17 @@ public:
 
 protected:
     void paintEvent(QPaintEvent *event);
+    void DrawBinaryValueChanged(QPainter &painter, int x, int y, quint16 value, quint16 oldValue, QColor colorChanged, QColor colorText);
     virtual DebugCtrlHitTest hitTest(int x, int y);
     void contextMenuEvent(QContextMenuEvent *event);
 
 private:
-    unsigned short m_wDebugCpuR[9];  // Old register values - R0..R7, PSW
-    unsigned short m_wDebugPpuR[9];  // Old register values - R0..R7, PSW
+    quint16 m_wDebugCpuR[9];  // Old register values - R0..R7, PSW
+    quint16 m_wDebugPpuR[9];  // Old register values - R0..R7, PSW
     bool m_okDebugCpuRChanged[9];   // Register change flags
     bool m_okDebugPpuRChanged[9];   // Register change flags
+    quint16 m_wDebugCpuPswOld;
+    quint16 m_wDebugPpuPswOld;
 };
 
 class QDebugStackCtrl : public QDebugCtrl
@@ -139,8 +142,6 @@ public slots:
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
-
-protected:
     void paintEvent(QPaintEvent *event);
 };
 
