@@ -53,5 +53,6 @@ jobs:
         QMAKESPEC: ${{ matrix.config.qmakespec }}
       run: |
         cd emulator
+        lrelease QtUkncBtl.pro
         qmake "CONFIG+=debug" QtUkncBtl.pro
         make

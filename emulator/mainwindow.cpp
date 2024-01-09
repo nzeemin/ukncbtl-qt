@@ -8,6 +8,7 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QSettings>
+#include <QSignalMapper>
 #include <QTimer>
 #include <QVBoxLayout>
 #include "main.h"
@@ -32,6 +33,13 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setWindowTitle(tr("UKNC Back to Life"));
 
     // Assign signals
+    QSignalMapper *langMapper = new QSignalMapper(this);
+    QObject::connect(ui->actionLangEnglish, SIGNAL(triggered()), langMapper, SLOT(map()));
+    langMapper->setMapping(ui->actionLangEnglish, "en");
+    QObject::connect(ui->actionLangRussian, SIGNAL(triggered()), langMapper, SLOT(map()));
+    langMapper->setMapping(ui->actionLangRussian, "ru");
+    QObject::connect(langMapper, SIGNAL(mapped(QString)), this, SLOT(selectLanguage(QString)));
+
     QObject::connect(ui->actionSaveStateImage, SIGNAL(triggered()), this, SLOT(saveStateImage()));
     QObject::connect(ui->actionLoadStateImage, SIGNAL(triggered()), this, SLOT(loadStateImage()));
     QObject::connect(ui->actionFileScreenshot, SIGNAL(triggered()), this, SLOT(saveScreenshot()));
@@ -348,6 +356,13 @@ void MainWindow::showFps(double framesPerSecond)
         _snprintf(buffer, 16, "%03.f%%", speed);
         m_statusLabelFrames->setText(buffer);
     }
+}
+
+void MainWindow::selectLanguage(const QString& lang)
+{
+    Global_getSettings()->setValue("Language", lang);
+
+    AlertInfo(tr("Restart the application to apply the language selection."));
 }
 
 void MainWindow::saveStateImage()

@@ -47,6 +47,7 @@ public:
     void detachHardDrive(int slot);
 
 public slots:
+    void selectLanguage(const QString&);
     void saveStateImage();
     void loadStateImage();
     void saveScreenshot();

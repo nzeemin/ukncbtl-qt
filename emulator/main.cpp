@@ -15,6 +15,7 @@ void RestoreSettings();
 static QApplication *g_Application;
 static MainWindow *g_MainWindow;
 static QSettings *g_Settings;
+static QTranslator *g_Translator;
 
 #if !defined(QT_NO_DEBUG)
 extern void UnitTests_ExecuteAll();  // Defined in UnitTests.cpp
@@ -57,12 +58,14 @@ int main(int argc, char *argv[])
     QApplication application(argc, argv);
     g_Application = &application;
 
-//    QTranslator translator;
-//    translator.load(QLocale::Russian, "ukncbtl_ru.qm");
-//    application.installTranslator(&translator);
-
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "Back to Life", "UKNCBTL");
     g_Settings = &settings;
+
+    QString strLang = g_Settings->value("Language", "en").toString();
+    QString strLangFilename = QString(":/lang/ukncbtl_%1.qm").arg(strLang);
+    g_Translator = new QTranslator();
+    g_Translator->load(strLangFilename);
+    g_Application->installTranslator(g_Translator);
 
     MainWindow w;
     g_MainWindow = &w;
@@ -99,6 +102,9 @@ int main(int argc, char *argv[])
     settings.sync();
 
     Common_Cleanup();
+
+    if (g_Translator != nullptr)
+        delete g_Translator;
 
     return result;
 }
@@ -144,6 +150,10 @@ void Global_showUptime(int uptimeMillisec)
 void Global_showFps(double framesPerSecond)
 {
     Global_getMainWindow()->showFps(framesPerSecond);
+}
+
+void Global_loadTranslation(const QString &filename)
+{
 }
 
 void RestoreSettings()

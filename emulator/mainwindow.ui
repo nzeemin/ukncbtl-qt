@@ -27,6 +27,13 @@
     <property name="title">
      <string>File</string>
     </property>
+    <widget class="QMenu" name="menuLanguage">
+     <property name="title">
+      <string>UI Language</string>
+     </property>
+     <addaction name="actionLangEnglish"/>
+     <addaction name="actionLangRussian"/>
+    </widget>
     <addaction name="actionSaveStateImage"/>
     <addaction name="actionLoadStateImage"/>
     <addaction name="separator"/>
@@ -34,6 +41,8 @@
     <addaction name="actionFileScreenshotAs"/>
     <addaction name="actionFileScreenshotToClipboard"/>
     <addaction name="actionFileScreenToClipboard"/>
+    <addaction name="separator"/>
+    <addaction name="menuLanguage"/>
     <addaction name="separator"/>
     <addaction name="actionScriptRun"/>
     <addaction name="separator"/>
@@ -333,11 +342,11 @@
     <iconset resource="QtUkncBtl.qrc">
      <normaloff>:/images/iconStepInto.svg</normaloff>:/images/iconStepInto.svg</iconset>
    </property>
-   <property name="shortcut">
-    <string>F7</string>
-   </property>
    <property name="text">
     <string>Step Into</string>
+   </property>
+   <property name="shortcut">
+    <string>F7</string>
    </property>
   </action>
   <action name="actionDebugStepOver">
@@ -345,11 +354,11 @@
     <iconset resource="QtUkncBtl.qrc">
      <normaloff>:/images/iconStepOver.svg</normaloff>:/images/iconStepOver.svg</iconset>
    </property>
-   <property name="shortcut">
-    <string>F8</string>
-   </property>
    <property name="text">
     <string>Step Over</string>
+   </property>
+   <property name="shortcut">
+    <string>F8</string>
    </property>
   </action>
   <action name="actionDebugDisasmView">
@@ -573,6 +582,16 @@
    </property>
    <property name="text">
     <string>Sound AY on PPU</string>
+   </property>
+  </action>
+  <action name="actionLangEnglish">
+   <property name="text">
+    <string>English</string>
+   </property>
+  </action>
+  <action name="actionLangRussian">
+   <property name="text">
+    <string>Russian</string>
    </property>
   </action>
  </widget>

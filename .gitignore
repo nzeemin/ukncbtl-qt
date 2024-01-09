@@ -16,6 +16,7 @@
 /emulator/Makefile.*
 /emulator/Makefile
 /emulator/object_script.*
+/emulator/lang/*.qm
 moc_*.cpp
 moc_*.h
 qrc_*.cpp

@@ -21,6 +21,7 @@ void Global_RedrawDisasmView();
 void Global_SetCurrentProc(bool);
 void Global_showUptime(int uptimeMillisec);
 void Global_showFps(double framesPerSecond);
+void Global_loadTranslation(const QString &filename);
 
 
 //////////////////////////////////////////////////////////////////////
