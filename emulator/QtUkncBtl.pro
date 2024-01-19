@@ -61,9 +61,9 @@ ICON = images/ukncbtl.icns
 
 TS_FILES = $$files(lang/*.ts, false)
 lrelease.name = LRELEASE ${QMAKE_FILE_IN}
-lrelease.commands = lrelease ${QMAKE_FILE_IN} -qm lang/${QMAKE_FILE_BASE}.qm
+lrelease.commands = lrelease ${QMAKE_FILE_IN} -qm ${QMAKE_FILE_PATH}/${QMAKE_FILE_BASE}.qm
 lrelease.output = ${QMAKE_FILE_BASE}.qm
 lrelease.input = TS_FILES
-lrelease.clean = lang/${QMAKE_FILE_BASE}.qm
+lrelease.clean = ${QMAKE_FILE_PATH}/${QMAKE_FILE_BASE}.qm
 lrelease.CONFIG += no_link target_predeps
 QMAKE_EXTRA_COMPILERS += lrelease
