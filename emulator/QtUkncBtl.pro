@@ -55,7 +55,15 @@ QT += script
 QT += testlib 
 QT += multimedia
 DEFINES -= UNICODE _UNICODE
-TRANSLATIONS = lang/ukncbtl_en.ts lang/ukncbtl_ru.ts
 CONFIG += c++11
 QMAKE_CXXFLAGS += -std=c++11
 ICON = images/ukncbtl.icns
+
+TS_FILES = $$files(lang/*.ts, false)
+lrelease.name = LRELEASE ${QMAKE_FILE_IN}
+lrelease.commands = lrelease ${QMAKE_FILE_IN} -qm lang/${QMAKE_FILE_BASE}.qm
+lrelease.output = ${QMAKE_FILE_BASE}.qm
+lrelease.input = TS_FILES
+lrelease.clean = lang/${QMAKE_FILE_BASE}.qm
+lrelease.CONFIG += no_link target_predeps
+QMAKE_EXTRA_COMPILERS += lrelease
