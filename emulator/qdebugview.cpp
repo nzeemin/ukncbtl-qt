@@ -361,18 +361,18 @@ void QDebugProcessorCtrl::DrawBinaryValueChanged(
 DebugCtrlHitTest QDebugProcessorCtrl::hitTest(int x, int y)
 {
     DebugCtrlHitTest hit = QDebugCtrl::hitTest(x, y);
-    if (hit.line < 0 || hit.line == 9 || hit.line > 11)
+    if (hit.line < 1 || hit.line == 10 || hit.line > 12)
         return hit;  // Invalid line number
     hit.isValid = true;
 
     const CProcessor* pProc = getProc();
-    if (hit.line < 8)
-        hit.value = pProc->GetReg(hit.line);
-    else if (hit.line == 8)
+    if (hit.line > 0 && hit.line < 9)
+        hit.value = pProc->GetReg(hit.line - 1);
+    else if (hit.line == 9)
         hit.value = pProc->GetCPC();
-    else if (hit.line == 10)
-        hit.value = pProc->GetPSW();
     else if (hit.line == 11)
+        hit.value = pProc->GetPSW();
+    else if (hit.line == 12)
         hit.value = pProc->GetCPSW();
 
     return hit;

@@ -17,3 +17,26 @@ The UKNCBTL project consists of:
 * Project wiki: https://github.com/nzeemin/ukncbtl-doc/wiki
   * Screenshots: https://github.com/nzeemin/ukncbtl-doc/wiki/Screenshots-ru
   * User's Manual (in Russian): https://github.com/nzeemin/ukncbtl-doc/wiki/Users-Manual-ru
+
+
+## Как запустить под Linux
+
+### Собрать из исходников
+
+ 1. Установить пакеты: Qt 5 + QtScript<br>
+    `sudo apt install qtbase5-dev qt5-qmake qtscript5-dev`
+ 2. Скачать исходники: либо через<br>
+    `git clone https://github.com/nzeemin/ukncbtl-qt.git`<br>
+    либо скачать как .zip и распаковать
+ 3. Выполнить команды:<br>
+   `cd emulator`<br>
+   `qmake "CONFIG+=release" QtUkncBtl.pro`<br>
+   `make`<br>
+ 4. Дать права на выполнение: `chmod +x QtUkncBtl`
+ 5. Запустить `QtUkncBtl`
+
+### Используя готовый AppImage
+
+ 1. Зайти в [Releases](https://github.com/nzeemin/bkbtl-qt/releases) найти последний AppImage-релиз и скачать `*.AppImage` файл
+ 2. Дать права на выполнение: `chmod +x UKNCBTL_Qt-a808c28-x86_64.AppImage` (подставить тут правильное название AppImage файла)
+ 3. Запустить AppImage файл
