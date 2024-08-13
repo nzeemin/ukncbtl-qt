@@ -32,4 +32,8 @@
 #include <tchar.h>
 #endif
 
+#if defined(QT_NO_DEBUG)
+#define PRODUCT 1
+#endif
+
 #include "Common.h"

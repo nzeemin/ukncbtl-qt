@@ -7,6 +7,7 @@
 #include <QFont>
 #include <QPainter>
 #include <QCoreApplication>
+#include <QDir>
 #include "main.h"
 #include "mainwindow.h"
 
@@ -89,8 +90,29 @@ void DebugLog(const char* message)
 {
     if (Common_LogFile == nullptr)
     {
-        Common_LogFile = ::fopen(TRACELOG_FILE_NAME, "a+b");
-        //TODO: Check if Common_LogFile == nullptr
+        std::string fullpathfile = TRACELOG_FILE_NAME;
+
+#ifndef Q_OS_WIN64
+#ifndef Q_OS_WIN32
+        QString dirname = QDir::homePath() +  "/.QtUkncBtl/";
+        QDir tracedir(dirname);
+        if(!tracedir.exists())
+        {
+            if(!tracedir.mkdir(dirname))
+            {
+                ::perror("Operation failed");
+                return;
+            }
+        }
+        fullpathfile = dirname.toStdString() + fullpathfile;
+#endif
+#endif
+        Common_LogFile = ::fopen(fullpathfile.c_str(), "a+b");
+        if(!Common_LogFile)
+        {
+            ::perror("Tracefile opening failed");
+            return;
+        }
     }
 
     ::fseek(Common_LogFile, 0, SEEK_END);
