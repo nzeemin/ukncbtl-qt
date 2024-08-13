@@ -78,14 +78,10 @@ bool AlertOkCancel(const QString &sMessage);
 //////////////////////////////////////////////////////////////////////
 // DebugPrint
 
-#if !defined(PRODUCT)
-
 void DebugPrint(const char* message);
 void DebugPrintFormat(const char* pszFormat, ...);
 void DebugLog(const char* message);
 void DebugLogFormat(const char* pszFormat, ...);
-
-#endif // !defined(PRODUCT)
 
 
 //////////////////////////////////////////////////////////////////////

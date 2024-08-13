@@ -60,7 +60,12 @@ bool AlertOkCancel(const QString &sMessage)
 //////////////////////////////////////////////////////////////////////
 // DebugPrint and DebugLog
 
-#if !defined(PRODUCT)
+#if defined(PRODUCT)
+void DebugPrint(const char*) {}
+void DebugPrintFormat(const char*, ...) {}
+void DebugLog(const char*) {}
+void DebugLogFormat(const char*, ...) {}
+#else
 
 void DebugPrint(const char* message)
 {
