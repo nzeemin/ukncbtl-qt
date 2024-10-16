@@ -24,13 +24,13 @@ The UKNCBTL project consists of:
 ### Собрать из исходников
 
  1. Установить пакеты: Qt 5 + QtScript<br>
-    `sudo apt install qtbase5-dev qt5-qmake qtscript5-dev`
+    `sudo apt install cmake qtbase5-dev qt5-qmake qtscript5-dev`
  2. Скачать исходники: либо через<br>
     `git clone https://github.com/nzeemin/ukncbtl-qt.git`<br>
     либо скачать как .zip и распаковать
  3. Выполнить команды:<br>
    `cd emulator`<br>
-   `qmake "CONFIG+=release" QtUkncBtl.pro`<br>
+   `cmake -G "Unix Makefiles" .`<br>
    `make`<br>
  4. Дать права на выполнение: `chmod +x QtUkncBtl`
  5. Запустить `QtUkncBtl`
