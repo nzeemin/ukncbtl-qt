@@ -4,6 +4,8 @@ project(QtUkncBtl VERSION 0.1 LANGUAGES CXX)
 
 SET(CMAKE_OSX_ARCHITECTURES "x86_64")
 
+add_subdirectory(emubase)
+
 find_package(Qt5 REQUIRED COMPONENTS Widgets LinguistTools Script Multimedia Test)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -19,13 +21,6 @@ set(PROJECT_SOURCES
     mainwindow.cpp
     util/WavPcmFile.cpp
     Common.cpp
-    emubase/Processor.cpp
-    emubase/Memory.cpp
-    emubase/Hard.cpp
-    emubase/Floppy.cpp
-    emubase/Disasm.cpp
-    emubase/Board.cpp
-    emubase/SoundAY.cpp
     Emulator.cpp
     qscreen.cpp
     qkeyboardview.cpp
@@ -44,11 +39,6 @@ set(PROJECT_HEADERS
     stdafx.h
     util/WavPcmFile.h
     Common.h
-    emubase/Processor.h
-    emubase/Memory.h
-    emubase/Emubase.h
-    emubase/Defines.h
-    emubase/Board.h
     Emulator.h
     qscreen.h
     qkeyboardview.h
@@ -78,7 +68,7 @@ add_executable(QtUkncBtl
 )
 
 target_include_directories(QtUkncBtl PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(QtUkncBtl PRIVATE Qt5::Widgets Qt5::Script Qt5::Multimedia Qt5::Test)
+target_link_libraries(QtUkncBtl PRIVATE emubase Qt5::Widgets Qt5::Script Qt5::Multimedia Qt5::Test)
 
 set_target_properties(QtUkncBtl PROPERTIES
     ${BUNDLE_ID_OPTION}
