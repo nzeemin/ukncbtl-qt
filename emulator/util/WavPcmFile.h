@@ -12,6 +12,8 @@ UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
 
 #pragma once
 
+#include <cstdint>
+
 //////////////////////////////////////////////////////////////////////
 
 DECLARE_HANDLE(HWAVPCMFILE);
@@ -26,12 +28,12 @@ void WavPcmFile_Close(HWAVPCMFILE wavpcmfile);
 // Samples per second, Hz
 int WavPcmFile_GetFrequency(HWAVPCMFILE wavpcmfile);
 // Length of the stream, in samples
-quint32 WavPcmFile_GetLength(HWAVPCMFILE wavpcmfile);
+uint32_t WavPcmFile_GetLength(HWAVPCMFILE wavpcmfile);
 
 // Current position in the stream, in samples, zero-based
-quint32 WavPcmFile_GetPosition(HWAVPCMFILE wavpcmfile);
+uint32_t WavPcmFile_GetPosition(HWAVPCMFILE wavpcmfile);
 // Set current position in the stream, in samples, zero-based
-void WavPcmFile_SetPosition(HWAVPCMFILE wavpcmfile, quint32 position);
+void WavPcmFile_SetPosition(HWAVPCMFILE wavpcmfile, uint32_t position);
 
 // Read one sample scaled to int type range
 unsigned int WavPcmFile_ReadOne(HWAVPCMFILE wavpcmfile);
