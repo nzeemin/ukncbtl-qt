@@ -101,9 +101,9 @@ void DebugLog(const char* message)
 #ifndef Q_OS_WIN32
         QString dirname = QDir::homePath() +  "/.QtUkncBtl/";
         QDir tracedir(dirname);
-        if(!tracedir.exists())
+        if (!tracedir.exists())
         {
-            if(!tracedir.mkdir(dirname))
+            if (!tracedir.mkdir(dirname))
             {
                 ::perror("Operation failed");
                 return;
@@ -113,7 +113,7 @@ void DebugLog(const char* message)
 #endif
 #endif
         Common_LogFile = ::fopen(fullpathfile.c_str(), "a+b");
-        if(!Common_LogFile)
+        if (!Common_LogFile)
         {
             ::perror("Tracefile opening failed");
             return;

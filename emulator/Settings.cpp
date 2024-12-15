@@ -105,6 +105,25 @@ quint16 Settings_GetDebugMemoryMode()
     return (quint16)value.toUInt();
 }
 
+void Settings_SetDebugBreakpoint(int bpno, bool okCpuPpu, quint16 address)
+{
+    char bufValueName[] = "DebugBreakptCpu0";
+    bufValueName[12] = okCpuPpu ? 'C' : 'P';
+    bufValueName[15] = bpno < 10 ? '0' + (char)bpno : 'A' + (char)(bpno - 10);
+    if (address == 0177777)
+        Global_getSettings()->remove(bufValueName);
+    else
+        Global_getSettings()->setValue(bufValueName, address);
+}
+quint16 Settings_GetDebugBreakpoint(int bpno, bool okCpuPpu)
+{
+    char bufValueName[] = "DebugBreakptCpu0";
+    bufValueName[12] = okCpuPpu ? 'C' : 'P';
+    bufValueName[15] = bpno < 10 ? '0' + (char)bpno : 'A' + (char)(bpno - 10);
+    QVariant value = Global_getSettings()->value(bufValueName, 0177777);
+    return (quint16)value.toUInt();
+}
+
 void Settings_SetDebugMemoryAddress(quint16 mode)
 {
     Global_getSettings()->setValue("DebugMemoryAddress", mode);

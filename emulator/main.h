@@ -41,6 +41,8 @@ void Settings_SetSoundAY(bool flag);
 bool Settings_GetSoundAY();
 bool Settings_GetDebugCpuPpu();
 void Settings_SetDebugCpuPpu(bool flag);
+void Settings_SetDebugBreakpoint(int bpno, bool okCpuPpu, quint16 address);
+quint16 Settings_GetDebugBreakpoint(int bpno, bool okCpuPpu);
 void Settings_SetDebugMemoryMode(quint16 mode);
 quint16 Settings_GetDebugMemoryMode();
 void Settings_SetDebugMemoryAddress(quint16 address);
