@@ -43,7 +43,7 @@ jobs:
       - name: Build
         run: |
           cd emulator
-          qmake "CONFIG+=release" -r GST_VERSION=1.0 QtUkncBtl.pro
+          cmake -G "Unix Makefiles" .
           make
 
       - name: Packaging

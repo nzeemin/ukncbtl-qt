@@ -40,8 +40,10 @@ install:
 before_build:
   # Prepare the out-of-source build directory
   - mkdir %APPVEYOR_BUILD_FOLDER%-build
-  - qmake -o %APPVEYOR_BUILD_FOLDER%-build -r -Wall -Wlogic -Wparser CONFIG+=%CONFIGURATION% %APPVEYOR_BUILD_FOLDER%/emulator
+  - cd %APPVEYOR_BUILD_FOLDER%-build
+  - if %QTDIR:msvc=%==%QTDIR% cmake -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CC_COMPILER=gcc -DCMAKE_MAKE_PROGRAM=mingw32-make -G "MinGW Makefiles" ..\ukncbtl-qt\emulator
+  - if not %QTDIR:msvc=%==%QTDIR% cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=%configuration% ..\ukncbtl-qt\emulator
 
 build_script:
   - cd %APPVEYOR_BUILD_FOLDER%-build
-  - '%make%'
+  - cmake --build .

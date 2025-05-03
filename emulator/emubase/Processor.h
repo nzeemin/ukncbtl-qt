@@ -15,6 +15,8 @@ UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
 #include "Defines.h"
 #include "Memory.h"
 
+// Processor register names
+extern const LPCTSTR REGISTER_NAME[];
 
 class CMemoryController;
 
