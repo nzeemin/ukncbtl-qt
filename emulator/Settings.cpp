@@ -8,6 +8,7 @@
 
 bool Option_ShowHelp = false;
 int Option_AutoBoot = 0;
+int Option_Debug = -1;  // Tri-state: -1 = undefined, 1 = Debug mode on, 0 = Debug mode off
 
 
 //////////////////////////////////////////////////////////////////////

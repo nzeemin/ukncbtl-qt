@@ -34,6 +34,7 @@ public:
     void restoreSettings();
     void showUptime(int uptimeMillisec);
     void showFps(double framesPerSecond);
+    bool isDebugMode();
 
 public:
     void saveStateImage(const QString& filename);

@@ -745,6 +745,11 @@ void MainWindow::detachHardDrive(int slot)
     Settings_SetHardFilePath(slot, nullptr);
 }
 
+bool MainWindow::isDebugMode()
+{
+    return m_dockConsole->isVisible();
+}
+
 void MainWindow::debugConsoleView()
 {
     bool okShow = !m_dockConsole->isVisible();

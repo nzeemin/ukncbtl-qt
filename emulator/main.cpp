@@ -40,6 +40,8 @@ const char CommandLineHelp[] =
     OPTIONSTR "noautostart " OPTIONSTR "autostartoff    Do not start emulation on window open\n"
     OPTIONSTR "sound " OPTIONSTR "soundon    Turn sound on\n"
     OPTIONSTR "nosound " OPTIONSTR "soundoff    Turn sound off\n"
+    OPTIONSTR "debug " OPTIONSTR "debugon    Show Debug views on window open\n"
+    OPTIONSTR "nodebug " OPTIONSTR "debugoff    Hide Debug views on window open\n"
     OPTIONSTR "diskN:filePath    Attach disk image, N=0..3\n"
     OPTIONSTR "cartN:filePath    Attach cartridge image, N=1..2\n"
     OPTIONSTR "hardN:filePath    Attach hard disk image, N=1..2\n";
@@ -85,6 +87,15 @@ int main(int argc, char *argv[])
     RestoreSettings();
     w.updateMenu();
     w.updateAllViews();
+
+    if (Option_Debug >= 0)
+    {
+        if ((w.isDebugMode() && Option_Debug == 0) ||
+            (!w.isDebugMode() && Option_Debug > 0))
+        {
+            w.debugConsoleView();  // switch Debug mode on/off
+        }
+    }
 
     if (Option_ShowHelp)
     {
@@ -202,7 +213,7 @@ void ParseCommandLine(int argc, char *argv[])
             {
                 Option_ShowHelp = true;
             }
-            else if (option.startsWith("boot"))
+            else if (option.startsWith("boot")) // /boot or /bootN
             {
                 Option_AutoBoot = 1;
                 if (option.length() > 4 && option[4] >= '1' && option[4] <= '7')
@@ -226,6 +237,14 @@ void ParseCommandLine(int argc, char *argv[])
             {
                 Settings_SetSound(false);
             }
+            else if (option == "debug" || option == "debugon" || option == "debugger")
+            {
+                Option_Debug = 1;
+            }
+            else if (option == "debugoff" || option == "nodebug")
+            {
+                Option_Debug = 0;
+            }
             else if (option.startsWith("disk") && option.length() > 6 && // "/diskN:filePath", N=0..3
                     option[4] >= '0' && option[4] <= '3' && option[5] == ':')
             {
@@ -244,7 +263,10 @@ void ParseCommandLine(int argc, char *argv[])
                 int slot = option[4].toLatin1() - '0';
                 Settings_SetHardFilePath(slot, option.mid(6));
             }
-            //TODO
+            else
+            {
+                AlertWarning(QString("Unknown command line option:\n%1").arg(QString::fromLocal8Bit(param)));
+            }
         }
 
         ++it;
