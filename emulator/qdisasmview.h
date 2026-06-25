@@ -59,6 +59,8 @@ public:
 public slots:
     void switchCpuPpu();
     void showHideSubtitles();
+    void copyAddressOctal();
+    void copyValueOctal();
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -82,7 +84,11 @@ private:
     QVector<DisasmLineItem> m_DisasmLineItems;
     int m_cxDisasmBreakpointZone;
     int m_cyDisasmLine;
+    bool m_lastHitValid;        // True if m_lastHit* fields are valid
+    quint16 m_lastHitAddress;   // Address under the last context menu hit test
+    quint16 m_lastHitValue;     // Value under the last context menu hit test
 
+    bool hitTest(int y);
     const DisasmSubtitleItem * findSubtitle(quint16 address, quint16 typemask);
 
     void drawJump(QPainter& painter, int yFrom, int delta, int x, QColor color);

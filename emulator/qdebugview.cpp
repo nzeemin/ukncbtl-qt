@@ -302,6 +302,13 @@ void QDebugProcessorCtrl::paintEvent(QPaintEvent * /*event*/)
     bool okStopped = pProc->IsStopped();
     if (okStopped)
         painter.drawText(x + 6 * cxChar, y + 14 * cyLine, "STOP");
+
+    // PSW flags as TNZVC string: flag letter if bit is set, '-' otherwise
+    const char* tnzvc = "TNZVC";
+    QString flagstr;
+    for (int j = 0; j < 5; j++)
+        flagstr += (psw & (1 << (4 - j))) ? QChar(tnzvc[j]) : QChar('-');
+    painter.drawText(x + cxChar * 26, y + 14 * cyLine, flagstr);
 }
 
 void QDebugProcessorCtrl::updateData()
