@@ -1,0 +1,9 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="/i18n">
+        <!-- Add the compiled .qm files here -->
+        <file>ukncbtl_en.qm</file>
+        <file>ukncbtl_ru.qm</file>
+        <!-- Add more .qm files if needed -->
+    </qresource>
+</RCC>

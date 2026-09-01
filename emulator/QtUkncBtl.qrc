@@ -26,8 +26,4 @@
         <file>images/ukncbtl.png</file>
         <file>uknc_rom.bin</file>
     </qresource>
-    <qresource prefix="/lang">
-        <file alias="ukncbtl_en.qm">lang/ukncbtl_en.qm</file>
-        <file alias="ukncbtl_ru.qm">lang/ukncbtl_ru.qm</file>
-    </qresource>
 </RCC>
