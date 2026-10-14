@@ -18,6 +18,8 @@ class CProcessor;
 class CMemoryController;
 class CSoundAY;
 
+#define FRAMERATE 50  // Количество фремов в секунду
+
 // Floppy debug constants
 #define FLOPPY_FSM_WAITFORLSB   0
 #define FLOPPY_FSM_WAITFORMSB   1
@@ -106,6 +108,14 @@ typedef bool (CALLBACK* PARALLELOUTCALLBACK)(uint8_t byte);
 
 // Terminal out callback -- CPU sends character by channel 0
 typedef void (CALLBACK* TERMINALOUTCALLBACK)(uint8_t byte);
+
+// Instruction execution callback -- called by CPU/PPU just before an instruction is executed,
+// memory and registers are still in pre-execution state
+// Input:
+//   pProc      Processor executing the instruction (CPU or PPU), see CProcessor::GetName()
+//   address    Address of the instruction, PC value before the fetch
+//   opcode     First word of the instruction as fetched
+typedef void (CALLBACK* INSTRUCTIONCALLBACK)(const CProcessor* pProc, uint16_t address, uint16_t opcode);
 
 class CFloppyController;
 class CHardDrive;
@@ -236,6 +246,7 @@ public:  // System control
     uint16_t    GetKeyboardRegister();
     uint16_t    GetScannedKey() const { return m_scanned_key; }
     int         GetSoundChanges() const { return m_SoundChanges; }  ///< Sound signal 0 to 1 changes since the beginning of the frame
+    void        MouseMove(int16_t dx, int16_t dy, bool btnLeft, bool btnRight);
 
     /// \brief Attach floppy image to the slot -- insert the disk.
     bool        AttachFloppyImage(int slot, LPCTSTR sFileName);
@@ -284,11 +295,16 @@ public:  // System control
     void        SetNetworkCallbacks(NETWORKINCALLBACK incallback, NETWORKOUTCALLBACK outcallback);
     /// \brief Assign terminal callback functions.
     void        SetTerminalCallback(TERMINALOUTCALLBACK callback) { m_TerminalOutCallback = callback; }
+    /// \brief Assign callback for CPU/PPU instruction execution, nullptr to remove
+    void        SetInstructionCallback(INSTRUCTIONCALLBACK callback);
 public:  // Saving/loading emulator status
     void        SaveToImage(uint8_t* pImage);
     void        LoadFromImage(const uint8_t* pImage);
+
     void        SetSound(uint16_t val);
     void        SetSoundAY(bool onoff) { m_okSoundAY = onoff; }
+    void        SetSoundCovox(bool onoff) { m_okSoundCovox = onoff; }
+    void        SetMouse(bool onoff);
 private: // Timing
     uint16_t    m_multiply;
     uint16_t    freq_per[6];
@@ -319,6 +335,7 @@ private:
 
     bool        m_okSoundAY;
     uint8_t     m_nSoundAYReg[3];  ///< AY current register
+    bool        m_okSoundCovox;
 
 private:
     TAPEREADCALLBACK    m_TapeReadCallback;

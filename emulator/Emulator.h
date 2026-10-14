@@ -61,5 +61,19 @@ quint16 Emulator_GetChangeRamStatus(int addrtype, quint16 address);
 bool Emulator_SaveImage(const QString &sFilePath);
 bool Emulator_LoadImage(const QString &sFilePath);
 
+// Instruction history, recorded always for both CPU and PPU
+const int INSTR_HISTORY_SIZE = 256;  // Must be a power of two
+
+struct InstructionRecord
+{
+    quint16 pc;
+    quint16 words[3];  // Opcode and two next words; the instruction is at most 3 words long
+    quint16 psw;       // Processor status word before the instruction; bit 0400 = HALT mode
+};
+
+int Emulator_GetHistoryLength(bool okCpuPpu);  // okCpuPpu: true = CPU, false = PPU
+const InstructionRecord& Emulator_GetHistoryRecord(bool okCpuPpu, int index);  // index 0 = most recent
+void Emulator_ClearHistory();
+
 
 //////////////////////////////////////////////////////////////////////

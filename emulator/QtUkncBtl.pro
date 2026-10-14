@@ -20,6 +20,7 @@ SOURCES += main.cpp \
     Settings.cpp \
     qdebugview.cpp \
     qdisasmview.cpp \
+    qinstrhistoryview.cpp \
     qconsoleview.cpp \
     qmemoryview.cpp \
     qsoundout.cpp \
@@ -41,6 +42,7 @@ HEADERS += mainwindow.h \
     main.h \
     qdebugview.h \
     qdisasmview.h \
+    qinstrhistoryview.h \
     qconsoleview.h \
     qmemoryview.h \
     qsoundout.h \

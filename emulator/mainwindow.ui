@@ -88,6 +88,7 @@
     <addaction name="actionDebugCpuPpu"/>
     <addaction name="separator"/>
     <addaction name="actionDebugDisasmView"/>
+    <addaction name="actionDebugInstrHistoryView"/>
     <addaction name="actionDebugMemoryView"/>
     <addaction name="separator"/>
     <addaction name="actionDebugStepInto"/>
@@ -367,6 +368,14 @@
    </property>
    <property name="text">
     <string>Disasm View</string>
+   </property>
+  </action>
+  <action name="actionDebugInstrHistoryView">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Instructions History</string>
    </property>
   </action>
   <action name="actionDebugMemoryView">

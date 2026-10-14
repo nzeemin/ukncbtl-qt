@@ -20,6 +20,7 @@
 #include "qconsoleview.h"
 #include "qdebugview.h"
 #include "qdisasmview.h"
+#include "qinstrhistoryview.h"
 #include "qmemoryview.h"
 #include "qscripting.h"
 #include "Emulator.h"
@@ -61,6 +62,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionDrivesHard2, SIGNAL(triggered()), this, SLOT(emulatorHardDrive2()));
     QObject::connect(ui->actionDebugConsoleView, SIGNAL(triggered()), this, SLOT(debugConsoleView()));
     QObject::connect(ui->actionDebugDisasmView, SIGNAL(triggered()), this, SLOT(debugDisasmView()));
+    QObject::connect(ui->actionDebugInstrHistoryView, SIGNAL(triggered()), this, SLOT(debugInstrHistoryView()));
     QObject::connect(ui->actionDebugMemoryView, SIGNAL(triggered()), this, SLOT(debugMemoryView()));
     QObject::connect(ui->actionDebugCpuPpu, SIGNAL(triggered()), this, SLOT(debugCpuPpu()));
     QObject::connect(ui->actionDebugStepInto, SIGNAL(triggered()), this, SLOT(debugStepInto()));
@@ -90,6 +92,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_console = new QConsoleView();
     m_debug = new QDebugView(this);
     m_disasm = new QDisasmView();
+    m_instrHistory = new QInstrHistoryView();
     m_memory = new QMemoryView();
 
     QVBoxLayout *vboxlayout = new QVBoxLayout;
@@ -109,6 +112,9 @@ MainWindow::MainWindow(QWidget *parent) :
     m_dockDisasm = new QDockWidget(tr("Disassemble"));
     m_dockDisasm->setObjectName("dockDisasm");
     m_dockDisasm->setWidget(m_disasm);
+    m_dockInstrHistory = new QDockWidget(tr("Instructions History"));
+    m_dockInstrHistory->setObjectName("dockInstrHistory");
+    m_dockInstrHistory->setWidget(m_instrHistory);
     m_dockMemory = new QDockWidget(tr("Memory"));
     m_dockMemory->setObjectName("dockMemory");
     m_dockMemory->setWidget(m_memory);
@@ -121,6 +127,8 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
     this->addDockWidget(Qt::RightDockWidgetArea, m_dockDebug, Qt::Vertical);
     this->addDockWidget(Qt::RightDockWidgetArea, m_dockDisasm, Qt::Vertical);
+    this->addDockWidget(Qt::RightDockWidgetArea, m_dockInstrHistory, Qt::Vertical);
+    this->splitDockWidget(m_dockDisasm, m_dockInstrHistory, Qt::Horizontal);  // Instructions History right of Disasm
     this->addDockWidget(Qt::RightDockWidgetArea, m_dockMemory, Qt::Vertical);
     this->addDockWidget(Qt::BottomDockWidgetArea, m_dockConsole);
 
@@ -144,10 +152,12 @@ MainWindow::~MainWindow()
     delete m_console;
     delete m_debug;
     delete m_disasm;
+    delete m_instrHistory;
     delete m_memory;
     delete m_dockConsole;
     delete m_dockDebug;
     delete m_dockDisasm;
+    delete m_dockInstrHistory;
     delete m_dockMemory;
     delete m_statusLabelInfo;
     delete m_statusLabelFrames;
@@ -195,6 +205,7 @@ void MainWindow::closeEvent(QCloseEvent* event)
     Global_getSettings()->setValue("MainWindow/ConsoleView", m_dockConsole->isVisible());
     Global_getSettings()->setValue("MainWindow/DebugView", m_dockDebug->isVisible());
     Global_getSettings()->setValue("MainWindow/DisasmView", m_dockDisasm->isVisible());
+    Global_getSettings()->setValue("MainWindow/InstrHistoryView", m_dockInstrHistory->isVisible());
     Global_getSettings()->setValue("MainWindow/MemoryView", m_dockMemory->isVisible());
 
     QMainWindow::closeEvent(event);
@@ -225,12 +236,14 @@ void MainWindow::restoreSettings()
     m_dockConsole->setVisible(Global_getSettings()->value("MainWindow/ConsoleView", false).toBool());
     m_dockDebug->setVisible(Global_getSettings()->value("MainWindow/DebugView", false).toBool());
     m_dockDisasm->setVisible(Global_getSettings()->value("MainWindow/DisasmView", false).toBool());
+    m_dockInstrHistory->setVisible(Global_getSettings()->value("MainWindow/InstrHistoryView", false).toBool());
     m_dockMemory->setVisible(Global_getSettings()->value("MainWindow/MemoryView", false).toBool());
 
     ui->actionSoundEnabled->setChecked(Settings_GetSound());
     ui->actionSoundAY->setChecked(Settings_GetSoundAY());
     m_debug->updateWindowText();
     m_disasm->updateWindowText();
+    m_instrHistory->updateWindowText();
     m_memory->updateWindowText();
 }
 
@@ -274,6 +287,7 @@ void MainWindow::updateMenu()
 
     ui->actionDebugConsoleView->setChecked(m_console->isVisible());
     ui->actionDebugDisasmView->setChecked(m_dockDisasm->isVisible());
+    ui->actionDebugInstrHistoryView->setChecked(m_dockInstrHistory->isVisible());
     ui->actionDebugMemoryView->setChecked(m_dockMemory->isVisible());
 
     if (m_debug != nullptr)
@@ -288,6 +302,8 @@ void MainWindow::updateAllViews()
         m_debug->updateData();
     if (m_disasm != nullptr)
         m_disasm->updateData();
+    if (m_instrHistory != nullptr)
+        m_instrHistory->updateData();
     if (m_memory != nullptr)
         m_memory->updateData();
     if (m_console != nullptr)
@@ -298,6 +314,8 @@ void MainWindow::updateAllViews()
         m_debug->repaint();
     if (m_disasm != nullptr)
         m_disasm->repaint();
+    if (m_instrHistory != nullptr)
+        m_instrHistory->repaint();
     if (m_memory != nullptr)
         m_memory->repaint();
 
@@ -756,6 +774,7 @@ void MainWindow::debugConsoleView()
     m_dockConsole->setVisible(okShow);
     m_dockDebug->setVisible(okShow);
     m_dockDisasm->setVisible(okShow);
+    m_dockInstrHistory->setVisible(okShow);
     m_dockMemory->setVisible(okShow);
 
     if (!okShow)
@@ -770,6 +789,11 @@ void MainWindow::debugConsoleView()
 void MainWindow::debugDisasmView()
 {
     m_dockDisasm->setVisible(!m_dockDisasm->isVisible());
+    updateMenu();
+}
+void MainWindow::debugInstrHistoryView()
+{
+    m_dockInstrHistory->setVisible(!m_dockInstrHistory->isVisible());
     updateMenu();
 }
 void MainWindow::debugMemoryView()

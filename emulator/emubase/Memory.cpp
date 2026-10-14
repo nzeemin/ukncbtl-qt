@@ -803,6 +803,10 @@ CSecondMemoryController::CSecondMemoryController() : CMemoryController()
     m_Port177054 = 01401;
 
     m_Port177100 = m_Port177101 = m_Port177102 = 0377;
+
+    m_okMouse = false;
+    m_mousedx = m_mousedy = 0;
+    m_mouseflags = 0;
 }
 
 void CSecondMemoryController::DCLO_Signal()
@@ -873,12 +877,12 @@ int CSecondMemoryController::TranslateAddress(uint16_t address, bool /*okHaltMod
                 *pOffset = address;
                 return ADDRTYPE_RAM0;
             }
-            else if ((m_Port177054 & 1) != 0)  // ROM selected
+            if ((m_Port177054 & 1) != 0)  // ROM selected
             {
                 *pOffset = address - 0100000;
                 return ADDRTYPE_ROM;
             }
-            else if ((m_Port177054 & 14) != 0)  // ROM cartridge selected
+            if ((m_Port177054 & 14) != 0)  // ROM cartridge selected
             {
                 int slot = ((m_Port177054 & 8) == 0) ? 1 : 2;
                 if (m_pBoard->IsHardImageAttached(slot) && address >= 0110000)
@@ -886,12 +890,13 @@ int CSecondMemoryController::TranslateAddress(uint16_t address, bool /*okHaltMod
                     *pOffset = address;
                     return ADDRTYPE_IO;  // 110000-117777 - HDD ports
                 }
-                else
+                if (m_pBoard->IsROMCartridgeLoaded(slot))
                 {
                     int bank = (m_Port177054 & 6) >> 1;
-                    *pOffset = address - 0100000 + (((uint16_t)bank - 1) << 13);
+                    *pOffset = address - 0100000 + (uint16_t)((bank - 1) << 13);
                     return (slot == 1) ? ADDRTYPE_ROMCART1 : ADDRTYPE_ROMCART2;
                 }
+                return ADDRTYPE_DENY;
             }
             return ADDRTYPE_NONE;
         }
@@ -1059,6 +1064,26 @@ uint16_t CSecondMemoryController::GetPortWord(uint16_t address)
     case 0177362:
     case 0177364:
         return 0; //m_pBoard->GetSoundAYVal((address >> 1) & 3);
+
+    case 0177400:  // Mouse
+        if (!m_okMouse)
+        {
+            m_pProcessor->MemoryError();
+            break;
+        }
+        else
+        {
+            int16_t dx = m_mousedx;
+            if (dx < -63) dx = -63;
+            if (dx > 63) dx = 63;
+            m_mousedx -= dx;
+            int16_t dy = m_mousedy;
+            if (dy < -63) dy = -63;
+            if (dy > 63) dy = 63;
+            m_mousedy -= dy;
+            uint16_t word = (uint16_t)( ((((uint16_t)dy) & 127) << 9) | ((((uint16_t)dx) & 127) << 1) | (m_mouseflags & 0x0101) );
+            return word;
+        }
 
     case 0177700:
     case 0177701:
@@ -1239,6 +1264,12 @@ void CSecondMemoryController::SetPortByte(uint16_t address, uint8_t byte)
     case 0177362:
     case 0177364:
         m_pBoard->SetSoundAYVal((address >> 1) & 3, byte);
+        break;
+
+    case 0177400:
+    case 0177401:
+        if (!m_okMouse)
+            m_pProcessor->MemoryError();
         break;
 
     case 0177700:  // Keyboard status
@@ -1463,6 +1494,11 @@ void CSecondMemoryController::SetPortWord(uint16_t address, uint16_t word)
         m_pBoard->SetSoundAYReg((address >> 1) & 3, word & 0xFF);
         break;
 
+    case 0177400:  // Mouse
+        if (!m_okMouse)
+            m_pProcessor->MemoryError();
+        break;
+
     case 0177700:  // Keyboard status
     case 0177701:
         if (((m_Port177700 & 0100) == 0) && (word & 0100) && (m_Port177700 & 0200))
@@ -1611,6 +1647,16 @@ void CSecondMemoryController::Init_177716()
     m_Port177716 &= 0117461;
 }
 
+void CSecondMemoryController::MouseMove(int16_t dx, int16_t dy, bool btnLeft, bool btnRight)
+{
+    m_mousedx += dx;
+    if (m_mousedx > 256) m_mousedx = 256;
+    if (m_mousedx < -256) m_mousedx = -256;
+    m_mousedy -= dy;
+    if (m_mousedy > 256) m_mousedy = 256;
+    if (m_mousedy < -256) m_mousedy = -256;
+    m_mouseflags = (btnLeft ? 0x0100 : 0) | (btnRight ? 0x0001 : 0);
+}
 
 //////////////////////////////////////////////////////////////////////
 //

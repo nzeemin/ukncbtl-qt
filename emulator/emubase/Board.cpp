@@ -181,7 +181,7 @@ CMotherboard::CMotherboard ()
     m_NetworkInCallback = nullptr;
     m_NetworkOutCallback = nullptr;
     m_TerminalOutCallback = nullptr;
-    m_okSoundAY = false;
+    m_okSoundAY = m_okSoundCovox = false;
 
     // Create devices
     m_pCPU = new CProcessor(_T("CPU"));
@@ -275,12 +275,14 @@ CMotherboard::~CMotherboard ()
 void CMotherboard::SetTrace(uint32_t dwTrace)
 {
     m_dwTrace = dwTrace;
-    if (m_pPPU != nullptr)
-        m_pPPU->SetTrace((dwTrace & TRACE_PPU) != 0);
-    if (m_pCPU != nullptr)
-        m_pCPU->SetTrace((dwTrace & TRACE_CPU) != 0);
     if (m_pFloppyCtl != nullptr)
         m_pFloppyCtl->SetTrace((dwTrace & TRACE_FLOPPY) != 0);
+}
+
+void CMotherboard::SetInstructionCallback(INSTRUCTIONCALLBACK callback)
+{
+    m_pCPU->SetInstructionCallback(callback);
+    m_pPPU->SetInstructionCallback(callback);
 }
 
 void CMotherboard::Reset ()
@@ -468,7 +470,7 @@ void CMotherboard::SetHardPortWord(int slot, uint16_t port, uint16_t data)
 uint16_t CMotherboard::GetROMWord(uint16_t offset) const
 {
     ASSERT(offset < 32768);
-    return *((uint16_t*)(m_pROM + (offset & 0xFFFE)));
+    return *reinterpret_cast<uint16_t*>(m_pROM + (offset & 0xFFFE));
 }
 uint8_t CMotherboard::GetROMByte(uint16_t offset) const
 {
@@ -483,7 +485,7 @@ uint16_t CMotherboard::GetROMCartWord(int cartno, uint16_t offset) const
     int cartindex = cartno - 1;
     if (m_pROMCart[cartindex] == nullptr)
         return 0177777;
-    uint16_t* p = (uint16_t*) (m_pROMCart[cartindex] + (offset & 0xFFFE));
+    uint16_t* p = reinterpret_cast<uint16_t*>(m_pROMCart[cartindex] + (offset & 0xFFFE));
     return *p;
 }
 uint8_t CMotherboard::GetROMCartByte(int cartno, uint16_t offset) const
@@ -659,6 +661,17 @@ void CMotherboard::SetSoundAYVal(int chip, uint8_t val)
     }
 }
 
+void CMotherboard::SetMouse(bool onoff)
+{
+    reinterpret_cast<CSecondMemoryController*>(m_pSecondMemCtl)->SetMouse(onoff);
+}
+
+void CMotherboard::MouseMove(int16_t dx, int16_t dy, bool btnLeft, bool btnRight)
+{
+    reinterpret_cast<CSecondMemoryController*>(m_pSecondMemCtl)->MouseMove(dx, dy, btnLeft, btnRight);
+}
+
+
 void CMotherboard::DebugTicks()
 {
     if (!m_pPPU->IsStopped())
@@ -677,19 +690,18 @@ void CMotherboard::DebugTicks()
 }
 
 /*
-Каждый фрейм равен 1/25 секунды = 40 мс = 20000 тиков, 1 тик = 2 мкс.
-
-* 20000 тиков системного таймера - на каждый 1-й тик
-* 2 сигнала EVNT, в 0-й и 10000-й тик фрейма
-* 320000 тиков ЦП - 16 раз за один тик
-* 250000 тиков ПП - 12.5 раз за один тик
-* Отрисовка 288 видимых строк, по 32 тика на строку (только в первой половине фрейма)
-** Первая невидимая строка (#0) начинает рисоваться на 96-ой тик
-** Первая видимая строка (#18) начинает рисоваться на 672-й тик
+Каждый фрейм равен 1/50 секунды = 20 мс = 10000 тиков, 1 тик = 2 мкс по времени машины.
+* 10000 тиков системного таймера - на каждый тик
+* 1 сигнал EVNT, в 0-й тик фрейма
+* 160000 тиков ЦП - 16 раз за один тик
+* 125000 тиков ПП - 12.5 раз за один тик
+* Отрисовка 312 строк
 * 625 тиков FDD - каждый 32-й тик
 * 48 тиков обмена с COM-портом - каждый 416 тик
 * 8?? тиков обмена с NET-портом - каждый 64 тик ???
 */
+
+#define FRAMETICKS 10000  // Количество тиков в одном фрейме
 #define SYSTEMFRAME_EXECUTE_CPU     { m_pCPU->Execute(); }
 #define SYSTEMFRAME_EXECUTE_PPU     { m_pPPU->Execute(); }
 #define SYSTEMFRAME_EXECUTE_BP_CPU  { m_pCPU->Execute(); if (m_CPUbps != nullptr) \
@@ -698,61 +710,65 @@ void CMotherboard::DebugTicks()
     { const uint16_t* pbps = m_PPUbps; while(*pbps != 0177777) { if (m_pPPU->GetPC() == *pbps++) return false; } } }
 bool CMotherboard::SystemFrame()
 {
-    int frameticks = 0;  // count 20000 ticks
+    int frameticks = 0;  // count 10000 ticks
 
     m_SoundChanges = 0;
-    int soundSamplesPerFrame = SAMPLERATE / 25, soundBrasErr = 0;
+    int soundSamplesPerFrame = SAMPLERATE / FRAMERATE, soundBrasErr = 0;
 
-    const int serialOutTicks = 20000 / (9600 / 25);
+    const int serialOutTicks = FRAMETICKS / (9600 / FRAMERATE);
     int serialTxCount = 0;
-    const int networkOutTicks = 7; //20000 / (57600 / 25);
+    const int networkOutTicks = 7; // FRAMETICKS / (57600 / FRAMERATE);
     int networkTxCount = 0;
 
     int tapeSamplesPerFrame = 1, tapeBrasErr = 0;
     if (m_TapeReadCallback != nullptr || m_TapeWriteCallback != nullptr)
-        tapeSamplesPerFrame = m_nTapeSampleRate / 25;
+        tapeSamplesPerFrame = m_nTapeSampleRate / FRAMERATE;
 
     do
     {
         TimerTick();  // System timer tick
 
-        if (frameticks % 10000 == 0)
+        if (frameticks == 0)
             Tick50();  // 1/50 timer event
 
         // CPU - 16 times, PPU - 12.5 times
         if (m_CPUbps == nullptr && m_PPUbps == nullptr)  // No breakpoints, no need to check
         {
-            /*  0 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;
-            /*  1 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;
-            /*  2 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;  SYSTEMFRAME_EXECUTE_CPU;
-            /*  3 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;
-            /*  4 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;
-            /*  5 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;  SYSTEMFRAME_EXECUTE_CPU;
-            /*  6 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;
-            /*  7 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;
-            /*  8 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;  SYSTEMFRAME_EXECUTE_CPU;
-            /*  9 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;
-            /* 10 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;
-            /* 11 */  SYSTEMFRAME_EXECUTE_CPU;  SYSTEMFRAME_EXECUTE_PPU;  SYSTEMFRAME_EXECUTE_CPU;
+            /*  0 */  SYSTEMFRAME_EXECUTE_CPU  SYSTEMFRAME_EXECUTE_PPU
+            /*  1 */  SYSTEMFRAME_EXECUTE_CPU  SYSTEMFRAME_EXECUTE_PPU
+            /*  2 */  SYSTEMFRAME_EXECUTE_CPU  SYSTEMFRAME_EXECUTE_PPU  SYSTEMFRAME_EXECUTE_CPU
+            /*  3 */  SYSTEMFRAME_EXECUTE_CPU  SYSTEMFRAME_EXECUTE_PPU
+            /*  4 */  SYSTEMFRAME_EXECUTE_CPU  SYSTEMFRAME_EXECUTE_PPU
+            /*  5 */  SYSTEMFRAME_EXECUTE_CPU  SYSTEMFRAME_EXECUTE_PPU  SYSTEMFRAME_EXECUTE_CPU
+            /*  6 */  SYSTEMFRAME_EXECUTE_CPU  SYSTEMFRAME_EXECUTE_PPU
+            /*  7 */  SYSTEMFRAME_EXECUTE_CPU  SYSTEMFRAME_EXECUTE_PPU
+            /*  8 */  SYSTEMFRAME_EXECUTE_CPU  SYSTEMFRAME_EXECUTE_PPU  SYSTEMFRAME_EXECUTE_CPU
+            /*  9 */  SYSTEMFRAME_EXECUTE_CPU  SYSTEMFRAME_EXECUTE_PPU
+            /* 10 */  SYSTEMFRAME_EXECUTE_CPU  SYSTEMFRAME_EXECUTE_PPU
+            /* 11 */  SYSTEMFRAME_EXECUTE_CPU  SYSTEMFRAME_EXECUTE_PPU  SYSTEMFRAME_EXECUTE_CPU
             if ((frameticks & 1) == 0)  // (frameticks % 2 == 0) PPU extra ticks
-                SYSTEMFRAME_EXECUTE_PPU;
+            {
+                SYSTEMFRAME_EXECUTE_PPU
+            }
         }
         else  // Have breakpoint, need to check
         {
-            /*  0 */  SYSTEMFRAME_EXECUTE_BP_CPU;  SYSTEMFRAME_EXECUTE_BP_PPU;
-            /*  1 */  SYSTEMFRAME_EXECUTE_BP_CPU;  SYSTEMFRAME_EXECUTE_BP_PPU;
-            /*  2 */  SYSTEMFRAME_EXECUTE_BP_CPU;  SYSTEMFRAME_EXECUTE_BP_PPU;  SYSTEMFRAME_EXECUTE_BP_CPU;
-            /*  3 */  SYSTEMFRAME_EXECUTE_BP_CPU;  SYSTEMFRAME_EXECUTE_BP_PPU;
-            /*  4 */  SYSTEMFRAME_EXECUTE_BP_CPU;  SYSTEMFRAME_EXECUTE_BP_PPU;
-            /*  5 */  SYSTEMFRAME_EXECUTE_BP_CPU;  SYSTEMFRAME_EXECUTE_BP_PPU;  SYSTEMFRAME_EXECUTE_BP_CPU;
-            /*  6 */  SYSTEMFRAME_EXECUTE_BP_CPU;  SYSTEMFRAME_EXECUTE_BP_PPU;
-            /*  7 */  SYSTEMFRAME_EXECUTE_BP_CPU;  SYSTEMFRAME_EXECUTE_BP_PPU;
-            /*  8 */  SYSTEMFRAME_EXECUTE_BP_CPU;  SYSTEMFRAME_EXECUTE_BP_PPU;  SYSTEMFRAME_EXECUTE_BP_CPU;
-            /*  9 */  SYSTEMFRAME_EXECUTE_BP_CPU;  SYSTEMFRAME_EXECUTE_BP_PPU;
-            /* 10 */  SYSTEMFRAME_EXECUTE_BP_CPU;  SYSTEMFRAME_EXECUTE_BP_PPU;
-            /* 11 */  SYSTEMFRAME_EXECUTE_BP_CPU;  SYSTEMFRAME_EXECUTE_BP_PPU;  SYSTEMFRAME_EXECUTE_BP_CPU;
+            /*  0 */  SYSTEMFRAME_EXECUTE_BP_CPU  SYSTEMFRAME_EXECUTE_BP_PPU
+            /*  1 */  SYSTEMFRAME_EXECUTE_BP_CPU  SYSTEMFRAME_EXECUTE_BP_PPU
+            /*  2 */  SYSTEMFRAME_EXECUTE_BP_CPU  SYSTEMFRAME_EXECUTE_BP_PPU  SYSTEMFRAME_EXECUTE_BP_CPU
+            /*  3 */  SYSTEMFRAME_EXECUTE_BP_CPU  SYSTEMFRAME_EXECUTE_BP_PPU
+            /*  4 */  SYSTEMFRAME_EXECUTE_BP_CPU  SYSTEMFRAME_EXECUTE_BP_PPU
+            /*  5 */  SYSTEMFRAME_EXECUTE_BP_CPU  SYSTEMFRAME_EXECUTE_BP_PPU  SYSTEMFRAME_EXECUTE_BP_CPU
+            /*  6 */  SYSTEMFRAME_EXECUTE_BP_CPU  SYSTEMFRAME_EXECUTE_BP_PPU
+            /*  7 */  SYSTEMFRAME_EXECUTE_BP_CPU  SYSTEMFRAME_EXECUTE_BP_PPU
+            /*  8 */  SYSTEMFRAME_EXECUTE_BP_CPU  SYSTEMFRAME_EXECUTE_BP_PPU  SYSTEMFRAME_EXECUTE_BP_CPU
+            /*  9 */  SYSTEMFRAME_EXECUTE_BP_CPU  SYSTEMFRAME_EXECUTE_BP_PPU
+            /* 10 */  SYSTEMFRAME_EXECUTE_BP_CPU  SYSTEMFRAME_EXECUTE_BP_PPU
+            /* 11 */  SYSTEMFRAME_EXECUTE_BP_CPU  SYSTEMFRAME_EXECUTE_BP_PPU  SYSTEMFRAME_EXECUTE_BP_CPU
             if ((frameticks & 1) == 0)  // (frameticks % 2 == 0) PPU extra ticks
-                SYSTEMFRAME_EXECUTE_BP_PPU;
+            {
+                SYSTEMFRAME_EXECUTE_BP_PPU
+            }
         }
 
         if ((frameticks & 31) == 0)  // (frameticks % 32 == 0)
@@ -760,7 +776,7 @@ bool CMotherboard::SystemFrame()
             m_pFloppyCtl->Periodic();  // Each 32nd tick -- FDD tick
 
             // Keyboard processing
-            CSecondMemoryController* pMemCtl = static_cast<CSecondMemoryController*>(m_pSecondMemCtl);
+            CSecondMemoryController* pMemCtl = reinterpret_cast<CSecondMemoryController*>(m_pSecondMemCtl);
             if ((pMemCtl->m_Port177700 & 0200) == 0)
             {
                 uint8_t row_Y = m_scanned_key & 0xF;
@@ -798,23 +814,23 @@ bool CMotherboard::SystemFrame()
             m_pHardDrives[1]->Periodic();
 
         soundBrasErr += soundSamplesPerFrame;
-        if (2 * soundBrasErr >= 20000)
+        if (2 * soundBrasErr >= FRAMETICKS)
         {
-            soundBrasErr -= 20000;
+            soundBrasErr -= FRAMETICKS;
             DoSound();
         }
 
         if (m_TapeReadCallback != nullptr || m_TapeWriteCallback != nullptr)
         {
             tapeBrasErr += tapeSamplesPerFrame;
-            if (2 * tapeBrasErr >= 20000)
+            if (2 * tapeBrasErr >= FRAMETICKS)
             {
-                tapeBrasErr -= 20000;
+                tapeBrasErr -= FRAMETICKS;
 
                 if (m_TapeReadCallback != nullptr)  // Tape reading
                 {
                     bool tapeBit = (*m_TapeReadCallback)(1);
-                    CSecondMemoryController* pMemCtl = static_cast<CSecondMemoryController*>(m_pSecondMemCtl);
+                    CSecondMemoryController* pMemCtl = reinterpret_cast<CSecondMemoryController*>(m_pSecondMemCtl);
                     if (pMemCtl->TapeInput(tapeBit))
                     {
                         m_timerflags |= 040;  // Set bit 5 of timer state: external event ready to read
@@ -822,7 +838,7 @@ bool CMotherboard::SystemFrame()
                 }
                 else if (m_TapeWriteCallback != nullptr)  // Tape writing
                 {
-                    CSecondMemoryController* pMemCtl = static_cast<CSecondMemoryController*>(m_pSecondMemCtl);
+                    CSecondMemoryController* pMemCtl = reinterpret_cast<CSecondMemoryController*>(m_pSecondMemCtl);
                     unsigned int value = pMemCtl->TapeOutput() ? 0xffffffff : 0;
                     (*m_TapeWriteCallback)(value, 1);
                 }
@@ -831,7 +847,7 @@ bool CMotherboard::SystemFrame()
 
         if (m_SerialInCallback != nullptr && frameticks % 416 == 0)
         {
-            CFirstMemoryController* pMemCtl = static_cast<CFirstMemoryController*>(m_pFirstMemCtl);
+            CFirstMemoryController* pMemCtl = reinterpret_cast<CFirstMemoryController*>(m_pFirstMemCtl);
             if ((pMemCtl->m_Port176574 & 004) == 0)  // Not loopback?
             {
                 uint8_t b;
@@ -844,7 +860,7 @@ bool CMotherboard::SystemFrame()
         }
         if (m_SerialOutCallback != nullptr && frameticks % serialOutTicks == 0)
         {
-            CFirstMemoryController* pMemCtl = static_cast<CFirstMemoryController*>(m_pFirstMemCtl);
+            CFirstMemoryController* pMemCtl = reinterpret_cast<CFirstMemoryController*>(m_pFirstMemCtl);
             if (serialTxCount > 0)
             {
                 serialTxCount--;
@@ -870,7 +886,7 @@ bool CMotherboard::SystemFrame()
 
         if (m_NetworkInCallback != nullptr && frameticks % 64 == 0)
         {
-            CFirstMemoryController* pMemCtl = static_cast<CFirstMemoryController*>(m_pFirstMemCtl);
+            CFirstMemoryController* pMemCtl = reinterpret_cast<CFirstMemoryController*>(m_pFirstMemCtl);
             if ((pMemCtl->m_Port176564 & 004) == 0)  // Not loopback?
             {
                 uint8_t b;
@@ -886,7 +902,7 @@ bool CMotherboard::SystemFrame()
         }
         if (m_NetworkOutCallback != nullptr && frameticks % networkOutTicks == 0)
         {
-            CFirstMemoryController* pMemCtl = static_cast<CFirstMemoryController*>(m_pFirstMemCtl);
+            CFirstMemoryController* pMemCtl = reinterpret_cast<CFirstMemoryController*>(m_pFirstMemCtl);
             if (networkTxCount > 0)
             {
                 networkTxCount--;
@@ -913,9 +929,9 @@ bool CMotherboard::SystemFrame()
             }
         }
 
-        if (m_ParallelOutCallback != nullptr)
+        if (m_ParallelOutCallback != nullptr && !m_okSoundCovox)
         {
-            CSecondMemoryController* pMemCtl = static_cast<CSecondMemoryController*>(m_pSecondMemCtl);
+            CSecondMemoryController* pMemCtl = reinterpret_cast<CSecondMemoryController*>(m_pSecondMemCtl);
             if ((pMemCtl->m_Port177102 & 0x80) == 0x80 && (pMemCtl->m_Port177101 & 0x80) == 0x80)
             {
                 // Strobe set, Printer Ack set => reset Printer Ack
@@ -933,7 +949,7 @@ bool CMotherboard::SystemFrame()
 
         frameticks++;
     }
-    while (frameticks < 20000);
+    while (frameticks < FRAMETICKS);
 
     return true;
 }
@@ -974,12 +990,12 @@ void CMotherboard::KeyboardEvent(uint8_t scancode, bool okPressed)
 void CMotherboard::SaveToImage(uint8_t* pImage)
 {
     // Board data                                       // Offset Size
-    uint16_t* pwImage = (uint16_t*) (pImage + 32);      //   32    --
+    uint16_t* pwImage = reinterpret_cast<uint16_t*>(pImage + 32);  //   32    --
     *pwImage++ = m_timer;                               //   32     2
     *pwImage++ = m_timerreload;                         //   34     2
     *pwImage++ = m_timerflags;                          //   36     2
     *pwImage++ = m_timerdivider;                        //   38     2
-    uint32_t* pdwImage = (uint32_t*)pwImage;            //   40    --
+    uint32_t* pdwImage = reinterpret_cast<uint32_t*>(pwImage);  //   40    --
     memcpy(pdwImage, m_chancputx, 3 * 4); pdwImage += 3;//   40    12
     memcpy(pdwImage, m_chancpurx, 2 * 4); pdwImage += 2;//   52     8
     memcpy(pdwImage, m_chanpputx, 2 * 4); pdwImage += 2;//   60     8
@@ -990,7 +1006,7 @@ void CMotherboard::SaveToImage(uint8_t* pImage)
     *pbImage++ = 0;                                     //   82     1  // not used
     *pbImage++ = m_scanned_key;                         //   83     1
     memcpy(pbImage, m_kbd_matrix, 2 * 16); pbImage += 32;//  84    32
-    pwImage = (uint16_t*) pbImage;                      //  116    --
+    pwImage = reinterpret_cast<uint16_t*>(pbImage);     //  116    --
     *pwImage++ = m_multiply;                            //  116     2
     memcpy(pwImage, freq_per, 12); pwImage += 6;        //  118    12
     memcpy(pwImage, freq_out, 12); pwImage += 6;        //  130    12
@@ -1030,7 +1046,7 @@ void CMotherboard::LoadFromImage(const uint8_t* pImage)
     m_timerreload = *pwImage++;                         //   34     2
     m_timerflags = *pwImage++;                          //   36     2
     m_timerdivider = *pwImage++;                        //   38     2
-    uint32_t* pdwImage = (uint32_t*)pwImage;            //   40    --
+    const uint32_t* pdwImage = reinterpret_cast<const uint32_t*>(pwImage);  //   40    --
     memcpy(m_chancputx, pdwImage, 3 * 4); pdwImage += 3;//   40    12
     memcpy(m_chancpurx, pdwImage, 2 * 4); pdwImage += 2;//   52     8
     memcpy(m_chanpputx, pdwImage, 2 * 4); pdwImage += 2;//   60     8
@@ -1041,7 +1057,7 @@ void CMotherboard::LoadFromImage(const uint8_t* pImage)
     pbImage++;                                          //   82     1  // not used
     m_scanned_key = *pbImage++;                         //   83     1
     memcpy(m_kbd_matrix, pbImage, 2 * 16); pbImage += 32;//  84    32
-    pwImage = (const uint16_t*) pbImage;                //  116    --
+    pwImage = reinterpret_cast<const uint16_t*>(pbImage);  //  116    --
     m_multiply = *pwImage++;                            //  116     2
     memcpy(freq_per, pwImage, 12); pwImage += 6;        //  118    12
     memcpy(freq_out, pwImage, 12); pwImage += 6;        //  130    12
@@ -1169,7 +1185,6 @@ uint8_t CMotherboard::ChanRxStateGetCPU(uint8_t chan)
 {
     chan &= 3;
     ASSERT(chan < 2);
-
     return (m_chancpurx[chan].ready << 7) | (m_chancpurx[chan].irq << 6);
 }
 
@@ -1182,21 +1197,16 @@ uint8_t CMotherboard::ChanTxStateGetCPU(uint8_t chan)
 
 uint8_t CMotherboard::ChanRxStateGetPPU()
 {
-    uint8_t res;
-
-    res = (m_irq_cpureset << 6) | (m_chanppurx[2].ready << 5) | (m_chanppurx[1].ready << 4) | (m_chanppurx[0].ready << 3) |
-          (m_chanppurx[2].irq << 2)   | (m_chanppurx[1].irq << 1)   | (m_chanppurx[0].irq);
-
-
+    uint8_t res =
+        (m_irq_cpureset << 6) | (m_chanppurx[2].ready << 5) | (m_chanppurx[1].ready << 4) | (m_chanppurx[0].ready << 3) |
+        (m_chanppurx[2].irq << 2)   | (m_chanppurx[1].irq << 1)   | (m_chanppurx[0].irq);
     return res;
 }
 uint8_t CMotherboard::ChanTxStateGetPPU()
 {
-    uint8_t res;
-    res = (m_chanpputx[1].ready << 4) | (m_chanpputx[0].ready << 3) | (m_chan0disabled << 2) |
-          (m_chanpputx[1].irq << 1)   | (m_chanpputx[0].irq);
-
-
+    uint8_t res =
+        (m_chanpputx[1].ready << 4) | (m_chanpputx[0].ready << 3) | (m_chan0disabled << 2) |
+        (m_chanpputx[1].irq << 1)   | (m_chanpputx[0].irq);
     return res;
 }
 void CMotherboard::ChanRxStateSetCPU(uint8_t chan, uint8_t state)
@@ -1454,7 +1464,7 @@ void CMotherboard::SetFloppyData(uint16_t val)
 
 //////////////////////////////////////////////////////////////////////
 
-uint16_t CMotherboard::GetKeyboardRegister(void)
+uint16_t CMotherboard::GetKeyboardRegister()
 {
     uint16_t w7214 = GetRAMWord(0, 07214);
     uint8_t b22556 = GetRAMByte(0, 022556);
@@ -1482,10 +1492,8 @@ uint16_t CMotherboard::GetKeyboardRegister(void)
     return res;
 }
 
-void CMotherboard::DoSound(void)
+void CMotherboard::DoSound()
 {
-    int global;
-
     freq_out[0] = (m_timer >> 3) & 1; //8000
     if (m_multiply >= 4)
         freq_out[0] = 0;
@@ -1495,7 +1503,7 @@ void CMotherboard::DoSound(void)
     freq_out[3] = (m_timer >> 8) & 1; //250
     freq_out[4] = (m_timer >> 10) & 1; //60
 
-    global = !(freq_out[0] & freq_enable[0]) & ! (freq_out[1] & freq_enable[1]) & !(freq_out[2] & freq_enable[2]) & !(freq_out[3] & freq_enable[3]) & !(freq_out[4] & freq_enable[4]);
+    int global = !(freq_out[0] & freq_enable[0]) & ! (freq_out[1] & freq_enable[1]) & !(freq_out[2] & freq_enable[2]) & !(freq_out[3] & freq_enable[3]) & !(freq_out[4] & freq_enable[4]);
     if (freq_enable[5] == 0)
         global = 0;
     else
@@ -1518,7 +1526,15 @@ void CMotherboard::DoSound(void)
         valueay |= bufferay[1];
         m_pSoundAY[2]->Callback(bufferay, sizeof(bufferay));
         valueay |= bufferay[1];
-        value |= valueay << 7;
+        value ^= valueay << 7;
+    }
+
+    if (m_okSoundCovox)
+    {
+        // Get byte from printer port output register, inverted, and merge it with the channel data
+        CSecondMemoryController* pSecondMemCtl = dynamic_cast<CSecondMemoryController*>(m_pSecondMemCtl);
+        uint8_t valuecovox = pSecondMemCtl->m_Port177100 ^ 0xff;
+        value ^= valuecovox << 7;
     }
 
     if (m_SoundGenCallback != nullptr)
@@ -1619,7 +1635,7 @@ void CMotherboard::SetSerialCallbacks(SERIALINCALLBACK incallback, SERIALOUTCALL
 
 void CMotherboard::SetParallelOutCallback(PARALLELOUTCALLBACK outcallback)
 {
-    CSecondMemoryController* pMemCtl = static_cast<CSecondMemoryController*>(m_pSecondMemCtl);
+    CSecondMemoryController* pMemCtl = reinterpret_cast<CSecondMemoryController*>(m_pSecondMemCtl);
     if (outcallback == nullptr)  // Reset callback
     {
         pMemCtl->m_Port177101 &= ~2;  // Reset OnLine flag
