@@ -64,16 +64,20 @@ bool Emulator_LoadImage(const QString &sFilePath);
 // Instruction history, recorded always for both CPU and PPU
 const int INSTR_HISTORY_SIZE = 256;  // Must be a power of two
 
+// A record is either an executed instruction or an interrupt taken by the processor
 struct InstructionRecord
 {
-    quint16 pc;
-    quint16 words[3];  // Opcode and two next words; the instruction is at most 3 words long
-    quint16 psw;       // Processor status word before the instruction; bit 0400 = HALT mode
+    quint16 pc;        // Instruction: its address; interrupt: PC where the interrupt appeared
+    quint16 words[3];  // Instruction: opcode and two next words, the instruction is at most 3 words long;
+    // interrupt: vector, new PC, new PSW
+    quint16 psw;       // Instruction: PSW before it; interrupt: new PSW; bit 0400 = HALT mode
+    bool    interrupt; // true = interrupt record
 };
 
 int Emulator_GetHistoryLength(bool okCpuPpu);  // okCpuPpu: true = CPU, false = PPU
 const InstructionRecord& Emulator_GetHistoryRecord(bool okCpuPpu, int index);  // index 0 = most recent
 void Emulator_ClearHistory();
+LPCTSTR Emulator_GetInterruptName(quint16 vector);  // Short name of the interrupt vector
 
 
 //////////////////////////////////////////////////////////////////////
