@@ -75,6 +75,7 @@ public:
     void cmdPrintAllBreakpoints(const ConsoleCommandParams& params);
     void cmdRemoveBreakpointAtAddress(const ConsoleCommandParams& params);
     void cmdRemoveAllBreakpoints(const ConsoleCommandParams& params);
+    void cmdCalculateFloatNumber(const ConsoleCommandParams& params);
 };
 
 #endif // QCONSOLEVIEW_H

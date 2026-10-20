@@ -23,6 +23,7 @@ typedef char TCHAR;
 #define _tcsicmp    _stricmp
 #define _tcscmp     strcmp
 #define _tcslen     strlen
+#define _tcstod     strtod
 #define _sntprintf  _snprintf
 #define _T(x)       x
 

@@ -419,6 +419,26 @@ void QConsoleView::cmdPrintMemoryDumpAtPC(const ConsoleCommandParams &)
     printMemoryDump(pProc, address);
 }
 
+void QConsoleView::cmdCalculateFloatNumber(const ConsoleCommandParams& params)
+{
+    quint16 O1 = params.paramOct1;
+    quint16 O2 = params.paramOct2;
+
+    unsigned long mant = ((((unsigned long)O1 << 16) | O2) & 0x7FFFFFL) | 0x800000L;
+    short exp = (O1 >> 7) & 0xFF;
+    if (exp == 0)  // zero exponent means real zero (0.0)
+    {
+        printLine(QString("exp: 0, mant: 0x%1").arg(mant, 0, 16));
+        printLine("0");
+        return;
+    }
+    exp -= 128;
+    printLine(QString("exp: %1, mant: 0x%2").arg(exp).arg(mant, 0, 16));
+    char buffer[32];
+    Disasm_FloatToString(O1, O2, buffer, sizeof(buffer) / sizeof(buffer[0]));
+    printLine(QString::fromLatin1(buffer));
+}
+
 void QConsoleView::cmdRunToAddress(const ConsoleCommandParams & params)
 {
     quint16 value = params.paramOct1;
@@ -534,7 +554,7 @@ static ConsoleCommands[] =
     { _T("b"), ARGINFO_NONE, &QConsoleView::cmdPrintAllBreakpoints },
     { _T("bc%ho"), ARGINFO_OCT, &QConsoleView::cmdRemoveBreakpointAtAddress },
     { _T("bc"), ARGINFO_NONE, &QConsoleView::cmdRemoveAllBreakpoints },
-//    { _T("fc%ho %ho"), ARGINFO_OCT_OCT, &QConsoleView::cmdCalculateFloatNumber },
+    { _T("fc%ho %ho"), ARGINFO_OCT_OCT, &QConsoleView::cmdCalculateFloatNumber },
 };
 const size_t ConsoleCommandsCount = sizeof(ConsoleCommands) / sizeof(ConsoleCommands[0]);
 

@@ -12,6 +12,7 @@
 
 // C RunTime Header Files
 #include <string.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
