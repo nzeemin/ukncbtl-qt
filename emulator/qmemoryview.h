@@ -19,7 +19,6 @@ public:
 
 public slots:
     void setMode(int mode);  // Select the memory mode: from the tab bar, the context menu, the Space key
-    void changeMemoryMode();
     void changeWordByteMode();
     void changeNumeralMode();
     void gotoAddress();

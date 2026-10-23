@@ -104,9 +104,17 @@ void QMemoryView::updateScrollPos()
     m_scrollbar->setValue(m_wBaseAddress);
 }
 
+static const char * GetMemoryModeName(int mode)
+{
+    if (mode < 0 || mode > MEMMODE_LAST)
+        return "UKWN";  // Unknown mode
+    return MemoryView_ModeNames[mode];
+}
+
 void QMemoryView::updateWindowText()
 {
-    parentWidget()->setWindowTitle(tr("Memory"));  // The current mode is shown by the tab bar
+    QString buffer = tr("Memory - %1").arg(GetMemoryModeName(m_Mode));
+    parentWidget()->setWindowTitle(buffer);
 }
 
 void QMemoryView::updateLayout()
@@ -158,18 +166,6 @@ void QMemoryView::contextMenuEvent(QContextMenuEvent *event)
     QMenu menu(this);
     menu.addAction(QIcon(":/images/iconEditAddress.svg"), tr("Go to Address..."), this, SLOT(gotoAddress()));
     menu.addSeparator();
-
-    for (int mode = 0; mode <= MEMMODE_LAST; mode++)
-    {
-        const char * modeName = MemoryView_ModeNames[mode];
-        QAction * action = menu.addAction(modeName, this, SLOT(changeMemoryMode()));
-        action->setCheckable(true);
-        action->setData(mode);
-        if (m_Mode == mode)
-            action->setChecked(true);
-    }
-
-    menu.addSeparator();
     menu.addAction(QIcon(":/images/iconWordByte.svg"), tr("Words / Bytes"), this, SLOT(changeWordByteMode()));
     menu.addAction(QIcon(":/images/iconHex.svg"), tr("Octal / Hex"), this, SLOT(changeNumeralMode()));
 
@@ -191,13 +187,7 @@ void QMemoryView::setMode(int mode)
     }
 
     repaint();
-}
-
-void QMemoryView::changeMemoryMode()
-{
-    QAction * action = qobject_cast<QAction*>(sender());
-    if (action == nullptr) return;
-    setMode(action->data().toInt());
+    updateWindowText();
 }
 
 void QMemoryView::changeWordByteMode()
